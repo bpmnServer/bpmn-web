@@ -48,26 +48,34 @@ Included is a sample web application (running Node.js and Express.js) to allow y
 
 This package requires Node.js and an access to MongoDB ()
 if you don't have MongoDB already installed you can [create a free cloud account here](http://bit.ly/cyd-atlas)
-
 ```javascript
-$ mkdir myBPMN
 
-$ cd myBPMN
+git clone https://github.com/bpmnServer/bpmn-web.git
 
-$ npm install bpmn-server
+cd bpmn-web
 
-$ cp node_modules/bpmn-server/WebApp/. ./  -r
+npm install
 
-Windows: 
-xcopy /e /i /s /y node_modules\bpmn-server\WebApp\*.* .
+npm run setup
 ```
+the above setup command will copy .env and configuration files
 Edit .env file to have MongoDB point to your server or free cloud account
+
 ```javascript
 API_KEY=12345
 MONGO_DB_URL=mongodb://0.0.0.0:27017/bpmn <---- point to your MONGODB
 MONGO_DB_NAME=bpmn
 DEFINITIONS_PATH="./processes/"
 SESSION_SECRET=omni-secret
+```
+
+```javascript
+npm start
+## To Update
+```javascript
+git pull
+npm update
+
 ```
 ## To start server
 ```
