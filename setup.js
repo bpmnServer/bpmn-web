@@ -10,18 +10,64 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = require(".");
-console.log('This routine will setup bpmn-server database');
 const fs = require('fs');
+
+const readline = require("readline");
+
+const cl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
+
+const question = function (q) {
+    return new Promise((res, rej) => {
+        cl.question(q, answer => {
+            res(answer);
+        })
+    });
+};
+
+console.log('This routine will copy initial files and setup bpmn-server database');
+
 const cwd = process.cwd();
-let configuration;
-const configPath = cwd + '/configuration.js';
-if (fs.existsSync(configPath)) {
-    configuration = require(configPath).configuration;
+copyFiles();
+promptForEdit();
+if (checkConfiguration())
     install();
+
+process.exit();
+
+
+async function promptForEdit() { 
+    let command = await question('Please edit ".env" file to point to your MongoDB commands\n\r> Press Enter when done.');
+    console.log(' continue...');
+    return command;
 }
-else {
-    console.log(`**Error** configuration.js file does not exist in this folder '${cwd}'**`);
-    console.log("please run this script from the folder containing 'configuration.js'");
+function checkConfiguration() {
+    let configuration;
+    const configPath = cwd + '/configuration.js';
+    if (fs.existsSync(configPath)) {
+        configuration = require(configPath).configuration;
+        return true;
+    }
+    else {
+        console.log(`**Error** configuration.js file does not exist in this folder '${cwd}'**`);
+        console.log("please run this script from the folder containing 'configuration.js'");
+        return false;
+    }
+
+}
+function copyFiles() {
+    copyFile('sample.env', '.env');
+    copyFile('sample_configuration.ts', 'configuration.ts');
+    copyFile('sample_configuration.js', 'configuration.js');
+    copyFile('sample_configuration.js.map', 'configuration.js.map');
+    copyFile('sample_appDelegate.ts', 'appDelegate.ts');
+    copyFile('sample_appDelegate.js', 'appDelegate.js');
+    copyFile('sample_appDelegate.js.map', 'appDelegate.js.map');
+}
+function copyFile(from,to) {
+    if (!fs.existsSync(to)) {
+        fs.copyFileSync(from, to);
+        console.log(`file ${to} created.`);
+    }
 }
 function install() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -41,7 +87,6 @@ function install() {
             console.log(exc);
         }
         console.log('---done.');
-        process.exit();
     });
 }
 //# sourceMappingURL=setup.js.map
