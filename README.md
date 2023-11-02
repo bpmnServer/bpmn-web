@@ -9,40 +9,9 @@ BPMN 2.0 Modeling, Execution and Presistence, an open source Workflow Server for
 This package is designed specifically for Node.js and TypeScript
 
 
-## Table of Contents
-- [Process modeller](#process-modeller)
-- [Execution](#Process-execution)
-- [Installation](#Installation)
-- [Demo](#Demo)
-- [Acknowledgments](#acknowledgments)
-
-### Documentation
-- [Featuers](./docs/features)
-- [Examples](./docs/examples.md)
-
-# Process modeller
-
-A web based modeler is included based on http://bpmn.io , models definitions are saved at your server
-![Modeller](./docs/model-demo.gif)
-
-
-# Process Execution
-
-bpmn-server provides an bpmnEngine to execute your workflow definition supporting most of BPMN 2.0 elements
-
-# Process Server
-
-provides an environment to presist execution Instances while running and communicate with your application.
-
-Applications can monitor and communicate to Instances whether they are running or offline, allowing user interface to query and process Workflow steps
-
-# Data Queries 
-
-Since instances are saved in MongoDB you can easily query your instances (running or completed)
-
 # Sample Web App
 
-Included is a sample web application (running Node.js and Express.js) to allow you to visualize your workflow 
+This is a sample web application (running Node.js and Express.js) to allow you to visualize your workflow 
 
 # Installation
 

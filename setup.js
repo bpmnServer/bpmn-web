@@ -58,10 +58,9 @@ function copyFiles() {
     copyFile('sample.env', '.env');
     copyFile('sample_configuration.ts', 'configuration.ts');
     copyFile('sample_configuration.js', 'configuration.js');
-    copyFile('sample_configuration.js.map', 'configuration.js.map');
     copyFile('sample_appDelegate.ts', 'appDelegate.ts');
     copyFile('sample_appDelegate.js', 'appDelegate.js');
-    copyFile('sample_appDelegate.js.map', 'appDelegate.js.map');
+
 }
 function copyFile(from,to) {
     if (!fs.existsSync(to)) {
