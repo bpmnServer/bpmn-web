@@ -1,9 +1,6 @@
 
 import { BPMNServer, dateDiff, Behaviour_names } from '../';
 
-//const config = require('../configuration.js').configuration;
-//const bpmnServer = new BPMNServer(config);
-//const definitions = bpmnServer.definitions;
 
 
 export class ModelerWProp {

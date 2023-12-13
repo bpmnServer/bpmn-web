@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Modeller = void 0;
 const __1 = require("../");
-const config = require('../configuration.js').configuration;
+const config = require('../WorkflowApp/configuration.js').configuration;
 const bpmnServer = new __1.BPMNServer(config);
 const definitions = bpmnServer.definitions;
 let xml, base_url, title, processName;

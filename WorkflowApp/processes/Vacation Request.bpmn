@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:collaboration id="Collaboration_04y2yh2">
+    <bpmn2:participant id="Participant_0r7glje" processRef="Process_1" />
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:startEvent id="StartEvent_1" camunda:initiator="requester">
+      <bpmn2:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="JavaScript">/*console.log('appDel',appDelegate);
+console.log('services',appServices); */
+console.log('inst ', item.token.execution.getItems().length);</camunda:script>
+        </camunda:executionListener>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_0xa1hl7</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_0xa1hl7" sourceRef="StartEvent_1" targetRef="Request" />
+    <bpmn2:sequenceFlow id="Flow_1ig8mx7" sourceRef="Request" targetRef="Approve" />
+    <bpmn2:sequenceFlow id="Flow_1sy0en3" sourceRef="Approve" targetRef="Event_0gvxbci" />
+    <bpmn2:endEvent id="Event_0gvxbci">
+      <bpmn2:incoming>Flow_1sy0en3</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:userTask id="Approve" name="Approve">
+      <bpmn2:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="JavaScript">this.assignee='Supervisor';</camunda:script>
+        </camunda:executionListener>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1ig8mx7</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1sy0en3</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:userTask id="Request" name="Request" camunda:assignee="$(this.data.requester)">
+      <bpmn2:incoming>Flow_0xa1hl7</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1ig8mx7</bpmn2:outgoing>
+    </bpmn2:userTask>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_04y2yh2">
+      <bpmndi:BPMNShape id="Participant_0r7glje_di" bpmnElement="Participant_0r7glje" isHorizontal="true">
+        <dc:Bounds x="160" y="46" width="600" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1sy0en3_di" bpmnElement="Flow_1sy0en3">
+        <di:waypoint x="570" y="160" />
+        <di:waypoint x="632" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ig8mx7_di" bpmnElement="Flow_1ig8mx7">
+        <di:waypoint x="390" y="160" />
+        <di:waypoint x="470" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xa1hl7_di" bpmnElement="Flow_0xa1hl7">
+        <di:waypoint x="238" y="160" />
+        <di:waypoint x="290" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="202" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0gvxbci_di" bpmnElement="Event_0gvxbci">
+        <dc:Bounds x="632" y="142" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1aanvd6_di" bpmnElement="Approve">
+        <dc:Bounds x="470" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0jq3ugg_di" bpmnElement="Request">
+        <dc:Bounds x="290" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

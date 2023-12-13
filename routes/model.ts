@@ -21,11 +21,10 @@ const awaitHandlerFactory = (middleware) => {
         }
     }
 }
+const config = require('../WorkflowApp/configuration.js').configuration;
 
 export class Model extends Common {
     config() {
-
-        const config = require('../configuration.js').configuration;
 
         const bpmnServer = this.webApp.bpmnServer;
 
@@ -165,7 +164,6 @@ export class Model extends Common {
             let output = [];
 
             console.log('model.ts/:process ');
-            const config = require('../configuration.js').configuration;
             let xml, base_url, title, processName;
 
             processName = request.params.process;
@@ -181,7 +179,6 @@ export class Model extends Common {
             let output = [];
 
             console.log('model.ts/:process ');
-            const config = require('../configuration.js').configuration;
             let xml, base_url, title, processName;
 
             processName = request.params.process;

@@ -15,8 +15,12 @@ This is a sample web application (running Node.js and Express.js) to allow you t
 
 # Installation
 
-This package requires Node.js and an access to MongoDB ()
-if you don't have MongoDB already installed you can [create a free cloud account here](http://bit.ly/cyd-atlas)
+## bpmn-server and bpmn-web
+This installs bpmn-server along with a sample web application
+It requires 
+- Node.js 
+- MongoDB , you can install it locally you can [create a free cloud account here](http://bit.ly/cyd-atlas)
+
 ```javascript
 
 git clone https://github.com/bpmnServer/bpmn-web.git
@@ -46,7 +50,7 @@ git pull
 npm update
 
 ```
-## To start server
+### To start server
 ```
 npm run start
 ```
@@ -62,7 +66,7 @@ App is running at http://localhost:3000 in development mode
 ```
 Use your browser to view the bpmn-server running
 
-## to update to latest release
+### to update to latest release
 
 ```
 $ npm update bpmn-server
@@ -99,6 +103,27 @@ a full demo site is available @ http://bpmn.omniworkflow.com
     console.log(`that is it!, process is now complete status=<${response.execution.status}>`)
 
 ```
+## BPMN-Client (for remote access)
+
+This requires a Server to be installed or using cloud server on https://bpmn.omniworkflow.com
+
+create a folder or use an existing project
+```js
+git clone https://github.com/bpmnServer/bpmn-client-sample.git 
+copy sample.env .env
+```
+Edit .env file to point to the server and set api-key 
+
+```js
+npm install
+To Update
+git pull
+npm update
+```
+
+Add your own code in this directory
+
+
 for more complete examples see [Examples](./docs/examples.md)
 
 # Acknowledgments

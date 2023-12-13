@@ -1,0 +1,20 @@
+"use strict";
+const dotenv = require('dotenv');
+dotenv.config();
+
+const mailer = require("../../../userAccess/config/mail");
+
+
+run();
+async function run() {
+	
+  const info = await mailer.sendMail({
+    from: '"BPMN Server👻" <bpmn.server@gmail.com>', // sender address
+    to: "ralphhanna@hotmail.com, hanna.ralph@gmail.com", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
+  });
+
+  console.log("Message sent: %s", info.messageId);
+}

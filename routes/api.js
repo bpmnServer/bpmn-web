@@ -49,14 +49,14 @@ class API extends common_1.Common {
         var router = express.Router();
         var bpmnServer = this.bpmnServer;
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            //console.log(request.body);
             let query;
             if (request.body.query) {
                 query = request.body.query;
             }
             else
                 query = request.body;
-            console.log(query);
+            //console.log(query);
             let items;
             let errors;
             try {
@@ -64,19 +64,19 @@ class API extends common_1.Common {
             }
             catch (exc) {
                 errors = exc.toString();
-                console.log(errors);
+                //console.log(errors);
             }
             response.json({ errors: errors, items });
         })));
         router.get('/datastore/findInstances', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
+            //console.log(request.body);
             let query;
             if (request.body.query) {
                 query = request.body.query;
             }
             else
                 query = request.body;
-            console.log(query);
+            //console.log(query);
             let instances;
             let errors;
             try {
@@ -108,25 +108,25 @@ class API extends common_1.Common {
                 let name = request.params.name;
                 if (!name)
                     name = request.body.name;
-                console.log(' starting ' + name);
-                console.log(request.body);
+                //console.log(' starting ' + name);
+                //console.log(request.body);
                 let data = request.body.data;
-                let startNodeId, options = {}, userId;
+                let startNodeId, options = {}, userName;
                 if (request.body.startNodeId) {
                     startNodeId = request.body.startNodeId;
                 }
                 if (request.body.options) {
                     options = request.body.options;
                 }
-                if (options['userId'] !== undefined) {
-                    userId = options['userId'];
+                if (options['userName'] !== undefined) {
+                    userName = options['userName'];
                 }
-                else if (request.body.userId) {
-                    userId = request.body.userId;
+                else if (request.body.userName) {
+                    userName = request.body.userName;
                 }
                 let context;
-                console.log(data, userId);
-                context = yield this.bpmnServer.engine.start(name, data, startNodeId, userId, options);
+                //console.log(data,userName);
+                context = yield this.bpmnServer.engine.start(name, data, startNodeId, userName, options);
                 response.json(context.instance);
             }
             catch (exc) {
@@ -135,8 +135,8 @@ class API extends common_1.Common {
         })));
         ///
         router.put('/engine/assign', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log(request.body);
-            let query, data, userId, assignment;
+            //console.log(request.body);
+            let query, data, userName, assignment;
             if (request.body.query) {
                 query = request.body.query;
             }
@@ -146,15 +146,15 @@ class API extends common_1.Common {
             if (request.body.assignment) {
                 assignment = request.body.assignment;
             }
-            if (request.body.userId) {
-                userId = request.body.userId;
+            if (request.body.userName) {
+                userName = request.body.userName;
             }
-            console.log(query);
+            //console.log(query);
             let context;
             let instance;
             let errors;
             try {
-                context = yield this.bpmnServer.engine.assign(query, data, userId, assignment);
+                context = yield this.bpmnServer.engine.assign(query, data, assignment, userName);
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -167,8 +167,8 @@ class API extends common_1.Common {
         })));
         ///
         router.put('/engine/invoke', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            console.log('---------invoke', request.body);
-            let query, data, userId, options;
+            //console.log('---------invoke',request.body);
+            let query, data, userName, options;
             if (request.body.query) {
                 query = request.body.query;
             }
@@ -178,14 +178,14 @@ class API extends common_1.Common {
             if (request.body.options) {
                 options = request.body.options;
             }
-            if (request.body.userId) {
-                userId = request.body.userId;
+            if (request.body.userName) {
+                userName = request.body.userName;
             }
             let context;
             let instance;
             let errors;
             try {
-                context = yield this.bpmnServer.engine.invoke(query, data, userId, options);
+                context = yield this.bpmnServer.engine.invoke(query, data, userName, options);
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -203,7 +203,7 @@ class API extends common_1.Common {
             }
             else
                 query = request.body;
-            console.log("Query", query);
+            //console.log("Query", query);
             let context;
             let instance;
             let errors;
@@ -223,13 +223,13 @@ class API extends common_1.Common {
         router.post('/engine/throwMessage', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let messageId = request.body.messageId;
-                console.log(' MessageId ' + messageId);
+                //console.log(' MessageId ' + messageId);
                 let data = request.body.data;
                 let messageMatchingKey = {};
                 if (request.body.messageMatchingKey)
                     messageMatchingKey = request.body.messageMatchingKey;
                 let context;
-                console.log(data);
+                //console.log(data);
                 context = yield this.bpmnServer.engine.throwMessage(messageId, data, messageMatchingKey);
                 if (context)
                     response.json(context.instance);
@@ -252,7 +252,7 @@ class API extends common_1.Common {
         router.post('/engine/throwSignal', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let signalId = request.body.signalId;
-                console.log(' Signal Id: ' + signalId);
+                //console.log(' Signal Id: ' + signalId);
                 let data = request.body.data;
                 let messageMatchingKey = {};
                 if (request.body.messageMatchingKey)
@@ -272,9 +272,9 @@ class API extends common_1.Common {
             let name = request.params.name;
             if (!name)
                 name = request.body.name;
-            console.log(' importing: ' + name);
+            //console.log(' importing: ' + name);
             //console.log('request', request);
-            console.log('request.body', request.body);
+            //console.log('request.body',request.body);
             var fstream;
             var files = [];
             try {
@@ -327,10 +327,10 @@ class API extends common_1.Common {
             return __awaiter(this, void 0, void 0, function* () {
                 let name = req.body.name;
                 let newName = req.body.newName;
-                console.log('renaming ', name, newName);
+                //console.log('renaming ', name, newName);
                 try {
                     var ret = yield bpmnServer.definitions.renameModel(name, newName);
-                    console.log('ret:', ret);
+                    //console.log('ret:',ret);
                     response.json(ret);
                 }
                 catch (exc) {
@@ -342,10 +342,10 @@ class API extends common_1.Common {
         router.post('/definitions/delete', loggedIn, function (req, response) {
             return __awaiter(this, void 0, void 0, function* () {
                 let name = req.body.name;
-                console.log('deleting ', name);
+                //console.log('deleting ', name);
                 try {
                     var ret = yield bpmnServer.definitions.deleteModel(name);
-                    console.log('ret: ', ret);
+                    //console.log('ret: ',ret);
                     response.json(ret);
                 }
                 catch (exc) {
@@ -357,13 +357,13 @@ class API extends common_1.Common {
         router.get('/definitions/list', loggedIn, function (req, response) {
             return __awaiter(this, void 0, void 0, function* () {
                 let list = yield bpmnServer.definitions.getList();
-                console.log(list);
+                //console.log(list);
                 response.json(list);
             });
         });
         router.get('/definitions/load/:name?', loggedIn, function (request, response) {
             return __awaiter(this, void 0, void 0, function* () {
-                console.log(request.params);
+                //console.log(request.params);
                 let name = request.params.name;
                 let definition = yield bpmnServer.definitions.load(name);
                 response.json(JSON.parse(definition.getJson()));
@@ -376,7 +376,7 @@ class API extends common_1.Common {
             }
             else
                 query = request.body;
-            console.log(query);
+            //console.log(query);
             let errors;
             let result;
             try {
@@ -388,24 +388,6 @@ class API extends common_1.Common {
             }
             response.json({ errors: errors, result });
         })));
-        router.get('/shutdown', loggedIn, function (req, res) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let instanceId = req.query.id;
-                yield this.bpmnServer.cache.shutdown();
-                let output = ['Complete ' + instanceId];
-                console.log(" deleted");
-                display(res, 'Show', output);
-            });
-        });
-        router.get('/restart', loggedIn, function (req, res) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let instanceId = req.query.id;
-                yield this.bpmnServer.cache.restart();
-                let output = ['Complete ' + instanceId];
-                console.log(" deleted");
-                display(res, 'Show', output);
-            });
-        });
         router.put('/rules/invoke', loggedIn, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             /*
              *
@@ -431,36 +413,5 @@ class API extends common_1.Common {
     }
 }
 exports.API = API;
-function display(res, title, output, logs = [], items = []) {
-    return __awaiter(this, void 0, void 0, function* () {
-        console.log(" Display Started");
-        var instances = yield this.bpmnServer.dataStore.findInstances({}, 'full');
-        let waiting = yield this.bpmnServer.dataStore.findItems({ items: { status: 'wait' } });
-        waiting.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
-        });
-        let engines = this.bpmnServer.cache.list();
-        engines.forEach(engine => {
-            engine.fromNow = (0, __1.dateDiff)(engine.startedAt);
-            engine.fromLast = (0, __1.dateDiff)(engine.lastAt);
-        });
-        instances.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
-            if (item.endedAt)
-                item.endFromNow = (0, __1.dateDiff)(item.endedAt);
-            else
-                item.endFromNow = '';
-        });
-        res.render('index', {
-            title: title, output: output,
-            engines,
-            procs: this.bpmnServer.definitions.getList(),
-            debugMsgs: [],
-            waiting: waiting,
-            instances,
-            logs, items
-        });
-    });
-}
 exports.default = router;
 //# sourceMappingURL=api.js.map

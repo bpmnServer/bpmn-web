@@ -5,7 +5,6 @@ var bodyParser = require('body-parser')
 const FS = require('fs');
 
 import { BPMNServer   } from '..';
-import { configuration as config} from '../configuration';
 import { docsFolder } from '..';
 import { Common } from './common';
 

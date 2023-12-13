@@ -1,7 +1,7 @@
 
 import { BPMNServer, dateDiff, Behaviour_names } from '../';
 
-const config = require('../configuration.js').configuration;
+const config = require('../WorkflowApp/configuration.js').configuration;
 
 
 

@@ -1,7 +1,7 @@
 extends layoutHome
 
 block content
-	h1 bpmn-server Workbench
+	h1 bpmn-server Workbench Demo
 	include includes/dashboardHeader.pug
 
 	script(type="text/javascript").
@@ -9,14 +9,11 @@ block content
 			$( "#tabs" ).tabs();
 		} );
 
-
 	div(id="tab13s")
 		div(id="processes",style="border-bottom: solid;border-width: thin;")
 			include includes/processes.pug
 		div(id="tasks")
 			include includes/tasks.pug
-		div(id="engines")
-			include includes/engines.pug
 		div(id="instances")
 			include includes/instances.pug
 

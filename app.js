@@ -2,27 +2,23 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebApp = void 0;
 console.log("bpmn-server WebApp.ts version " + getVersion());
+const flash = require('connect-flash');
+const UserManager_1 = require("./userAccess/UserManager");
 /**
  * Module dependencies.
  */
+const dotenv = require('dotenv');
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const errorHandler = require('errorhandler');
-const lusca = require('lusca');
-const dotenv = require('dotenv');
-const MongoStore = require('connect-mongo')(session);
-const flash = require('express-flash');
 const path = require('path');
-const mongoose = require('mongoose');
-//NOPASSPORT const passport = require('passport');
-//const sass = require('node-sass-middleware');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 const _1 = require("./");
-const configuration_1 = require("./configuration");
+const configuration_1 = require("./WorkflowApp/configuration");
 var busboy = require('connect-busboy'); //middleware for form/file upload
 function getVersion() {
     const fs = require('fs');
@@ -37,11 +33,9 @@ function getVersion() {
 }
 class WebApp {
     constructor() {
-        //NOPASSPORT 		this.passport = passport;
-        //NOPASSPORT 		this.passportConfig = require('./config/passport');
         this.initExpress();
-        this.initMongo();
-        //NOPASSPORT 		this.initPassport();
+        this.userManager = new UserManager_1.UserManager(this.app);
+        this.userManager.init();
         const wflogger = new _1.Logger({ toConsole: true });
         this.bpmnServer = new _1.BPMNServer(configuration_1.configuration, wflogger);
         this.bpmnServer.appDelegate.winSocket = null;
@@ -65,79 +59,14 @@ class WebApp {
           dest: path.join(__dirname, 'public')
         }));*/
         app.use(logger('dev'));
-        app.use(bodyParser.json());
-        app.use(bodyParser.urlencoded({ extended: true }));
-        app.use(session({
-            resave: true,
-            saveUninitialized: true,
-            secret: process.env.SESSION_SECRET,
-            cookie: { maxAge: 1209600000 },
-            store: new MongoStore({
-                url: process.env.MONGO_DB_URL,
-                autoReconnect: true,
-            })
-        }));
+        app.use(bodyParser.json({ limit: '200mb' }));
+        app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
         app.use(busboy());
         this.app = app;
     }
-    initMongo() {
-        /*mongoose.set('useFindAndModify', false);
-        mongoose.set('useCreateIndex', true);
-        mongoose.set('useNewUrlParser', true);
-        mongoose.set('useUnifiedTopology', true); */
-        console.log("MongoDB URL", process.env.MONGO_DB_URL);
-        mongoose.set('strictQuery', true);
-        mongoose.connect(process.env.MONGO_DB_URL);
-        mongoose.connection.on('error', (err) => {
-            console.error(err);
-            console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
-            process.exit();
-        });
-        mongoose.connection.on('open', function () {
-            console.log('db connection open');
-        });
-    }
-    /* //NOPASSPORT
-    initPassport() {
-        this.app.use(passport.initialize());
-        this.app.use(passport.session());
-        this.app.use(flash());
-        this.app.use((req, res, next) => {
-            if (req.path === '/api/upload') {
-                // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
-                next();
-            } else {
-                lusca.csrf()(req, res, next);
-            }
-        });
-
-    } */
     setupExpress() {
         const app = this.app;
-        app.use(lusca.xframe('SAMEORIGIN'));
-        app.use(lusca.xssProtection(true));
-        app.disable('x-powered-by');
-        app.use((req, res, next) => {
-            res.locals.user = req.user;
-            next();
-        });
-        /* //NOPASSPORT
-        app.use((req, res, next) => {
-            // After successful login, redirect back to the intended page
-            if (!req.user
-                && req.path !== '/login'
-                && req.path !== '/signup'
-                && !req.path.match(/^\/auth/)
-                && !req.path.match(/\./)) {
-                console.log("redirecting to:", req.originalUrl);
-                req.session.returnTo = req.originalUrl;
-            } else if (req.user
-                && (req.path === '/account' || req.path.match(/^\/api/))) {
-                req.session.returnTo = req.originalUrl;
-            }
-            next();
-        });
-        */
+        this.userManager.setup();
         this.setupRoutes();
         /**
          * Error Handler.
@@ -171,13 +100,11 @@ class WebApp {
         router.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
         this.app.use('/', router);
         var Common = require("./routes/common");
-        var Workflow = require("./routes/index").Workflow;
-        //NOPASSPORT var Account = require("./routes/account").Account;
+        var Workflow = require("./routes/workflow").Workflow;
         var Docs = require("./routes/docs").Docs;
         var Model = require("./routes/model").Model;
         var API = require("./routes/api").API;
         this.app.use('/', (new Workflow(this)).config());
-        //NOPASSPORT 		this.app.use('/', (new Account(this)).config());
         this.app.use('/docs', (new Docs(this)).config());
         this.app.use('/model', (new Model(this)).config());
         this.app.use('/api', (new API(this)).config());
@@ -189,7 +116,17 @@ exports.WebApp = WebApp;
 /**
  * Load environment variables from .env file, where API keys and passwords are configured.
  */
-dotenv.config({ path: '.env' });
+function setupEnvVars() {
+    dotenv.config();
+    var argv = process.argv;
+    var args = {};
+    for (let i = 2; i < argv.length; i++) {
+        const key = argv[i];
+        const val = argv[++i];
+        process.env[key] = val;
+    }
+}
+setupEnvVars();
 const webApp = new WebApp();
 module.exports = webApp.app;
 //# sourceMappingURL=app.js.map

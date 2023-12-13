@@ -9,23 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Workflow = void 0;
+exports.ViewHelper = exports.Workflow = void 0;
 const express = require("express");
 const FS = require('fs');
 const __1 = require("../");
+const __2 = require("../");
 const common_1 = require("./common");
 var caseId = Math.floor(Math.random() * 10000);
-var userId;
 const docsFolder = __dirname + '/../bpmnServer/docs/';
 // main functions
 function awaitAppDelegateFactory(middleware) {
     return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
         try {
-            if (req.query.userId && typeof (req.query.userId) !== 'undefined' && req.query.userId !== 'undefined') {
-                req.session.userId = req.query.userId;
-            }
-            else if (!req.session.userId)
-                req.session.userId = 'demoUser';
+            /*            if (req.query.userName && typeof (req.query.userName) !=='undefined' && req.query.userName !=='undefined') {
+                            req.session.userName = req.query.userName;
+                        }
+                        else if (!req.session.userName)
+                            req.session.userName = 'demoUser';
+                            */
             yield middleware(req, res, next);
         }
         catch (err) {
@@ -42,18 +43,17 @@ class Workflow extends common_1.Common {
         bpmnServer = this.webApp.bpmnServer;
         definitions = bpmnServer.definitions;
         router.get('/home', home);
-        router.get('/', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+        router.get('/', this.isAuthenticated, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let output = [];
             output = show(output);
-            //NOPASSPORT             console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
-            if (request.session.views) {
-                request.session.views++;
-            }
-            else {
-                request.session.views = 1;
-            }
-            console.log('Session:', request.session);
-            userId = request.session.userId;
+            console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
+            display(request, response, 'Show', output);
+        })));
+        router.get('/setUser', this.isAuthenticated, awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            let output = [];
+            setForUser(request);
+            output = show(output);
+            console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             display(request, response, 'Show', output);
         })));
         router.get('/readme_md', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
@@ -62,20 +62,8 @@ class Workflow extends common_1.Common {
             let file = FS.readFileSync(fileName, { encoding: 'utf8', flag: 'r' });
             response.send(file);
         })));
-        router.get('/userId', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            response.send(request.session.userId);
-        })));
-        router.get('/example', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
-            /* Testing only
-             *
-            */
-            var test;
-            let file = '../tests/bpmn-engine/getFields.js';
-            if (test)
-                delete require.cache[require.resolve(file)];
-            test = require(file);
-            //        const test = require('../examples/example.js');
-            /* */
+        router.get('/userName', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            response.send(getUser(request).userName);
         })));
         /*
          *  3 methods for execute:
@@ -91,7 +79,8 @@ class Workflow extends common_1.Common {
         router.get('/execute/:processName', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let processName = request.params.processName;
             request.session.processName = processName;
-            let context = yield bpmnServer.engine.start(processName, { caseId: caseId++ }, null, userId);
+            console.log('username', getUser(request).userName);
+            let context = yield bpmnServer.engine.start(processName, { caseId: caseId++ }, null, getUser(request).userName);
             if (context.errors) {
                 displayError(response, context.errors);
             }
@@ -102,11 +91,12 @@ class Workflow extends common_1.Common {
             let process = request.body.processName;
             request.session.processName = process;
             let data = {};
-            parseField(request.body.field1, request.body.value1, data);
-            parseField(request.body.field2, request.body.value2, data);
+            ViewHelper.parseField(request.body.field1, request.body.value1, data);
+            ViewHelper.parseField(request.body.field2, request.body.value2, data);
             let startNodeId = request.body.startNodeId;
+            console.log('username', getUser(request).userName);
             data['caseId'] = caseId++;
-            let context = yield bpmnServer.engine.start(process, data, startNodeId, userId);
+            let context = yield bpmnServer.engine.start(process, data, startNodeId, getUser(request).userName);
             if (context.errors) {
                 displayError(response, context.errors);
             }
@@ -139,7 +129,7 @@ class Workflow extends common_1.Common {
             let id = request.query.id;
             let processName = request.query.processName;
             let elementId = request.query.elementId;
-            let fields = yield getFields(processName, elementId);
+            let fields = yield ViewHelper.getFields(processName, elementId);
             if (fields && fields.length > 0) {
                 response.render('invokeItem', {
                     id, fields, processName, elementId
@@ -147,8 +137,7 @@ class Workflow extends common_1.Common {
                 return;
             }
             try {
-                let result = yield bpmnServer.engine.invoke({ "items.id": id }, {}, userId);
-                console.log("redirecting");
+                let result = yield bpmnServer.engine.invoke({ "items.id": id }, {}, getUser(request).userName);
                 response.redirect('/instanceDetails?id=' + result.execution.id);
             }
             catch (exc) {
@@ -165,7 +154,61 @@ class Workflow extends common_1.Common {
                 }
             });
             try {
-                let result = yield bpmnServer.engine.invoke({ "items.id": id }, data, userId);
+                let result = yield bpmnServer.engine.invoke({ "items.id": id }, data, getUser(request).userName);
+                response.redirect('/instanceDetails?id=' + result.execution.id);
+            }
+            catch (exc) {
+                response.send(exc.toString());
+            }
+        })));
+        router.get('/assign', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            let id = request.query.id;
+            let processName = request.query.processName;
+            let elementId = request.query.elementId;
+            let itemId = request.query.itemId;
+            let api = getAPI(request);
+            let fields = yield ViewHelper.getFields(processName, elementId);
+            let item = yield api.data.findItem({ "items.id": id });
+            console.log('item:', item);
+            if (!item) {
+                request.flash('errors', [{ msg: 'Item not found or not authorized' }]);
+                response.redirect('/');
+                return;
+            }
+            const instances = yield api.data.findInstances({ "id": item.instanceId }, 'full');
+            const instance = instances[0];
+            const lastItem = instance.items[instance.items.length - 1];
+            let vars = ViewHelper.formatData(instance.data);
+            response.render('assign', {
+                item, instance, vars, lastItem,
+                dueDate: ViewHelper.dateDisplay(item.dueDate),
+                followUpDate: ViewHelper.dateDisplay(item.followUpDate),
+                id, fields, processName, elementId
+            });
+            return;
+        })));
+        router.post('/assign', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
+            let id = request.body.itemId;
+            let data = {};
+            let assignment = {};
+            Object.entries(request.body).forEach(entry => {
+                const label = entry[0];
+                if (label == 'itemId') { }
+                else if (label.startsWith('data_')) {
+                    data[label.substr(5)] = entry[1];
+                }
+                else {
+                    console.log(label, entry[1]);
+                    assignment[label] = entry[1];
+                }
+            });
+            try {
+                assignment['dueDate'] = ViewHelper.dateInput(assignment['DueDate']);
+                assignment['followUpDate'] = ViewHelper.dateInput(assignment['followUpDate']);
+                assignment['candidateUsers'] = assignment['candidateUsers'].split(',');
+                assignment['candidateGroups'] = assignment['candidateGroups'].split(',');
+                console.log('data', data, 'assignment', assignment);
+                let result = yield bpmnServer.engine.assign({ "items.id": id }, data, getUser(request).userName, assignment);
                 response.redirect('/instanceDetails?id=' + result.execution.id);
             }
             catch (exc) {
@@ -177,7 +220,8 @@ class Workflow extends common_1.Common {
         })));
         router.get('/run/:process', awaitAppDelegateFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let process = request.params.process;
-            let exec = yield bpmnServer.engine.start(process, { caseId: caseId++ }, null, userId);
+            console.log('username', getUser(request).userName);
+            let exec = yield bpmnServer.engine.start(process, { caseId: caseId++ }, null, getUser(request).userName);
             if (exec.errors) {
                 displayError(response, exec.errors);
             }
@@ -270,12 +314,47 @@ function displayError(res, error) {
         res.send(msg);
     });
 }
+function getUser(req) {
+    console.log('getUser', req.user, req.session.forUser);
+    if (req.session.forUser)
+        return req.session.forUser;
+    else
+        return req.user;
+}
+function setForUser(req) {
+    let forUserName;
+    let forUserGroups;
+    if ('forUserName' in req.query) {
+        forUserName = req.query.forUserName;
+        forUserGroups = req.query.forUserGroups;
+        let userInfo = { userName: forUserName, userGroups: forUserGroups.split(',') };
+        req.session.forUser = userInfo;
+    }
+}
+function getAPI(req) {
+    /* console.log('req.params', req.params, req.query);
+
+    let forUserName = req.session.forUserName;
+    if ('forUserName' in req.query) {
+        forUserName = req.query.forUserName;
+        req.session.forUserName = forUserName;
+    }
+    let forUserGroups = req.session.forUserGroups;
+    if ('forUserGroups' in req.query) {
+        forUserGroups = req.query.forUserGroups;
+        req.session.forUserGroups = forUserGroups;
+    }
+    console.log('Session:', req.session);
+    */
+    return new __2.APIClient(bpmnServer, getUser(req));
+}
 function display(req, res, title, output, logs = [], items = []) {
     return __awaiter(this, void 0, void 0, function* () {
-        var instances = yield bpmnServer.dataStore.findInstances({}, 'summary');
-        let waiting = yield bpmnServer.dataStore.findItems({ "items.status": 'wait', "items.type": 'bpmn:UserTask' });
+        let api = getAPI(req);
+        var instances = yield api.data.findInstances({}, 'summary');
+        let waiting = yield api.data.findItems({ "items.status": 'wait', "items.type": 'bpmn:UserTask' });
         waiting.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
+            item['fromNow'] = (0, __1.dateDiff)(item.startedAt);
         });
         let engines = bpmnServer.cache.list();
         engines.forEach(engine => {
@@ -283,22 +362,23 @@ function display(req, res, title, output, logs = [], items = []) {
             engine.fromLast = (0, __1.dateDiff)(engine.lastAt);
         });
         instances.forEach(item => {
-            item.fromNow = (0, __1.dateDiff)(item.startedAt);
+            item['fromNow'] = (0, __1.dateDiff)(item.startedAt);
             if (item.endedAt)
-                item.endFromNow = (0, __1.dateDiff)(item.endedAt);
+                item['endFromNow'] = (0, __1.dateDiff)(item.endedAt);
             else
-                item.endFromNow = '';
+                item['endFromNow'] = '';
         });
         res.render('index', {
             title: title, output: output,
             engines,
-            userId: req.session.userId,
+            userName: req.session.userName,
             procs: yield getProcs(),
             debugMsgs: [],
             waiting: waiting,
             instances,
             request: req,
-            logs, items
+            logs, items,
+            forUserGroups: req.session.forUserGroups, forUserName: req.session.forUserName
         });
     });
 }
@@ -321,16 +401,8 @@ function instanceDetails(response, instanceId) {
         const defJson = def.getJson();
         let output = ['View Process Log'];
         output = show(output);
-        let vars = [];
-        Object.keys(instance.data).forEach(function (key) {
-            let value = instance.data[key];
-            if (Array.isArray(value))
-                value = JSON.stringify(value);
-            if (typeof value === 'object' && value !== null)
-                value = JSON.stringify(value);
-            vars.push({ key, value });
-        });
-        let decorations = JSON.stringify(calculateDecorations(instance.items));
+        let vars = ViewHelper.formatData(instance.data);
+        let decorations = JSON.stringify(ViewHelper.calculateDecorations(instance.items));
         response.render('InstanceDetails', {
             instance, vars,
             accessRules: def.accessRules,
@@ -340,46 +412,73 @@ function instanceDetails(response, instanceId) {
         });
     });
 }
-function getFields(processName, elementId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let definition = yield bpmnServer.definitions.load(processName);
-        let node = definition.getNodeById(elementId);
-        let extName = __1.Behaviour_names.CamundaFormData;
-        let ext = node.getBehaviour(extName);
-        if (ext) {
-            return ext.fields;
-        }
+class ViewHelper {
+    static dateDisplay(date) {
+        if (date)
+            return (date).toISOString().split('T')[0];
         else
+            return '';
+    }
+    static dateInput(dateString) {
+        if (dateString === '' || dateString == 'Invalid Date')
             return null;
-    });
-}
-function parseField(field, value, data) {
-    if (field) {
-        if (value.substring(0, 1) == '[') {
-            value = value.substring(1);
-            value = value.substring(0, value.length - 1);
-            let array = value.split(',');
-            value = array;
+        else
+            return new Date(dateString);
+    }
+    static formatData(data) {
+        let vars = [];
+        Object.keys(data).forEach(function (key) {
+            let value = data[key];
+            if (Array.isArray(value))
+                value = JSON.stringify(value);
+            if (typeof value === 'object' && value !== null)
+                value = JSON.stringify(value);
+            vars.push({ key, value });
+        });
+        return vars;
+    }
+    static getFields(processName, elementId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let definition = yield bpmnServer.definitions.load(processName);
+            let node = definition.getNodeById(elementId);
+            let extName = __1.Behaviour_names.CamundaFormData;
+            let ext = node.getBehaviour(extName);
+            if (ext) {
+                return ext.fields;
+            }
+            else
+                return null;
+        });
+    }
+    static parseField(field, value, data) {
+        if (field) {
+            if (value.substring(0, 1) == '[') {
+                value = value.substring(1);
+                value = value.substring(0, value.length - 1);
+                let array = value.split(',');
+                value = array;
+            }
+            data[field] = value;
         }
-        data[field] = value;
+    }
+    static calculateDecorations(items) {
+        let decors = [];
+        let seq = 1;
+        items.forEach(item => {
+            let color = 'red';
+            if (item.status == 'end') {
+                if (item.endedAt == null && item.type != 'bpmn:SequenceFlow')
+                    color = 'gray';
+                else
+                    color = 'black';
+            }
+            let decor = { id: item.elementId, color, seq };
+            decors.push(decor);
+            seq++;
+        });
+        return decors;
     }
 }
-function calculateDecorations(items) {
-    let decors = [];
-    let seq = 1;
-    items.forEach(item => {
-        let color = 'red';
-        if (item.status == 'end') {
-            if (item.endedAt == null && item.type != 'bpmn:SequenceFlow')
-                color = 'gray';
-            else
-                color = 'black';
-        }
-        let decor = { id: item.elementId, color, seq };
-        decors.push(decor);
-        seq++;
-    });
-    return decors;
-}
+exports.ViewHelper = ViewHelper;
 //export default router;
 //# sourceMappingURL=index.js.map

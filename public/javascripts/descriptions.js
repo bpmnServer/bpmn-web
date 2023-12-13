@@ -133,6 +133,14 @@ const bpmn_descriptions = {
 	},
 
 	// ----------------------	messageEvent   ---------------------- 
+	BoundaryEvent:
+	{
+		name: "boundayEvent",
+		desc: "An Event attached to another node.",
+		start: KW_autoStart,
+		completion: KW_autoComplete,
+		designOptions: []
+	},
 	MessageEvent:
 	{
 		name: "messageEvent",

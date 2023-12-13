@@ -29,9 +29,9 @@ const awaitHandlerFactory = (middleware) => {
         }
     });
 };
+const config = require('../WorkflowApp/configuration.js').configuration;
 class Model extends common_1.Common {
     config() {
-        const config = require('../configuration.js').configuration;
         const bpmnServer = this.webApp.bpmnServer;
         const definitions = bpmnServer.definitions;
         var router = express.Router();
@@ -124,7 +124,6 @@ class Model extends common_1.Common {
         router.get('/editNoProp/:process', awaitHandlerFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let output = [];
             console.log('model.ts/:process ');
-            const config = require('../configuration.js').configuration;
             let xml, base_url, title, processName;
             processName = request.params.process;
             xml = yield definitions.getSource(processName);
@@ -135,7 +134,6 @@ class Model extends common_1.Common {
         router.get('/edit/:process', awaitHandlerFactory((request, response) => __awaiter(this, void 0, void 0, function* () {
             let output = [];
             console.log('model.ts/:process ');
-            const config = require('../configuration.js').configuration;
             let xml, base_url, title, processName;
             processName = request.params.process;
             request.session.processName = processName;

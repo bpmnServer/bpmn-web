@@ -21,11 +21,23 @@ class Common {
         return router;
     }
     isAuthenticated(req, res, next) {
-        console.log("isAuthenticated:", req.path);
-        if (req.isAuthenticated()) {
-            return next();
+        console.log(' calling isAuthenticated', process.env.REQUIRE_AUTHENTICATION);
+        if ((process.env.REQUIRE_AUTHENTICATION === 'true')
+            &&
+                (typeof req.isAuthenticated === "function")) {
+            let check = req.isAuthenticated();
+            console.log('is auth', check);
+            if (check == true) {
+                console.log('calling next?');
+                return next();
+            }
+            else {
+                console.log('not authenticated redirecting to login');
+                res.redirect('/login');
+            }
         }
-        res.redirect('/login');
+        else
+            return next();
     }
 }
 exports.Common = Common;

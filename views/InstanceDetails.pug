@@ -1,8 +1,17 @@
 extends layout
 
 block content
+	- function prettyDate(date){
+	- var d = date.getDate();
+	- var m = date.getMonth() + 1; //Months are zero based
+	- var y = date.getFullYear();
+	- var h = date.getHours();
+	- var mm = date.getMinutes();
+	- var s = date.getSeconds();
+	- 
+	-     return d+'/'+m+'/'+y+' '+h+':'+mm+':'+s;
+	-   }
 
-		
 	div(style="border-bottom: 1px solid #999;padding-bottom: 10px;overflow: hidden;")
 
 		h1(style="float:left;")
@@ -50,9 +59,9 @@ block content
 			td #{instance.id}
 		tr
 			td started At
-			td(class='startDate') #{instance.startedAt}
+			td(class='startDate') #{(instance.startedAt)}
 			td ended At
-			td #{instance.endedAt}
+			td #{(instance.endedAt)}
 		tr
 			td lastAt
 			td #{lastAt} 
@@ -89,14 +98,16 @@ block content
 				
 		- let seq=0;
 		each item in items
-			- var ref = "/invokeItem?id="+item.id+"&processName="+instance.name+"&elementId="+item.elementId;
+			- var ref = "?id="+item.id+"&processName="+instance.name+"&elementId="+item.elementId;
 			- var label='';
+			- var label2='';
 			- if (item.status=='wait' && item.type=='bpmn:UserTask') label= 'Execute';
+			- if (item.status=='wait' && item.type=='bpmn:UserTask') label2= 'Assign';
 			- if (item.status=='wait' && item.type.includes('Event')) label= 'Force';
 			- var assign='';
-			- if (item.candidateUsers) assign+='>Assigned to users:'+item.candidateUsers;
-			- if (item.candidateGroups) assign+=' groups:'+item.candidateGroups;
-			- if (item.assignee) assign+=' Assigned by:'+item.assignee;
+			- if (item.candidateUsers) assign+='>Assigned to users:\''+item.candidateUsers+'\'';
+			- if (item.candidateGroups) assign+=' groups: \''+item.candidateGroups+'\'';
+			- if (item.assignee) assign+=' Assigned to: \''+item.assignee+'\'';
 			- if (item.dueDate) assign+=' Due on:'+item.dueDate;
 			- seq++;
 				tr
@@ -107,18 +118,20 @@ block content
 					td(class='date') #{item.endedAt}
 					td #{item.status}
 					td #{item.type}
-					td #{item.userId}
+					td #{item.userName}
 					td
-						a(href=`${ref}`) #{label}
+						a(href=`/invokeItem${ref}`) #{label} 
+						a(href=`/assign${ref}`) #{label2}
 			if (!assign=='')
 				tr
 					td
-					td(colspan=3) #{assign}
+					td(colspan=8) #{assign}
 
 	h4 Instance Logs <button id="showHide" onclick="showLogs()">&darr;</button>
 	div(id="logs" style="display:none;") 
 		table
 			each log in logs
 				tr
-					td #{log}
+					td #{prettyDate(log.date)}
+					td #{log.message}
 		

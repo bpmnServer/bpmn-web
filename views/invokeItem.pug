@@ -2,8 +2,16 @@ extends layout
 
 block content
 
-	h3 Invoking Item  #{elementId} - #{processName} 
+	h3 Invoking Item  #{name} - #{processName}
 	p Item Id: #{id}
+
+	h4 Data 
+	table
+		each v in vars
+			tr
+				td #{v.key}
+				td #{v.value}
+	
 	table
 		form(name='InvokeForm',action="/invokeItem",method="post")
 			input(type='hidden',name='itemId',id='itemId',value=`${id}`)
@@ -11,9 +19,17 @@ block content
 			each field in fields
 				tr 
 					a(vertical-align="top")
+
 					td #{field.label}
 					td  
-						input(name=`${field.id}`)
+						if (field['$children'])
+							select(name=`${field.id}`)
+								each v in (field['$children'])
+									option(value=`${v.id}`) #{v.name}
+						else if (field.type=='date')
+							input(name=`${field.id}` type='date')
+						else
+							input(name=`${field.id}`)
 			tr
 				td
 					input(type='submit')

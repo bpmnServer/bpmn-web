@@ -10,9 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModelerWProp = void 0;
-//const config = require('../configuration.js').configuration;
-//const bpmnServer = new BPMNServer(config);
-//const definitions = bpmnServer.definitions;
 class ModelerWProp {
     displayNew(name, request, response) {
         return __awaiter(this, void 0, void 0, function* () {

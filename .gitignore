@@ -1,9 +1,9 @@
 ﻿/node_modules
 /obj
 *.log
-.env
-configuration.*
-appDelegate.*
-
+/bin
+/bpmnServer/node_modules
+/bpmnServer/obj
+/bpmnServer/bin
 
 
