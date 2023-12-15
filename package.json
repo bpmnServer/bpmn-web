@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "setup": "ts-node setup.ts",
-    "cli": "node cli.js",
+    "cli": "ts-node cli.js",
     "build": "tsc --build",
     "compileRun": "tsc --build && node app.js",
     "dev": "nodemon -e ts  --exec \"npm run compileRun\"",
     "clean": "tsc --build --clean",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./app.ts\"",
-    "start": "node app",
+    "start": "ts-node app",
     "test": "mocha -exit --config=WorkflowApp/test/.mocharc.json WorkflowApp/test/feature/"
   },
   "description": "bpmn-server.webApp",
@@ -18,6 +18,7 @@
     "name": ""
   },
   "dependencies": {
+    "bpmn-server": "^2.0.3-alpha2",
     "axios": "^1.6.2",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
