@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "setup": "ts-node setup.ts",
-    "cli": "ts-node cli.js",
+    "cli": "ts-node cli.ts",
     "build": "tsc --build",
     "compileRun": "tsc --build && node app.js",
     "dev": "nodemon -e ts  --exec \"npm run compileRun\"",
