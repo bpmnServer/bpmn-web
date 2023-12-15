@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "setup": "node setup.js",
+    "setup": "ts-node setup.ts",
     "cli": "node cli.js",
     "build": "tsc --build",
     "compileRun": "tsc --build && node app.js",

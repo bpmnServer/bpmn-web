@@ -1,7 +1,6 @@
-import { BPMNServer } from '.';
-const fs = require('fs');
-
-const readline = require("readline");
+import { BPMNServer } from 'bpmn-server';
+import * as fs from 'fs';
+import * as readline from "readline";
 
 const cl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
 
