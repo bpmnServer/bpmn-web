@@ -4,13 +4,10 @@ import { TestAppDelegate } from './appDelegate';
 import { IConfiguration, DataStore, ILogger , NoCacheManager} from '../';
 import { Logger } from '../'
 import { UserService } from '../../userAccess/UserService';
-
-
-const dotenv = require('dotenv');
-const res = dotenv.config();
+import 'dotenv/config';
 
 let definitionsPath = __dirname + '/../processes/';
-var configuration = new Configuration(
+export const configuration = new Configuration(
 	{
 		definitionsPath: definitionsPath,
 		templatesPath: __dirname + '/../emailTemplates',
@@ -46,6 +43,3 @@ var configuration = new Configuration(
 		}
 
 	});
-
-
-export { configuration}
