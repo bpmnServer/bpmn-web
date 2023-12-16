@@ -2,6 +2,7 @@
 /obj
 *.log
 /bin
+/dist
 /bpmnServer/node_modules
 /bpmnServer/obj
 /bpmnServer/bin
