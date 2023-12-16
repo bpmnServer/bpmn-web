@@ -1,6 +1,7 @@
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const mongoose = require('mongoose');
+import bcrypt from "bcrypt";
+import * as crypto from "crypto";
+import mongoose from "mongoose";
+
 const userSchema = new mongoose.Schema({
     userName: { type: String, unique: true },
     email: { type: String, unique: true },
@@ -84,6 +85,5 @@ userSchema.methods.gravatar = function gravatar(size) {
     const md5 = crypto.createHash('md5').update(this.email).digest('hex');
     return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+export const User = mongoose.model('User', userSchema);
 //# sourceMappingURL=User.js.map
