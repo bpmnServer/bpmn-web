@@ -1,5 +1,5 @@
 console.log('----', __filename);
-const { BPMNServer, Execution, DefaultHandler, Logger } = require("../../");
+const { BPMNServer, Execution, DefaultHandler, Logger } = require('./');
 
 const config = require("../testConfiguration.js").configuration;
 

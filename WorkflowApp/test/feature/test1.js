@@ -17,8 +17,8 @@ function getRepeat(input) {
 
 /*
 
-const { BPMNServer, DefaultAppDelegate, Logger } = require("../../");
-const { configuration } = require('../testConfiguration');
+const { BPMNServer, DefaultAppDelegate, Logger } = require('./');
+const { configuration } = require('./');
 
 const logger = new Logger({ toConsole: false });
 

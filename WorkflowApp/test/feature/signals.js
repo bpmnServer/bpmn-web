@@ -7,8 +7,8 @@
 
 ///```javascript
 
-const { BPMNServer , DefaultHandler , Logger } = require("../../");
-const { configuration } = require('../testConfiguration');
+const { BPMNServer , DefaultHandler , Logger } = require('./');
+const { configuration } = require('./');
 
 
 const logger = new Logger({ toConsole: false});

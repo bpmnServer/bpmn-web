@@ -1,4 +1,4 @@
-const { BPMNServer, Behaviour_names, Execution, DefaultAppDelegate, Logger } = require("../../");
+const { BPMNServer, Behaviour_names, Execution, DefaultAppDelegate, Logger } = require('./');
 
 
 const config = require("../testConfiguration.js").configuration;

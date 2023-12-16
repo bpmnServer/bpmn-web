@@ -1,6 +1,6 @@
 console.log('----', __filename);
-const { BPMNServer , DefaultAppDelegate , Logger } = require("../../");
-const { configuration } = require('../testConfiguration');
+const { BPMNServer , DefaultAppDelegate , Logger } = require('./');
+const { configuration } = require('./');
 
 console.log('-------- concurrent.js -----------');
 
