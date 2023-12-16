@@ -1,17 +1,16 @@
-import { BPMNServer, DefaultAppDelegate, Logger } from "./";
+import { BPMNServer, DefaultAppDelegate, Logger } from "bpmn-server";
 import { configuration} from './WorkflowApp/configuration';
+import * as readline from "readline";
+import "dotenv/config";
 
 const logger = new Logger({ toConsole: false});
 
 const server = new BPMNServer(configuration, logger,{cron:false});
-const readline = require("readline");
-const dotenv = require('dotenv');
-dotenv.config();
 
 const cl = readline.createInterface({input: process.stdin, output: process.stdout,terminal:false});
 
-const question = function(q) {
-  return new Promise( (res, rej) => {
+const question = function(q: string) {
+  return new Promise<string>( (res, rej) => {
       cl.question( q, answer => {
           res(answer);
       })
@@ -45,8 +44,8 @@ async function completeUserTask() {
 
 	menu();
 	
-  let option='';
-  var command;
+  let option = '';
+  let command = '';
   while(option!=='q')
   {
 	command= await question('Enter Command, q to quit, or ? to list commands\n\r>');
@@ -140,15 +139,15 @@ async function completeUserTask() {
 async function start()
 {
   const name = await question('Please provide your process name: ');
-  let taskData = await question('Please provide your Task Data (json obj) if any: ');
-
-	console.log(taskData);
+  const taskDataString = await question('Please provide your Task Data (json obj) if any: ');
+	let taskData = {};
+	console.log(taskDataString);
 
 	try {
-		if (taskData === "") {
+		if (taskDataString === "") {
 			taskData = {};
 		} else {
-			taskData = JSON.parse(taskData.toString());
+			taskData = JSON.parse(taskDataString.toString());
 		}
 
 	}
@@ -230,12 +229,12 @@ async function invoke()
 {
   const instanceId = await question('Please provide your Instance ID: ');
   const taskId = await question('Please provide your Task ID: ');
-  let taskData = await question('Please provide your Task Data (json obj) if any: ');
-
-  if (taskData === ""){
+  let taskDataString = await question('Please provide your Task Data (json obj) if any: ');
+	let taskData = {};
+  if (taskDataString === ""){
       taskData = {};
   }else{
-      taskData = JSON.parse(taskData.toString());
+      taskData = JSON.parse(taskDataString.toString());
   }
 
 	try {
@@ -258,14 +257,14 @@ async function invoke()
 async function signal() {
 	const signalId = await question('Please provide signal ID: ');
 
-	let signalData = await question('Please provide your Data (json obj) if any: ');
-
+	const signalDataString = await question('Please provide your Data (json obj) if any: ');
+	let signalData = {};
 	//if (typeof signalData === 'string' && signalData.trim() === '') {
-	if (signalData === "") {
+	if (signalDataString === "") {
 		signalData = {};
 	} else {
 		try {
-			signalData = JSON.parse(signalData.toString());
+			signalData = JSON.parse(signalDataString.toString());
 		}
 		catch (exc) {
 			console.log(exc);
@@ -281,12 +280,12 @@ async function signal() {
 async function message() {
 	const messageId = await question('Please provide message ID: ');
 
-	let messageData = await question('Please provide your Data (json obj) if any: ');
-
-	if (typeof messageData === 'string' && messageData.trim() === '') {
+	const messageDataString = await question('Please provide your Data (json obj) if any: ');
+	let messageData = {};
+	if (typeof messageDataString === 'string' && messageDataString.trim() === '') {
 		messageData = {};
 	} else {
-		messageData = JSON.parse(messageData.toString());
+		messageData = JSON.parse(messageDataString.toString());
 	}
 
 	let response = await server.engine.throwMessage(messageId, messageData);
@@ -352,7 +351,7 @@ async function recover() {
 		console.log('nothing to recover');
 
 }
-function dateDiff(dateStr) {
+function dateDiff(dateStr: string) {
 
     var endDate = new Date();
     var startTime = new Date(dateStr);
