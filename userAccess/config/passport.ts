@@ -1,3 +1,5 @@
+import { User } from "../models/User";
+
 const passport = require('passport');
 //const refresh = require('passport-oauth2-refresh');
 const axios = require('axios');
@@ -18,7 +20,6 @@ const { OAuth2Strategy } = require('passport-oauth');
 //const _ = require('lodash');
 //const moment = require('moment');
 
-const UserModel = require('../models/User');
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -34,7 +35,7 @@ passport.deserializeUser((id, done) => {
  * Sign in using Email and Password.
  */
 passport.use(new LocalStrategy({ usernameField: 'userName' }, (userName, password, done) => {
-  UserModel.findOne({ userName: userName.toLowerCase() }, (err, user) => {
+  User.findOne({ userName: userName.toLowerCase() }, (err, user) => {
     if (err) { return done(err); }
     if (!user) {
       return done(null, false, { msg: `UserName ${userName} not found.` });

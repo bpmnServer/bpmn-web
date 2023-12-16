@@ -16,7 +16,7 @@ const logger = new Logger({ toConsole: false });
 const server = new BPMNServer(configuration, logger);
 
 */
-const { BPMNServer, DefaultHandler, Logger , logger,server,caseId, delay } = require('../helpers/BPMNTester');
+const { Logger , logger, server,caseId, delay } = require('../helpers/BPMNTester');
 
 let name = 'test-boundary-timer';
 let response;

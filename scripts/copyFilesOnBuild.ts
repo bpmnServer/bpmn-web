@@ -17,7 +17,7 @@ const ensureDirectoryExistence = (filePath: string) => {
 
 const copyNonTsFiles = async (source: string, destination: string) => {
     // Find all non-TS files in the source directory using the synchronous version of glob
-    const files = globSync('**/!(*.ts)', { cwd: source, nodir: true });
+    const files = globSync('**/!(*.ts)', { cwd: source, nodir: true, dot: true });
 
     for (const file of files) {
         const srcPath = path.join(source, file);

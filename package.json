@@ -6,12 +6,12 @@
     "setup": "ts-node setup.ts",
     "start": "ts-node app",
     "cli": "ts-node cli.ts",
-    "build": "tsc --build",
-    "compileRun": "tsc --build && ts-node scripts/copyFilesOnBuild.ts && node dist/app.js",
+    "build": "tsc --build && ts-node scripts/copyFilesOnBuild.ts",
+    "compileRun": "npm run build && node dist/app.js",
     "dev": "nodemon -e ts  --exec \"npm run compileRun\"",
     "clean": "rimraf dist",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./app.ts\"",
-    "test": "mocha -exit --config=WorkflowApp/test/.mocharc.json WorkflowApp/test/feature/"
+    "test": "npm run build && mocha -exit --config=dist/WorkflowApp/test/.mocharc.json dist/WorkflowApp/test/feature/"
   },
   "description": "bpmn-server.webApp",
   "author": {
