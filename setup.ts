@@ -1,4 +1,4 @@
-import { BPMNServer } from 'bpmn-server';
+import { BPMNServer,configuration} from '.';
 import * as fs from 'fs';
 import * as readline from "readline";
 
@@ -29,11 +29,8 @@ async function main() {
 
     }
     else {
-        if (checkConfiguration())
-            {
             const server=await install();
             await docModels(server);
-            }
 
     }
 
@@ -46,28 +43,13 @@ async function promptForEdit() {
     console.log(' continue...');
     return command;
 }
-var configuration;
 
-function checkConfiguration() {
-    const cwd = process.cwd();
-    const configPath = cwd + '/WorkflowApp/configuration.js';
-    if (fs.existsSync(configPath)) {
-        configuration = require(configPath).configuration;
-        return true;
-    }
-    else {
-        console.log(`**Error** configuration.js file does not exist in this folder '${configPath}'**`);
-        console.log("please run this script from the folder containing 'configuration.js'");
-        return false;
-    }
-
-}
 function copyFiles() {
     const ret=copyFile('INSTALL.env', '.env');
     copyFile('./WorkflowApp/INSTALL_configuration.ts', './WorkflowApp/configuration.ts');
-    copyFile('./WorkflowApp/INSTALL_configuration.js', './WorkflowApp/configuration.js');
+//    copyFile('./WorkflowApp/INSTALL_configuration.js', './WorkflowApp/configuration.js');
     copyFile('./WorkflowApp/INSTALL_appDelegate.ts', './WorkflowApp/appDelegate.ts');
-    copyFile('./WorkflowApp/INSTALL_appDelegate.js', './WorkflowApp/appDelegate.js');
+//    copyFile('./WorkflowApp/INSTALL_appDelegate.js', './WorkflowApp/appDelegate.js');
 
     return ret;
 }
