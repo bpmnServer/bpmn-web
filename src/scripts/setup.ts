@@ -1,4 +1,4 @@
-import { BPMNServer,configuration} from '.';
+import { BPMNServer,configuration} from '../';
 import * as fs from 'fs';
 import * as readline from "readline";
 
@@ -46,9 +46,9 @@ async function promptForEdit() {
 
 function copyFiles() {
     const ret=copyFile('INSTALL.env', '.env');
-    copyFile('./WorkflowApp/INSTALL_configuration.ts', './WorkflowApp/configuration.ts');
+    copyFile('./src/WorkflowApp/INSTALL_configuration.ts', './src/WorkflowApp/configuration.ts');
 //    copyFile('./WorkflowApp/INSTALL_configuration.js', './WorkflowApp/configuration.js');
-    copyFile('./WorkflowApp/INSTALL_appDelegate.ts', './WorkflowApp/appDelegate.ts');
+    copyFile('./src/WorkflowApp/INSTALL_appDelegate.ts', './src/WorkflowApp/appDelegate.ts');
 //    copyFile('./WorkflowApp/INSTALL_appDelegate.js', './WorkflowApp/appDelegate.js');
 
     return ret;

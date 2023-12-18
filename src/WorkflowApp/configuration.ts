@@ -7,9 +7,6 @@ import { UserService } from '../userAccess/UserService';
 const dotenv = require('dotenv');
 const res = dotenv.config();
 
-class SQLite extends DataStore {
-}
-
 const templatesPath = __dirname + '/emailTemplates/';
 var configuration = new Configuration(
 	{
@@ -23,8 +20,7 @@ var configuration = new Configuration(
 			MongoDB:
 			{
 				db_url: process.env.MONGO_DB_URL  //"mongodb://localhost:27017?retryWrites=true&w=majority",
-			},
-			SQLite: { db_connection: '' }
+			}
 		},
 		apiKey: process.env.API_KEY,
 		/* Define Server Services */
@@ -38,8 +34,7 @@ var configuration = new Configuration(
 			return new MyAppDelegate(server);
 		},
 		dataStore: function (server) {
-//			return new DataStore(server);
-			return new SQLite(server);
+			return new DataStore(server);
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);

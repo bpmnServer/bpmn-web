@@ -6,7 +6,7 @@
   "slow": 1500,
   "timeout": 50000,
   "recursive": true,
-  "file": [ "WorkflowApp/test/helpers/setup.js" ],
+  "file": [ "dist/test/helpers/setup.js" ],
   "ui": "mocha-cakes-2",
-  "watch-files": [ "WorkflowApp/test/feature/*.js" ]
+  "watch-files": [ "dist/test/feature/*.js" ]
 }

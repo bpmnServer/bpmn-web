@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <Name>Server2</Name>
+    <RootNamespace>Server2</RootNamespace>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{b1ebe941-8821-4379-8141-b0794ab8e771}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>
+    </StartupFile>
+    <StartWebBrowser>True</StartWebBrowser>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
+    <NodejsPort>1337</NodejsPort>
+    <EnableTypeScript>true</EnableTypeScript>
+    <StartWebBrowser>True</StartWebBrowser>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include=".env" />
+    <Content Include=".gitignore" />
+    <Content Include="INSTALL.env" />
+    <Content Include="processes\boundary-event.bpmn" />
+    <Content Include="processes\boundary-event.svg" />
+    <Content Include="processes\boundary-event2.bpmn" />
+    <Content Include="processes\boundary-event2.svg" />
+    <Content Include="processes\bpmn-server-arch.bpmn" />
+    <Content Include="processes\bpmn-server-arch.svg" />
+    <Content Include="processes\BusinessRules.bpmn" />
+    <Content Include="processes\BusinessRules.svg" />
+    <Content Include="processes\Buy Used Car" />
+    <Content Include="processes\Buy Used Car with Lanes.bpmn" />
+    <Content Include="processes\Buy Used Car with Lanes.svg" />
+    <Content Include="processes\Buy Used Car.bpmn" />
+    <Content Include="processes\Buy Used Car.json" />
+    <Content Include="processes\Buy Used Car.rules" />
+    <Content Include="processes\Buy Used Car.svg" />
+    <Content Include="processes\CallTask.bpmn" />
+    <Content Include="processes\CallTask.svg" />
+    <Content Include="processes\Cash Request  with timer.svg" />
+    <Content Include="processes\Cash Request.bpmn" />
+    <Content Include="processes\Cash Request.svg" />
+    <Content Include="processes\Check Input.bpmn" />
+    <Content Include="processes\Check Input.svg" />
+    <Content Include="processes\error event.bpmn" />
+    <Content Include="processes\error event.svg" />
+    <Content Include="processes\Error Handling 2.bpmn" />
+    <Content Include="processes\Error Handling 2.svg" />
+    <Content Include="processes\Event Based Gateway.bpmn" />
+    <Content Include="processes\Event Based Gateway.svg" />
+    <Content Include="processes\Hungry.bpmn" />
+    <Content Include="processes\Hungry.svg" />
+    <Content Include="processes\Invoice.bpmn" />
+    <Content Include="processes\Invoice.svg" />
+    <Content Include="processes\Issue124-1.bpmn" />
+    <Content Include="processes\Issue124-1.svg" />
+    <Content Include="processes\Issue124-1A.bpmn" />
+    <Content Include="processes\Issue124-1A.svg" />
+    <Content Include="processes\Issue124.bpmn.bpmn" />
+    <Content Include="processes\Issue124.bpmn.svg" />
+    <Content Include="processes\Leave Application.bpmn" />
+    <Content Include="processes\Leave Application.svg" />
+    <Content Include="processes\loop.bpmn" />
+    <Content Include="processes\loop.svg" />
+    <Content Include="processes\loop2.bpmn" />
+    <Content Include="processes\loop2.svg" />
+    <Content Include="processes\messageFlow.bpmn" />
+    <Content Include="processes\messageFlow.svg" />
+    <Content Include="processes\MsgCatch.bpmn" />
+    <Content Include="processes\MsgCatch.svg" />
+    <Content Include="processes\msgThrow.bpmn" />
+    <Content Include="processes\msgThrow.svg" />
+    <Content Include="processes\multi-instanceP.bpmn" />
+    <Content Include="processes\multi-instanceP.svg" />
+    <Content Include="processes\multiStart.bpmn" />
+    <Content Include="processes\multiStart.svg" />
+    <Content Include="processes\pizza store example.bpmn" />
+    <Content Include="processes\pizza store example.svg" />
+    <Content Include="processes\ReceiveTask-starter.bpmn" />
+    <Content Include="processes\ReceiveTask-starter.svg" />
+    <Content Include="processes\ReceiveTask.bpmn" />
+    <Content Include="processes\ReceiveTask.svg" />
+    <Content Include="processes\Sample User Task Meta Model.bpmn" />
+    <Content Include="processes\Sample User Task Meta Model.svg" />
+    <Content Include="processes\scripts and services.bpmn" />
+    <Content Include="processes\scripts and services.svg" />
+    <Content Include="processes\sendTask.bpmn" />
+    <Content Include="processes\sendTask.svg" />
+    <Content Include="processes\serviceTask.bpmn" />
+    <Content Include="processes\serviceTask.svg" />
+    <Content Include="processes\Simple-Script.bpmn" />
+    <Content Include="processes\Simple-Script.svg" />
+    <Content Include="processes\SubProcess.bpmn" />
+    <Content Include="processes\SubProcess.svg" />
+    <Content Include="processes\t-catch-signals1.bpmn" />
+    <Content Include="processes\t-catch-signals1.svg" />
+    <Content Include="processes\t-catch-signals2.bpmn" />
+    <Content Include="processes\t-catch-signals2.svg" />
+    <Content Include="processes\t-loop-std.bpmn" />
+    <Content Include="processes\t-loop-std.svg" />
+    <Content Include="processes\t-throw-signals.bpmn" />
+    <Content Include="processes\t-throw-signals.svg" />
+    <Content Include="processes\t1.bpmn" />
+    <Content Include="processes\t1.svg" />
+    <Content Include="processes\test-boundary-timer.bpmn" />
+    <Content Include="processes\test-boundary-timer.svg" />
+    <Content Include="processes\test-catch.bpmn" />
+    <Content Include="processes\test-catch.svg" />
+    <Content Include="processes\test-catch2.bpmn" />
+    <Content Include="processes\test-catch2.svg" />
+    <Content Include="processes\test-concurrency.bpmn" />
+    <Content Include="processes\test-concurrency.svg" />
+    <Content Include="processes\test-exclusive-gateway.bpmn" />
+    <Content Include="processes\test-exclusive-gateway.svg" />
+    <Content Include="processes\test-import.bpmn" />
+    <Content Include="processes\test-import.svg" />
+    <Content Include="processes\test-service-input.bpmn" />
+    <Content Include="processes\test-service-input.svg" />
+    <Content Include="processes\test-service.bpmn" />
+    <Content Include="processes\test-service.svg" />
+    <Content Include="processes\test-system-crash.bpmn" />
+    <Content Include="processes\test-system-crash.svg" />
+    <Content Include="processes\test-throw.bpmn" />
+    <Content Include="processes\test-throw.svg" />
+    <Content Include="processes\test-throw2.bpmn" />
+    <Content Include="processes\test-throw2.svg" />
+    <Content Include="processes\testing-3.bpmn" />
+    <Content Include="processes\testing-3.svg" />
+    <Content Include="processes\testing3.bpmn" />
+    <Content Include="processes\testing33.bpmn" />
+    <Content Include="processes\TestUseCaseMS.bpmn" />
+    <Content Include="processes\TestUseCaseMS.svg" />
+    <Content Include="processes\test_gateway1.bpmn" />
+    <Content Include="processes\test_gateway1.svg" />
+    <Content Include="processes\test_gateway2.bpmn" />
+    <Content Include="processes\test_gateway2.svg" />
+    <Content Include="processes\test_gateway3.bpmn" />
+    <Content Include="processes\test_gateway3.svg" />
+    <Content Include="processes\test_gateway4.bpmn" />
+    <Content Include="processes\test_gateway4.svg" />
+    <Content Include="processes\timer before user task.svg" />
+    <Content Include="processes\timer-repeat.bpmn" />
+    <Content Include="processes\timer-repeat.svg" />
+    <Content Include="processes\timer-sample.bpmn" />
+    <Content Include="processes\timer-sample.svg" />
+    <Content Include="processes\timer1.bpmn" />
+    <Content Include="processes\timer1.svg" />
+    <Content Include="processes\timerBeforeUser.bpmn" />
+    <Content Include="processes\timerBeforeUser.svg" />
+    <Content Include="processes\Trans.bpmn" />
+    <Content Include="processes\Trans.svg" />
+    <Content Include="processes\UserInputDataObject.bpmn" />
+    <Content Include="processes\UserInputDataObject.svg" />
+    <Content Include="processes\Vacation Request.bpmn" />
+    <Content Include="processes\Vacation.json" />
+    <Content Include="src\userAccess\views\account\admin.pug" />
+    <Content Include="src\userAccess\views\account\edit.pug" />
+    <Content Include="src\userAccess\views\account\forgot.pug" />
+    <Content Include="src\userAccess\views\account\login.pug" />
+    <Content Include="src\userAccess\views\account\profile.pug" />
+    <Content Include="src\userAccess\views\account\reset.pug" />
+    <Content Include="src\userAccess\views\account\signup.pug" />
+    <Content Include="src\views\about.pug" />
+    <Content Include="src\views\assign.pug" />
+    <Content Include="src\views\docs.pug" />
+    <Content Include="src\views\error.pug" />
+    <Content Include="src\views\executeInput.pug" />
+    <Content Include="src\views\includes\dashboardHeader.pug" />
+    <Content Include="src\views\includes\engines.pug" />
+    <Content Include="src\views\includes\instances.pug" />
+    <Content Include="src\views\includes\nav.pug" />
+    <Content Include="src\views\includes\navDocs.pug" />
+    <Content Include="src\views\includes\navHome.pug" />
+    <Content Include="src\views\includes\processes.pug" />
+    <Content Include="src\views\includes\tasks.pug" />
+    <Content Include="src\views\index.pug" />
+    <Content Include="src\views\InstanceDetails.pug" />
+    <Content Include="src\views\invokeItem.pug" />
+    <Content Include="src\views\layout.pug" />
+    <Content Include="src\views\layoutDocs.pug" />
+    <Content Include="src\views\layoutHome.pug" />
+    <Content Include="src\views\login.pug" />
+    <Content Include="src\views\modeller.bu.js" />
+    <Content Include="src\views\Modeller.js.bu" />
+    <Content Include="src\views\Modeller.pug" />
+    <Content Include="src\views\models\add.pug" />
+    <Content Include="src\views\models\delete.pug" />
+    <Content Include="src\views\models\export.pug" />
+    <Content Include="src\views\models\import.pug" />
+    <Content Include="src\views\models\rename.pug" />
+    <Content Include="src\views\partials\flash.pug" />
+    <Content Include="src\views\partials\footer.pug" />
+    <Content Include="src\views\partials\header.pug" />
+    <Content Include="src\views\register.pug" />
+    <Content Include="src\views\SVGHelper.js" />
+    <Content Include="src\views\tasks.pug" />
+    <Content Include="public\javascripts\bootstrap.min.js" />
+    <Content Include="public\javascripts\caseView.js" />
+    <Content Include="public\javascripts\descriptions.js" />
+    <Content Include="public\javascripts\jquery-ui.min.js" />
+    <Content Include="public\javascripts\jquery.isloading.min.js" />
+    <Content Include="public\javascripts\jquery.min.js" />
+    <Content Include="public\javascripts\jsonHelper.js" />
+    <Content Include="public\javascripts\modeler-without-panel.js" />
+    <Content Include="public\javascripts\modeller-prop-panel.js" />
+    <Content Include="public\javascripts\modeller-withPropertyPanel.js" />
+    <Content Include="public\javascripts\modeller.js" />
+    <Content Include="public\javascripts\modeller1.js" />
+    <Content Include="public\javascripts\processEditor.js" />
+    <Content Include="public\javascripts\SVGHelper.js" />
+    <Content Include="public\javascripts\workflow.js" />
+    <Content Include="public\stylesheets\app.css" />
+    <Content Include="public\vendor\bpmn-font\css\bpmn-embedded.css" />
+    <Content Include="public\vendor\bpmn-font\css\bpmn.css" />
+    <Content Include="public\vendor\bpmn-font\font\bpmn.eot" />
+    <Content Include="public\vendor\bpmn-font\font\bpmn.svg" />
+    <Content Include="public\vendor\bpmn-font\font\bpmn.ttf" />
+    <Content Include="public\vendor\bpmn-font\font\bpmn.woff" />
+    <Content Include="README.md" />
+    <Content Include="resources\camunda.json" />
+    <Content Include="tools\convertTomd.js" />
+    <Content Include="tools\generate-toc.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="tools\typedoc-default-themes-master.zip" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_comment.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_filter.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_footer.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_hierarchy.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_images.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_index.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_member.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_navigation.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_panel.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_search.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_signatures.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_sources.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\elements\_toolbar.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\layouts\_default.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\layouts\_minimal.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\main.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\setup\_animations.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\setup\_grid.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\setup\_icons.scss" />
+    <Content Include="tools\typedoc_theme\assets\css\setup\_mixins.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\setup\_typography.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\vendors\_highlight.js.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\vendors\_normalize.sass" />
+    <Content Include="tools\typedoc_theme\assets\css\_constants.sass" />
+    <Content Include="tools\typedoc_theme\assets\images\icons%402x.png" />
+    <Content Include="tools\typedoc_theme\assets\images\icons.png" />
+    <Content Include="tools\typedoc_theme\assets\images\icons.psd" />
+    <Content Include="tools\typedoc_theme\assets\images\widgets%402x.png" />
+    <Content Include="tools\typedoc_theme\assets\images\widgets.png" />
+    <Content Include="tools\typedoc_theme\assets\images\widgets.psd" />
+    <Content Include="tools\typedoc_theme\layouts\default.hbs" />
+    <Content Include="tools\typedoc_theme\partials\analytics.hbs" />
+    <Content Include="tools\typedoc_theme\partials\breadcrumb.hbs" />
+    <Content Include="tools\typedoc_theme\partials\comment.hbs" />
+    <Content Include="tools\typedoc_theme\partials\footer.hbs" />
+    <Content Include="tools\typedoc_theme\partials\header.hbs" />
+    <Content Include="tools\typedoc_theme\partials\hierarchy.hbs" />
+    <Content Include="tools\typedoc_theme\partials\index.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.declaration.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.getterSetter.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.reference.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.signature.body.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.signature.title.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.signatures.hbs" />
+    <Content Include="tools\typedoc_theme\partials\member.sources.hbs" />
+    <Content Include="tools\typedoc_theme\partials\members.group.hbs" />
+    <Content Include="tools\typedoc_theme\partials\members.hbs" />
+    <Content Include="tools\typedoc_theme\partials\navigation.hbs" />
+    <Content Include="tools\typedoc_theme\partials\parameter.hbs" />
+    <Content Include="tools\typedoc_theme\partials\toc.hbs" />
+    <Content Include="tools\typedoc_theme\partials\toc.root.hbs" />
+    <Content Include="tools\typedoc_theme\partials\type.hbs" />
+    <Content Include="tools\typedoc_theme\partials\typeAndParent.hbs" />
+    <Content Include="tools\typedoc_theme\partials\typeParameters.hbs" />
+    <Content Include="tools\typedoc_theme\templates\index.hbs" />
+    <Content Include="tools\typedoc_theme\templates\reflection.hbs" />
+    <Content Include="Web.config" />
+    <Content Include="tsconfig.json" />
+    <Content Include="package.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="processes\" />
+    <Folder Include="src\" />
+    <Folder Include="src\routes\" />
+    <Folder Include="src\routes\uploads\" />
+    <Folder Include="src\scripts\" />
+    <Folder Include="src\userAccess\" />
+    <Folder Include="src\userAccess\config\" />
+    <Folder Include="src\userAccess\controllers\" />
+    <Folder Include="src\userAccess\models\" />
+    <Folder Include="src\userAccess\routes\" />
+    <Folder Include="src\userAccess\routes\uploads\" />
+    <Folder Include="src\userAccess\views\" />
+    <Folder Include="src\userAccess\views\account\" />
+    <Folder Include="src\views\" />
+    <Folder Include="src\views\includes\" />
+    <Folder Include="src\views\models\" />
+    <Folder Include="src\views\partials\" />
+    <Folder Include="src\WorkflowApp\" />
+    <Folder Include="resources\" />
+    <Folder Include="public\" />
+    <Folder Include="public\images\" />
+    <Folder Include="public\javascripts\" />
+    <Folder Include="public\stylesheets\" />
+    <Folder Include="public\vendor\" />
+    <Folder Include="public\vendor\bpmn-font\" />
+    <Folder Include="public\vendor\bpmn-font\css\" />
+    <Folder Include="public\vendor\bpmn-font\font\" />
+    <Folder Include="tools\" />
+    <Folder Include="tools\typedoc_theme\" />
+    <Folder Include="tools\typedoc_theme\assets\" />
+    <Folder Include="tools\typedoc_theme\assets\css\" />
+    <Folder Include="tools\typedoc_theme\assets\css\elements\" />
+    <Folder Include="tools\typedoc_theme\assets\css\layouts\" />
+    <Folder Include="tools\typedoc_theme\assets\css\setup\" />
+    <Folder Include="tools\typedoc_theme\assets\css\vendors\" />
+    <Folder Include="tools\typedoc_theme\assets\images\" />
+    <Folder Include="tools\typedoc_theme\assets\js\" />
+    <Folder Include="tools\typedoc_theme\assets\js\src\" />
+    <Folder Include="tools\typedoc_theme\assets\js\src\typedoc\" />
+    <Folder Include="tools\typedoc_theme\assets\js\src\typedoc\components\" />
+    <Folder Include="tools\typedoc_theme\assets\js\src\typedoc\services\" />
+    <Folder Include="tools\typedoc_theme\assets\js\src\typedoc\utils\" />
+    <Folder Include="tools\typedoc_theme\layouts\" />
+    <Folder Include="tools\typedoc_theme\partials\" />
+    <Folder Include="tools\typedoc_theme\templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\index.ts" />
+    <TypeScriptCompile Include="src\routes\api.ts" />
+    <TypeScriptCompile Include="src\routes\common.ts" />
+    <TypeScriptCompile Include="src\routes\docs.ts" />
+    <TypeScriptCompile Include="src\routes\model.ts" />
+    <TypeScriptCompile Include="src\routes\workflow.ts" />
+    <TypeScriptCompile Include="src\scripts\cli.ts" />
+    <TypeScriptCompile Include="src\scripts\copyFilesOnBuild.ts" />
+    <TypeScriptCompile Include="src\scripts\setup.ts" />
+    <TypeScriptCompile Include="src\userAccess\config\mail.ts" />
+    <TypeScriptCompile Include="src\userAccess\config\passport.ts" />
+    <TypeScriptCompile Include="src\userAccess\controllers\user.ts" />
+    <TypeScriptCompile Include="src\userAccess\models\User.ts" />
+    <TypeScriptCompile Include="src\userAccess\routes\account.ts" />
+    <TypeScriptCompile Include="src\userAccess\UserManager.ts" />
+    <TypeScriptCompile Include="src\userAccess\UserService.ts" />
+    <TypeScriptCompile Include="src\views\InstanceViewer.ts" />
+    <TypeScriptCompile Include="src\views\Modeler-noProp.ts" />
+    <TypeScriptCompile Include="src\views\Modeler-wProp.ts" />
+    <TypeScriptCompile Include="src\views\Modeller.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\appDelegate.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\appServices.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\appUtils.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\configuration.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\index.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\INSTALL_appDelegate.ts" />
+    <TypeScriptCompile Include="src\WorkflowApp\INSTALL_configuration.ts" />
+    <TypeScriptCompile Include="resources\js.json" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\Application.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\Component.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\components\Filter.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\components\MenuHighlight.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\components\Search.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\components\Signature.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\components\Toggle.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\EventTarget.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\services\Viewport.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\utils\pointer.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\typedoc\utils\trottle.ts" />
+    <TypeScriptCompile Include="tools\typedoc_theme\assets\js\src\~bootstrap.ts" />
+  </ItemGroup>
+  <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:48022/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost:1337</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

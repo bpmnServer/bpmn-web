@@ -1,6 +1,5 @@
 
-import { MyAppDelegate} from '../appDelegate';
-
+import { MyAppDelegate} from '../WorkflowApp/appDelegate';
 
 
 class TestAppDelegate extends MyAppDelegate {

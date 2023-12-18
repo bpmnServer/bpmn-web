@@ -28,6 +28,7 @@ const copyNonTsFiles = async (source: string, destination: string) => {
 
         try {
             // Copy file
+			console.log('..copying file',source,file,'to',destination);
             await copy(srcPath, destPath);
             // console.log(`Copied ${srcPath} to ${destPath}`);
         } catch (err) {
