@@ -13,6 +13,8 @@ const MULTI_APP_SERVICES =false;
 
 const nodemailer = require("nodemailer");
 
+console.log('appDelegate from ',__filename);
+
 
 class MyAppDelegate extends DefaultAppDelegate{
     winSocket;

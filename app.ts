@@ -1,4 +1,4 @@
-console.log("bpmn-server WebApp.ts version "+ getVersion());
+//console.log("bpmn-server WebApp.ts version "+ getVersion());
 
 import debug = require('debug');
 const flash = require('connect-flash');
