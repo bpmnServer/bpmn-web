@@ -4,12 +4,15 @@
     "target": "es6",
     "lib": [ "es6" ],
     "sourceMap": true,
-    "declaration": true ,
-/*    "rootDir": "./src",*/
-    "outDir": "./dist" 
+    "declaration": true,
+    "incremental": true,
+    "allowJs": true,
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": [
-    "**/*.ts", "test/handler.js"
+    "./src",
+    "./src/test/**/*.js",
   ],
   "exclude": [
     "node_modules" , "./dist" , "./webApp"
