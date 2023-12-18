@@ -1,15 +1,14 @@
 
-import { ModelsDatastore, Configuration} from '../';
+import { ModelsDatastore, Configuration} from '../WorkflowApp';
 import { TestAppDelegate } from './appDelegate';
 import { IConfiguration, DataStore, ILogger , NoCacheManager} from '../';
 import { Logger } from '../'
-import { UserService } from '../../userAccess/UserService';
+import { UserService } from '../userAccess/UserService';
 import 'dotenv/config';
 
-let definitionsPath = __dirname + '/../processes/';
 export const configuration = new Configuration(
 	{
-		definitionsPath: definitionsPath,
+		definitionsPath: process.env.DEFINITIONS_PATH,
 		templatesPath: __dirname + '/../emailTemplates',
 		timers: {
 			//forceTimersDelay: 1000,

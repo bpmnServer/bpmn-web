@@ -1,5 +1,5 @@
 import { BPMNServer, DefaultAppDelegate, Logger } from "bpmn-server";
-import { configuration} from './WorkflowApp/configuration';
+import { configuration} from '../WorkflowApp/configuration';
 import * as readline from "readline";
 import "dotenv/config";
 
