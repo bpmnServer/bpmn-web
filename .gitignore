@@ -3,7 +3,5 @@
 *.log
 /bin
 /dist
-/bpmnServer/node_modules
-/bpmnServer/obj
-/bpmnServer/bin
 .env
+bpmn-web.njsproj
