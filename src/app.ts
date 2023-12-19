@@ -125,13 +125,14 @@ export class WebApp {
 
 	setupRoutes() {
 		var router = express.Router();
-
-		router.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-		router.use('/js/lib', express.static(path.join(__dirname, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
-		router.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
-		router.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
-		router.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
-		router.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
+		var root=path.join(__dirname,'../');
+		
+		router.use('/', express.static(path.join(root, 'public'), { maxAge: 31557600000 }));
+		router.use('/js/lib', express.static(path.join(root, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
+		router.use('/js/lib', express.static(path.join(root, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
+		router.use('/js/lib', express.static(path.join(root, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
+		router.use('/js/lib', express.static(path.join(root, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
+		router.use('/webfonts', express.static(path.join(root, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
 		this.app.use('/', router);
 
 		var Common = require("./routes/common");

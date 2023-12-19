@@ -12,7 +12,7 @@
   },
   "include": [
     "./src",
-    "./src/test/**/*.js",
+    "./src/test/**/*.js"
 
   ],
   "exclude": [
