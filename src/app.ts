@@ -34,7 +34,7 @@ var busboy = require('connect-busboy'); //middleware for form/file upload
 function getVersion() {
 	const fs = require('fs');
 
-	const configPath = __dirname + '/package.json';
+	const configPath = __dirname + '/../package.json';
 
 	if (fs.existsSync(configPath)) {
 
