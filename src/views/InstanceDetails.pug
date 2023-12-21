@@ -1,6 +1,8 @@
 extends layout
 
 block content
+	- var docs= JSON.parse(definition);
+	- 
 	- function prettyDate(date){
 	- var d = date.getDate();
 	- var m = date.getMonth() + 1; //Months are zero based
@@ -8,7 +10,7 @@ block content
 	- var h = date.getHours();
 	- var mm = date.getMinutes();
 	- var s = date.getSeconds();
-	- 
+	-
 	-     return d+'/'+m+'/'+y+' '+h+':'+mm+':'+s;
 	-   }
 
@@ -81,6 +83,101 @@ block content
 
 	div!= svg
 
+	h4 Model Documentation<button id="showDoc" onclick="showDocs()">&darr;</button>
+
+	div(id="docs" style="display:default;") 
+		table
+			tr
+				th(colspan=5) Processes
+			tr
+				th() Id
+				th() name
+			each proc in docs.processes
+				tr
+					td #{proc.id}
+					td #{proc.name}
+					if (proc.description)
+						each line in proc.description
+							tr
+								td
+								td
+								td #{line[0]}
+								td #{line[1]}
+					if (proc.docs)
+						each doc in proc.docs
+							tr
+								td
+								td
+								td Documentation:
+								td #{doc.text}
+
+		table
+			tr
+				th(colspan=5) Nodes
+			tr
+				th id
+				th name
+				th type/feature
+				th details
+			each el in docs.elements
+				tr
+					td #{el.id}
+					td #{el.name}
+					td #{el.type}#{el.subType}
+					td
+						each line in el.description
+							tr
+								td 
+								td
+								td #{line[0]}
+								td #{line[1]}
+						each behav in el.behaviours
+							each line in behav
+								tr
+									td
+									td
+									td #{line[0]}
+									td #{line[1]}
+						if (el.docs)
+							each doc in el.docs
+								tr
+									td
+									td
+									td Documentation:
+									td #{doc.text}
+		table
+			tr
+				th(colspan=5) Sequence Flows (only with some details)
+			tr
+				th id
+				th from 
+				th to
+				th feature
+				th details
+			each el in docs.flows
+				if (el.description)
+					tr
+						td #{el.id}
+						td #{el.from}
+						td #{el.to}
+						each line in el.description
+							tr
+								td
+								td
+								td
+								td #{line[0]}
+								td #{line[1]}
+						if (el.docs)
+							each doc in el.docs
+								tr
+									td
+									td
+									td Documentation:
+									td #{doc.text}
+
+
+
+
 	h4 Instance Items
 
 	span Times shown are from the start of the Execution
@@ -127,11 +224,20 @@ block content
 					td
 					td(colspan=8) #{assign}
 
+	h4 Instance Info 
+	div(id="info" ) 
+		table(style='width:100%')
+			each log in logs
+				if (log.type=='info')
+					tr
+						td(style="width:1%;white-space:nowrap") #{prettyDate(log.date)}
+						td #{log.message}
+		
 	h4 Instance Logs <button id="showHide" onclick="showLogs()">&darr;</button>
 	div(id="logs" style="display:none;") 
-		table
+		table(style='width:100%')
 			each log in logs
 				tr
-					td #{prettyDate(log.date)}
+					td(style="white-space:nowrap") #{prettyDate(log.date)}
 					td #{log.message}
 		
