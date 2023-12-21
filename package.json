@@ -7,7 +7,7 @@
     "start": "ts-node src/app",
     "cli": "ts-node src/scripts/cli.ts",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./src/app.ts\"",
-    "test": "npm run build && mocha -exit --config=src/test/.mocharc.json src/test/feature/"
+    "test": "mocha -exit --config=src/test/.mocharc.json src/test/feature/"
   },
   "description": "bpmn-web a front end for bpmn-server",
   "author": {

@@ -3,9 +3,10 @@
 *.log
 *.map
 *.d.ts
-*.js
+**/*.js
 /bin
 /dist
 .env
 *.bak
-bpmn-web.njsproj
+*.njsproj
+*.njsproj.user
