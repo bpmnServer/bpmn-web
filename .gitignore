@@ -7,4 +7,5 @@
 /bin
 /dist
 .env
+*.bak
 bpmn-web.njsproj

@@ -6,17 +6,10 @@
     "setup": "ts-node src/scripts/setup.ts",
     "start": "ts-node src/app",
     "cli": "ts-node src/scripts/cli.ts",
-    "build": "tsc --build",
-    "compileRun": "npm run build && node src/app.js",
-    "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRun\"",
-    "build2": "tsc --build && tsc --build ../bpmn-server",
-    "compileRun2": "npm run build2 && node src/app.js",
-    "dev2":  "nodemon -e ts --watch ./src --watch ../bpmn-server/src --exec \"npm run compileRun2\"",
-    "clean": "rimraf dist",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./src/app.ts\"",
     "test": "npm run build && mocha -exit --config=src/test/.mocharc.json src/test/feature/"
   },
-  "description": "bpmn-server.webApp",
+  "description": "bpmn-web a front end for bpmn-server",
   "author": {
     "name": ""
   },
@@ -25,7 +18,7 @@
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "bpmn-moddle": "^7.0.2",
-    "bpmn-server": "file:../bpmn-server",
+    "bpmn-server": "bpmn-server",
     "camunda-bpmn-moddle": "^4.4.0",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",

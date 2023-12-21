@@ -8,7 +8,6 @@
     "incremental": true,
     "allowJs": false,
     "rootDir": "./src",
-  //  "outDir": "./dist"
   },
   "include": [
     "./src"
