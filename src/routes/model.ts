@@ -21,7 +21,6 @@ const awaitHandlerFactory = (middleware) => {
         }
     }
 }
-const config = require('../WorkflowApp/configuration.js').configuration;
 
 export class Model extends Common {
     config() {
@@ -77,7 +76,7 @@ export class Model extends Common {
         router.get('/download/:file', awaitHandlerFactory(async (request, response) => {
             console.log(request.params.file);
 
-            const filePath = config.definitionsPath + request.params.file;
+            const filePath = bpmnServer.configuration.definitionsPath + request.params.file;
             console.log('filePath:' + filePath);
 
             response.download(filePath); // Set disposition and send it.
