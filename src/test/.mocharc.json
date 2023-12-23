@@ -6,7 +6,7 @@
   "slow": 1500,
   "timeout": 50000,
   "recursive": true,
-  "file": [ "dist/test/helpers/setup.js" ],
+  "file": [ "./src/test/helpers/setup.js" ],
   "ui": "mocha-cakes-2",
-  "watch-files": [ "dist/test/feature/*.js" ]
+  "watch-files": [ "./src/test/feature/*.js" ]
 }

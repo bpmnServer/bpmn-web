@@ -48,7 +48,7 @@ export class Workflow extends Common {
         router.get('/', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
             let output = [];
             output = show(output);
-		    console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
+		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             
             display(request,response, 'Show', output);
         }));
@@ -57,7 +57,7 @@ export class Workflow extends Common {
             let output = [];
             setForUser(request);
             output = show(output);
-            console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
+            //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
 
             display(request, response, 'Show', output);
         }));
@@ -222,7 +222,7 @@ export class Workflow extends Common {
             let itemId = request.query.itemId;
             let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
             let item = await bpmnAPI.data.findItem({"items.id": id},getSecureUser(request));
-            console.log('item:', item);
+            //console.log('item:', item);
             if (!item) {
                 request.flash('errors', [{ msg: 'Item not found or not authorized' }]);
                 response.redirect('/');
@@ -256,7 +256,7 @@ export class Workflow extends Common {
                     data[label.substr(5)] = entry[1];
                 }
                 else {
-                    console.log(label, entry[1]);
+                    //console.log(label, entry[1]);
                     assignment[label] = entry[1];
 
                 }
@@ -269,7 +269,7 @@ export class Workflow extends Common {
                 assignment['candidateUsers'] = assignment['candidateUsers'].split(',');
                 assignment['candidateGroups'] = assignment['candidateGroups'].split(',');
 
-                console.log('data', data, 'assignment', assignment);
+                //console.log('data', data, 'assignment', assignment);
                 let result = await bpmnAPI.engine.assign({ "items.id": id }, data, assignment, getSecureUser(request));
 
                 response.redirect('/instanceDetails?id=' + result.execution.id);
@@ -355,7 +355,7 @@ async function home(request, response)  {
         } else {
             request.session.views = 1
         }
-        console.log('Session:', request.session);
+        //console.log('Session:', request.session);
 
 
 
@@ -425,7 +425,7 @@ async function displayError(res, error) {
 
 }
 function getSecureUser(req) {
-console.log('process.env.REQUIRE_AUTHENTICATION',process.env.REQUIRE_AUTHENTICATION);
+//console.log('process.env.REQUIRE_AUTHENTICATION',process.env.REQUIRE_AUTHENTICATION);
 
     let user;
     if (process.env.REQUIRE_AUTHENTICATION === 'true')
@@ -437,12 +437,12 @@ console.log('process.env.REQUIRE_AUTHENTICATION',process.env.REQUIRE_AUTHENTICAT
     else
          user=SecureUser.SystemUser();
      
-    console.log('getSecureUser',user);
+    //console.log('getSecureUser',user);
     return user;        
  }
 
 function getUser(req) {
-    console.log('getUser', req.user, req.session.forUser);
+    //console.log('getUser', req.user, req.session.forUser);
     if (req.session.forUser)
         return req.session.forUser;
     else

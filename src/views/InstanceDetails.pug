@@ -108,12 +108,22 @@ block content
 				tr
 					td #{proc.id}
 					td #{proc.name}
+<<<<<<< HEAD
 					each line in proc.description
 						tr
 							td
 							td
 							td #{line[0]}
 							td #{line[1]}
+=======
+					if (proc.description)
+						each line in proc.description
+							tr
+								td
+								td
+								td #{line[0]}
+								td #{line[1]}
+>>>>>>> 4c938444aff1594ccae23b1bea045b9acdc36567
 					if (proc.docs)
 						each doc in proc.docs
 							tr
@@ -166,7 +176,11 @@ block content
 				th feature
 				th details
 			each el in docs.flows
+<<<<<<< HEAD
 				if (el.description.length>0 || el.documentation)
+=======
+				if (el.description)
+>>>>>>> 4c938444aff1594ccae23b1bea045b9acdc36567
 					tr
 						td #{el.id}
 						td #{el.from}

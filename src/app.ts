@@ -1,4 +1,6 @@
-//console.log("bpmn-server WebApp.ts version "+ getVersion());
+console.log('app.ts from ',__filename);
+
+console.log("bpmn-server WebApp.ts version "+ getVersion());
 
 import debug = require('debug');
 const flash = require('connect-flash');
@@ -32,7 +34,7 @@ var busboy = require('connect-busboy'); //middleware for form/file upload
 function getVersion() {
 	const fs = require('fs');
 
-	const configPath = __dirname + '/package.json';
+	const configPath = __dirname + '/../package.json';
 
 	if (fs.existsSync(configPath)) {
 
