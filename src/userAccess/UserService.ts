@@ -1,8 +1,8 @@
 import { IUserService } from '../';
 
-import { config } from "dotenv";
-import mongoose from "mongoose";
-import { User } from "./models/User";
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const User = require('./models/User');
 
 export class UserService implements IUserService {
 	static initialized = false;	
@@ -61,7 +61,7 @@ export class UserService implements IUserService {
 
 	init() {
 		console.log('UserService.init()');
-		config();
+		dotenv.config();
 		console.log("MongoDB URL", process.env.MONGO_DB_URL)
 		mongoose.set('strictQuery', false);
 		mongoose.connect(process.env.MONGO_DB_URL);

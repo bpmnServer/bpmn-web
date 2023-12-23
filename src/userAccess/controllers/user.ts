@@ -70,31 +70,32 @@ export class UserController {
             return res.redirect(viewPath + '/edit/' + req.body.id);
         }
         req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
-        User.findById(req.body.id, (err, user) => {
-            if (err) {
-                return next(err);
-            }
-            if (user.email !== req.body.email)
-                user.emailVerified = false;
-            user.email = req.body.email || '';
-            user.userGroups = req.body.userGroups;
-            user.profile.name = req.body.name || '';
-            user.profile.gender = req.body.gender || '';
-            user.profile.location = req.body.location || '';
-            user.profile.website = req.body.website || '';
-            console.log('user obj', user);
-            user.save((err) => {
-                if (err) {
-                    if (err.code === 11000) {
-                        req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
-                        return res.redirect(viewPath + 'edit/' + req.body.id);
-                    }
-                    return next(err);
-                }
-                req.flash('success', { msg: 'Profile information has been updated.' });
-                return res.redirect(viewPath + 'edit/' + req.body.id);
+
+        User.findById(req.body.id).then(
+            function (user) {
+        
+                if (user.email !== req.body.email)
+                    user.emailVerified = false;
+                user.email = req.body.email || '';
+                user.userGroups = req.body.userGroups;
+                user.profile.name = req.body.name || '';
+                user.profile.gender = req.body.gender || '';
+                user.profile.location = req.body.location || '';
+                user.profile.website = req.body.website || '';
+                console.log('user obj', user);
+                user.save().then((savedUser) => {
+                    /*if (!user) {
+                        if (err.code === 11000) {
+                            req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
+                            return res.redirect(viewPath + 'edit/' + req.body.id);
+                        }
+                        return next(err);
+                     
+                    }   */ 
+                    req.flash('success', { msg: 'Profile information has been updated.' });
+                    return res.redirect(viewPath + 'edit/' + req.body.id);
+                });
             });
-        });
     }
     /**
      * GET /login
@@ -193,29 +194,22 @@ export class UserController {
             email: req.body.email,
             password: req.body.password
         });
-        User.findOne({ userName: req.body.userName }, (err, existingUser) => {
-            if (err) {
-                return next(err);
-            }
+        User.findOne({ userName: req.body.userName })
+            .then((existingUser) => {
             if (existingUser) {
                 req.flash('errors', { msg: 'Account with that userName already exists.' });
                 console.log('already exists');
                 return res.redirect('/signup');
             }
         });
-        User.findOne({ email: req.body.email }, (err, existingUser) => {
-            if (err) {
-                return next(err);
-            }
+        User.findOne({ email: req.body.email })
+            .then ((existingUser) => {
             if (existingUser) {
                 req.flash('errors', { msg: 'Account with that email address already exists.' });
                 console.log('already exists');
                 return res.redirect('/signup');
             }
-            user.save((err) => {
-                if (err) {
-                    return next(err);
-                }
+            user.save().then((savedUser) => {
                 req.logIn(user, (err) => {
                     if (err) {
                         return next(err);
@@ -249,10 +243,10 @@ export class UserController {
             return res.redirect('/account/edit/'+req.body.id);
         }
         req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
-        User.findById(req.body.id, (err, user) => {
-            if (err) {
-                return next(err);
-            }
+
+
+        User.findById(req.body.id).then((user) =>
+            {
             if (user.email !== req.body.email)
                 user.emailVerified = false;
             user.userGroups = req.body.userGroups.split(',');
@@ -262,14 +256,11 @@ export class UserController {
             user.profile.location = req.body.location || '';
             user.profile.website = req.body.website || '';
            
-            user.save((err) => {
-                if (err) {
-                    if (err.code === 11000) {
+            user.save().then((savedUser) => {
+                if (user!==savedUser) {
                         req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
                         return res.redirect('/account/edit' + req.body.id);
-                    }
-                    return next(err);
-                }
+                } 
                 req.flash('success', { msg: 'Profile information has been updated.' });
                 res.redirect('/account/edit/' + req.body.id);
             });
@@ -290,14 +281,12 @@ export class UserController {
             res.redirect('/account/edit/' + req.body.id);
         }
         console.log('changing pw for ' + req.body.id);
-        User.findById(req.body.id, (err, user) => {
-            if (err) {
-                return next(err);
-            }
+
+        User.findById(req.body.id).then(( user) => {
             user.password = req.body.password;
-            user.save((err) => {
-                if (err) {
-                    return next(err);
+            user.save().then((savedUser) => {
+                if (user !== savedUser) {
+                    req.flash('error', { msg: 'Password has not been changed for user ' + user.userName + '.' });
                 }
                 req.flash('success', { msg: 'Password has been changed for user '+user.userName+'.' });
                 res.redirect('/account/edit/' + user.id);
@@ -332,10 +321,9 @@ export class UserController {
      */
     static getOauthUnlink(req, res, next) {
         const { provider } = req.params;
-        User.findById(req.user.id, (err, user) => {
-            if (err) {
-                return next(err);
-            }
+
+
+        User.findById(req.user.id).then((user) => {
             user[provider.toLowerCase()] = undefined;
             const tokensWithoutProviderToUnlink = user.tokens.filter((token) => token.kind !== provider.toLowerCase());
             // Some auth providers do not provide an email address in the user profile.
@@ -350,10 +338,7 @@ export class UserController {
                 return res.redirect('/account');
             }
             user.tokens = tokensWithoutProviderToUnlink;
-            user.save((err) => {
-                if (err) {
-                    return next(err);
-                }
+            user.save().then((savedUser) => {
                 req.flash('info', { msg: `${_.startCase(_.toLower(provider))} account has been unlinked.` });
                 res.redirect('/account');
             });

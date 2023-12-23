@@ -23,6 +23,10 @@ async function delay(time, result) {
 
 var seq = 0;
 class AppServices {
+    appDelegate;
+    constructor(delegate) {
+        this.appDelegate = delegate;
+    }
     async echo(input, context) {
         console.log('service echo - input', input);
         return input;

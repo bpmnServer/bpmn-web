@@ -4,4 +4,9 @@
 /bin
 /dist
 .env
-bpmn-web.njsproj
+/src/examples
+*.njsproj
+.vscode
+*.bak
+*.cmd
+*.tsbuildinfo

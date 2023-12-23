@@ -76,9 +76,7 @@ export class Model extends Common {
         router.get('/download/:file', awaitHandlerFactory(async (request, response) => {
             console.log(request.params.file);
 
-            let definitionsPath = bpmnServer.configuration.definitionsPath;
-            const filePath = definitionsPath + request.params.file;
-
+            const filePath = bpmnServer.configuration.definitionsPath + request.params.file;
             console.log('filePath:' + filePath);
 
             response.download(filePath); // Set disposition and send it.

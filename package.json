@@ -1,19 +1,20 @@
 {
-  "name": "bpmn-server.webapp",
+  "name": "bpmn-web",
   "version": "2.1.0",
   "private": true,
   "scripts": {
     "setup": "ts-node src/scripts/setup.ts",
     "start": "ts-node src/app",
+    "start2": "tsc -w & tscp -w",
     "cli": "ts-node src/scripts/cli.ts",
-    "build": "tsc --build",
+    "build": "tsc --build && tscp",
     "compileRun": "npm run build && node dist/app.js",
-    "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRun\"",
+    "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRun\" && tscp -w",
     "clean": "rimraf dist",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./src/app.ts\"",
     "test": "npm run build && mocha -exit --config=src/test/.mocharc.json dist/test/feature/"
   },
-  "description": "bpmn-server.webApp",
+  "description": "bpmn-web Demo App",
   "author": {
     "name": ""
   },

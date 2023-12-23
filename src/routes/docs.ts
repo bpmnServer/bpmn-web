@@ -67,38 +67,34 @@ export class Docs extends Common {
         });
         router.get('/api/*/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
-            console.log('from docs');
-            console.log(request.params);
             let folder = '';
             if (request.params[0])
                 folder = request.params[0] + '/';
-            console.log(folder);
             let fileName = 'api/' + folder + request.params.fileName;
 
             return processFile(fileName, response);
         }));
         router.get('/api/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
-            console.log('from docs');
-            console.log(request.params);
             let fileName = 'api/' + request.params.fileName;
 
             return processFile(fileName, response);
         }));
         router.get('/examples/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
-            console.log('from docs');
-            console.log(request.params);
-
             let fileName = 'examples/' + request.params.fileName;
 
             return processFile(fileName, response);
         }));
 
-        router.get('/:fileName', awaitAppDelegateFactory(async (request, response) => {
+        router.get('/images/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
-            console.log('from docs');
-            console.log(request.params);
+            let fileName = 'images/' + request.params.fileName;
+
+            return processFile(fileName, response);
+        }));
+
+        router.get('/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
             let fileName = request.params.fileName;
 
@@ -122,13 +118,17 @@ export class Docs extends Common {
 }
 function processFile(fileName,response) {
 
+    
+    if (!fileName.includes('.'))
+        fileName=fileName+'.md';
+    
     fileName = docsFolder + fileName;
 
     let file = FS.readFileSync(fileName);
 
 
+
     if (fileName.endsWith('.png')) {
-        console.log('.png');
         //            response.header("Content-Type", "image/png");
         //            response.send(file);
         response.writeHead(200, { 'Content-Type': 'image/png' });
@@ -140,7 +140,10 @@ function processFile(fileName,response) {
         response.send(file);
     }
     else {
-        response.render('docs', { md: file });
+        let sidebar = null;
+        if (FS.existsSync(docsFolder + 'sidebar.md')) 
+            sidebar = FS.readFileSync(docsFolder + 'sidebar.md');
+        response.render('docs', { md: file , sidebar});
     }
 
 

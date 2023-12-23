@@ -40,7 +40,7 @@ class MyAppDelegate extends DefaultAppDelegate{
                 if (!instance) {
                     const IMPORT = await import(path)
                     const aClass = IMPORT.AppServices;
-                    instance = new aClass();
+                    instance = new aClass(this);
                     this.appServices.set(path, instance);
                     console.log('instance loaded', path, instance);
                 }
@@ -50,7 +50,7 @@ class MyAppDelegate extends DefaultAppDelegate{
     else
         {
         if (this.appServices == null)
-        this.appServices = new AppServices();
+        this.appServices = new AppServices(this);
         return this.appServices
         }
         
