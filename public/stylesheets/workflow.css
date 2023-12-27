@@ -44,6 +44,7 @@
 
 .navbar {min-height: 42px !important;}
 
+.docs > tr > td { vertical-align: top ; border:0 !important;}
 /* forms */
 .form-section {
    border: 1px dotted green;

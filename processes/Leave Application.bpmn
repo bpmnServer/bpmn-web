@@ -18,12 +18,12 @@
         <bpmn2:flowNodeRef>Approve</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>Event_02om8ew</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>Gateway_1kqewfd</bpmn2:flowNodeRef>
-        <bpmn2:flowNodeRef>Event_1lkpj3z</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>timer-event</bpmn2:flowNodeRef>
       </bpmn2:lane>
       <bpmn2:lane id="Lane_05wy8pe" name="HR">
         <bpmn2:flowNodeRef>Event_1qg3mz1</bpmn2:flowNodeRef>
-        <bpmn2:flowNodeRef>Activity_1rx1txe</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>Activity_1escddn</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Activity_1rx1txe</bpmn2:flowNodeRef>
       </bpmn2:lane>
     </bpmn2:laneSet>
     <bpmn2:sequenceFlow id="Flow_1ig8mx7" sourceRef="Request" targetRef="Approve" />
@@ -53,15 +53,9 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
           <camunda:formField id="StartDate" label="Start Date" type="date" />
           <camunda:formField id="EndDate" label="End Date" type="date" />
         </camunda:formData>
-        <camunda:executionListener event="end">
-          <camunda:script scriptFormat="JavaScript">this.data.dateRequestCompleted=new Date();</camunda:script>
-        </camunda:executionListener>
         <camunda:taskListener event="assignment">
           <camunda:script scriptFormat="JavaScript">console.log('assignment');</camunda:script>
         </camunda:taskListener>
-        <camunda:executionListener event="start">
-          <camunda:script />
-        </camunda:executionListener>
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_0xa1hl7</bpmn2:incoming>
       <bpmn2:incoming>Flow_0rvg1ym</bpmn2:incoming>
@@ -106,21 +100,22 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
       <bpmn2:outgoing>Flow_1ef1q1u</bpmn2:outgoing>
       <bpmn2:outgoing>Flow_0rvg1ym</bpmn2:outgoing>
     </bpmn2:exclusiveGateway>
-    <bpmn2:task id="Activity_1rx1txe" name="Process">
-      <bpmn2:incoming>Flow_1ufmnuh</bpmn2:incoming>
-      <bpmn2:outgoing>Flow_1un6mui</bpmn2:outgoing>
-    </bpmn2:task>
-    <bpmn2:sequenceFlow id="Flow_00etx8n" sourceRef="Event_1lkpj3z" targetRef="Activity_1escddn" />
+    <bpmn2:sequenceFlow id="Flow_00etx8n" sourceRef="timer-event" targetRef="Activity_1escddn" />
     <bpmn2:scriptTask id="Activity_1escddn" name="Reminder" scriptFormat="JavaScript">
       <bpmn2:incoming>Flow_00etx8n</bpmn2:incoming>
       <bpmn2:script>/*appUtils.notify();*/</bpmn2:script>
     </bpmn2:scriptTask>
-    <bpmn2:boundaryEvent id="Event_1lkpj3z" cancelActivity="false" attachedToRef="Approve">
+    <bpmn2:boundaryEvent id="timer-event" cancelActivity="false" attachedToRef="Approve">
+      <bpmn2:documentation>Repeat 3 times after 2 days</bpmn2:documentation>
       <bpmn2:outgoing>Flow_00etx8n</bpmn2:outgoing>
       <bpmn2:timerEventDefinition id="TimerEventDefinition_1hfeiwy">
-        <bpmn2:timeDate xsi:type="bpmn2:tFormalExpression">$(appUtils.dateAdd(data.dateRequestCompleted,2,'day'))</bpmn2:timeDate>
+        <bpmn2:timeCycle xsi:type="bpmn2:tFormalExpression">R3P2D</bpmn2:timeCycle>
       </bpmn2:timerEventDefinition>
     </bpmn2:boundaryEvent>
+    <bpmn2:serviceTask id="Activity_1rx1txe" name="Process">
+      <bpmn2:incoming>Flow_1ufmnuh</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1un6mui</bpmn2:outgoing>
+    </bpmn2:serviceTask>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_04y2yh2">
@@ -160,7 +155,7 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
         <di:waypoint x="500" y="285" />
         <di:waypoint x="500" y="360" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="516" y="343" width="47" height="14" />
+          <dc:Bounds x="517" y="343" width="46" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1un6mui_di" bpmnElement="Flow_1un6mui">
@@ -197,13 +192,13 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
       <bpmndi:BPMNShape id="Gateway_1kqewfd_di" bpmnElement="Gateway_1kqewfd" isMarkerVisible="true">
         <dc:Bounds x="475" y="235" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1rx1txe_di" bpmnElement="Activity_1rx1txe">
-        <dc:Bounds x="450" y="360" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_12w2lic_di" bpmnElement="Activity_1escddn">
         <dc:Bounds x="250" y="350" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0dn083r_di" bpmnElement="Event_1lkpj3z">
+      <bpmndi:BPMNShape id="Activity_0jssmpk_di" bpmnElement="Activity_1rx1txe">
+        <dc:Bounds x="450" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0dn083r_di" bpmnElement="timer-event">
         <dc:Bounds x="312" y="252" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>

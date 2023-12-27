@@ -144,11 +144,13 @@ export class WebApp {
 		var Docs = require("./routes/docs").Docs;
 		var Model = require("./routes/model").Model;
 		var API = require("./routes/api").API;
+		var API2 = require("./routes/api2").API2;
 
 		this.app.use('/', (new Workflow(this)).config());
 		this.app.use('/docs', (new Docs(this)).config());
 		this.app.use('/model', (new Model(this)).config());
 		this.app.use('/api', (new API(this)).config());
+		this.app.use('/api2', (new API2(this)).config());
 
 
 	}

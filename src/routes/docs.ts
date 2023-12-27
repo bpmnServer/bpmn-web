@@ -128,7 +128,7 @@ function processFile(fileName,response) {
 
 
 
-    if (fileName.endsWith('.png')) {
+    if (fileName.toLowerCase().endsWith('.png')) {
         //            response.header("Content-Type", "image/png");
         //            response.send(file);
         response.writeHead(200, { 'Content-Type': 'image/png' });
