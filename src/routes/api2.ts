@@ -332,7 +332,7 @@ export class API2 extends Common {
             let newName = req.body.newName;
             //console.log('renaming ', name, newName);
             try {
-                var ret = await api.model.rename(name, newName,this.getUser(request));
+                var ret = await api.model.rename(name, newName,this.getUser(req));
                 //console.log('ret:',ret);
                 response.json(ret);
             }
@@ -347,7 +347,7 @@ export class API2 extends Common {
             let name = req.body.name;
             //console.log('deleting ', name);
             try {
-                var ret = await api.model.delete(name,this.getUser(request));
+                var ret = await api.model.delete(name,this.getUser(req));
                 //console.log('ret: ',ret);
                 response.json(ret);
             }
@@ -361,7 +361,7 @@ export class API2 extends Common {
 
             let query={};
             
-            let list = await api.model.list(query,this.getUser(request));
+            let list = await api.model.list(this.getUser(req));
             //console.log(list);
             response.json(list);
         });
