@@ -359,9 +359,9 @@ export class API2 extends Common {
 
         router.get('/model/list', loggedIn, async function (req, response) {
 
-            let query={};
+            let query=req.body.query;
             
-            let list = await api.model.list(this.getUser(req));
+            let list = await api.model.list(query,this.getUser(req));
             //console.log(list);
             response.json(list);
         });
