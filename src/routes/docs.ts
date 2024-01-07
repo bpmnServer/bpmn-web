@@ -5,9 +5,7 @@ var bodyParser = require('body-parser')
 const FS = require('fs');
 
 import { BPMNServer   } from '..';
-import { docsFolder } from '..';
 import { Common } from './common';
-
 
 /* GET users listing. */
 
@@ -43,7 +41,7 @@ function getRemoteFile(file) {
 
 }
 
-
+//console.log('get file',getRemoteFile('README.md').then(file=>{console.log(file)}));
 
 const awaitAppDelegateFactory = (middleware) => {
     return async (req, res, next) => {
@@ -54,14 +52,23 @@ const awaitAppDelegateFactory = (middleware) => {
         }
     }
 }
-
+var docsFolder=__dirname + '\\..\\..\\..\\bpmn-server/docs/';
 export class Docs extends Common {
 
+    constructor(app) {
+        super(app);
+
+//        docsFolder= this.webApp.packageJson.homepage;
+        console.log(docsFolder);
+        
+    }
+
     config() {
+
         var router = express.Router();
 
         router.get('/', function (request, response) {
-            let fileName = '../README.md';
+            let fileName =  '../README.md';
             return processFile(fileName, response);
 
         });
@@ -118,7 +125,6 @@ export class Docs extends Common {
 }
 function processFile(fileName,response) {
 
-    
     if (!fileName.includes('.'))
         fileName=fileName+'.md';
     

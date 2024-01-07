@@ -8,12 +8,13 @@
     "incremental": true,
     "allowJs": false,
     "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": [
     "./src"
 
   ],
   "exclude": [
-    "node_modules" , "./dist" , "./webApp"
+    "node_modules" , "./dist" 
   ]
 }

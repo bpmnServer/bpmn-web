@@ -1,6 +1,5 @@
 console.log('app.ts from ',__filename);
 
-console.log("bpmn-server WebApp.ts version "+ getVersion());
 
 import debug = require('debug');
 const flash = require('connect-flash');
@@ -31,29 +30,25 @@ import { configuration as config } from './WorkflowApp/configuration';
 var busboy = require('connect-busboy'); //middleware for form/file upload
 
 
-function getVersion() {
-	const fs = require('fs');
-
-	const configPath = __dirname + '/../package.json';
-
-	if (fs.existsSync(configPath)) {
-
-		var configuration = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-		var _version = configuration['version'];
-		return _version;
-	}
-	else
-		return 'cannot locate package.json current: ' + __dirname + ' path ' + configPath;
-
-
-}
 
 export class WebApp {
 	app;
 	userManager;
 	bpmnServer;
+	packageJson;
 
 	constructor() {
+
+		const fs = require('fs');
+	
+		const configPath = __dirname + '/../package.json';
+		if (fs.existsSync(configPath)) {
+	
+			this.packageJson= JSON.parse(fs.readFileSync(configPath, 'utf8'));
+			var _version = this.packageJson['version'];
+			console.log("bpmn-server WebApp.ts version "+ _version);
+		}
+	
 
 		this.initExpress();
 
@@ -67,8 +62,9 @@ export class WebApp {
 		this.bpmnServer.appDelegate.winSocket = null;
 
 		this.setupExpress();
+	
 	}
-	/**
+		/**
 	 * Create Express server.
 	 */
 	initExpress() {
@@ -79,7 +75,7 @@ export class WebApp {
 		 */
 		app.set('host', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 		app.set('port', process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 3000);
-		app.set('views', path.join(__dirname, 'views'));
+		app.set('views', path.join(__dirname, '../src/views'));
 		app.set('view engine', 'pug');
 		app.use(compression());
 		/*app.use(sass({

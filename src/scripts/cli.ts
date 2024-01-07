@@ -102,7 +102,8 @@ async function completeUserTask() {
 		case 'lm':
 			console.log("listing Models");
 			var list=await server.definitions.getList({});
-			console.log(list);
+			list.forEach(m=>{console.log(m.name);});
+			console.log();
 			break;
 		case 'lme':
 			console.log("listing Models");
@@ -112,10 +113,11 @@ async function completeUserTask() {
 		case 'lu':
 			console.log("listing Users");
 			var list = await server.userService.findUsers({});
-			console.log('users');
+			console.log('users:\n name\t email\t userGroups');
 			list.forEach(u => {
-				console.log(`userName:${u.userName} email:${u.email} groups: ${u.userGroups}`)
+				console.log(`${u.userName} \t${u.email} \t ${u.userGroups}`)
 			});
+			console.log();
 			break;
 		case 'spw':
 			console.log("setting user password");
