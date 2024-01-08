@@ -6,7 +6,7 @@
     "sourceMap": true,
     "declaration": false,
     "incremental": true,
-    "allowJs": false,
+    "allowJs": true,
     "rootDir": "./src",
     "outDir": "./dist"
   },

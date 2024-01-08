@@ -13,7 +13,7 @@
     "example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRunEX\"",
     "clean": "tsc --build --clean",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./src/app.ts\"",
-    "test": "mocha -exit --config=src/test/.mocharc.json src/test/feature/"
+    "test": "mocha -exit --config=src/test/.mocharc.json dist/test/feature/"
   },
   "description": "bpmn-web Demo App",
   "author": {

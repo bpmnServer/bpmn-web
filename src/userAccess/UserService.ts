@@ -70,6 +70,10 @@ export class UserService implements IUserService {
 			console.log('%s MongoDB connection error. Please make sure MongoDB is running.');
 			process.exit();
 		});
+		mongoose.connection.on('connected',()=> {
+			console.log('Connected.');
+		});
+
 	}
 
 }

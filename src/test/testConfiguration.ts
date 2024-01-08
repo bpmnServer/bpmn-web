@@ -1,5 +1,5 @@
 
-import { ModelsDatastore, Configuration} from '../WorkflowApp';
+import { ModelsDatastore, Configuration} from '../';
 import { TestAppDelegate } from './appDelegate';
 import { IConfiguration, DataStore, ILogger , NoCacheManager} from '../';
 import { Logger } from '../'
