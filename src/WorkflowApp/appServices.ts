@@ -29,6 +29,7 @@ class AppServices {
     }
     async echo(input, context) {
         console.log('service echo - input', input);
+        context.item.data['echo']=input;
         return input;
     }
     async getSupervisorUser(input, context) {

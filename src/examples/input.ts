@@ -1,19 +1,35 @@
 const { BPMNServer, DefaultAppDelegate, Logger } = require("./");
 const { BPMNAPI, SecureUser } = require("./");
-const { configuration } = require('../configuration');
-const logger = new Logger({ toConsole: true });
+
+const { configuration } = require('./');
+
+const logger = new Logger({ toConsole: false });
 const bpmnServer=new BPMNServer(configuration, logger, { cron: true });
 
 checkInput();
 
 async function checkInput() {
-        let user1 = new SecureUser({ userName: 'user1', userGroups: ['Owner', 'Others'] });
-        let user2 = new SecureUser({ userName: 'user2', userGroups: ['Owner', 'Others'] });
-        let userSupervisor = new SecureUser({ userName: 'Supervisor', userGroups: ['Owner', 'Others'] });
-//        let api = new BPMNAPI(bpmnServer);
-        console.log('starting');
+    console.log('starting');
+
+    let definition = await bpmnServer.definitions.load('Check Input');
+
+    const json = JSON.parse(definition.getJson());
+
+
     let response = await bpmnServer.engine.start('Check Input', { reason: 'I like it', type: 'Vacation' });
     console.log(response.instance.data);
+
+    json.elements.forEach(el => {
+        console.log();
+        console.log('Element:', el.id, el.type, el.name,el.docs);
+        el.description.forEach(desc => {
+            console.log('-', desc);
+        });
+        el.behaviours.forEach(desc => {
+            console.log('>', desc);
+        });
+    });
+
     return;
 
 }

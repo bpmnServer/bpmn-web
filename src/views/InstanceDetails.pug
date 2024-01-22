@@ -3,6 +3,10 @@ extends layout
 block content
 	- var docs= JSON.parse(definition);
 	- 
+	- function displayText(txt) {
+	- return txt.replace('\n','<br/>');	
+	- }
+
 	- function prettyDate(date){
 	- var d = date.getDate();
 	- var m = date.getMonth() + 1; //Months are zero based

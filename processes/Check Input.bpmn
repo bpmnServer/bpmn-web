@@ -43,8 +43,11 @@ console.log(item.data);</camunda:script>
               <camunda:value>$data.val2</camunda:value>
             </camunda:list>
           </camunda:inputParameter>
-          <camunda:inputParameter name="text5">$data.objSample</camunda:inputParameter>
+          <camunda:inputParameter name="text5">Just Text</camunda:inputParameter>
           <camunda:inputParameter name="text6">$[data.val1,data.val2,data.val3]</camunda:inputParameter>
+          <camunda:inputParameter name="script1">
+            <camunda:script scriptFormat="JavaScript">['a','b',123]</camunda:script>
+          </camunda:inputParameter>
           <camunda:outputParameter name="echoOutput">$data.text1</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:executionListener event="getInput">

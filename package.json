@@ -8,9 +8,10 @@
     "build": "tsc --build",
     "start": "ts-node src/app",
     "compileRun": "npm run build && node dist/app.js",
+    "compileAllRun": "tsc --build && tsc --build ../bpmn-server && node dist/app.js",
     "compileRunEx": "npm run build && node dist/examples/EX.js",
-    "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRun\"",
-    "example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRunEX\"",
+    "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileAllRun\"",
+    "example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRunEx\"",
     "clean": "tsc --build --clean",
     "start:watch": "tsc-watch --project . --onSuccess \"nodemon ./src/app.ts\"",
     "test": "mocha -exit --config=src/test/.mocharc.json dist/test/feature/"
