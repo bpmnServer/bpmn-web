@@ -32,12 +32,12 @@
     <bpmn:sequenceFlow id="flow_start_buy" sourceRef="StartEvent_158yep3" targetRef="task_Buy" />
     <bpmn:sequenceFlow id="flow_buy_gw" sourceRef="task_Buy" targetRef="gateway_1" />
     <bpmn:sequenceFlow id="flow_gw1_clean" sourceRef="gateway_1" targetRef="task_clean">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(item.data.needsCleaning=="Yes")</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(item.data.needsCleaning=="Yes")</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="flow_repair_gw2" sourceRef="task_repair" targetRef="gateway_2" />
     <bpmn:sequenceFlow id="flow_gw2_drive" sourceRef="gateway_2" targetRef="task_Drive" />
     <bpmn:sequenceFlow id="flow_gw1_repair" sourceRef="gateway_1" targetRef="task_repair">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(item.data.needsRepairs=="Yes")</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(item.data.needsRepairs=="Yes")</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="flow_drive_end" sourceRef="task_Drive" targetRef="Event_19ebav7" />
     <bpmn:inclusiveGateway id="gateway_1" default="Flow_g1_g2">

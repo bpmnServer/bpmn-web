@@ -23,7 +23,7 @@
     <bpmn:sequenceFlow id="flow_start_buy" sourceRef="StartEvent_158yep3" targetRef="task_Buy" />
     <bpmn:sequenceFlow id="flow_repair_gw2" sourceRef="task_repair" targetRef="gateway_2" />
     <bpmn:sequenceFlow id="flow_gw1_repair" sourceRef="gateway_1" targetRef="task_repair">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(item.data.needsRepairs=="Yes")</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(item.data.needsRepairs=="Yes")</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:userTask id="task_clean" name="Clean">
       <bpmn:incoming>flow_gw1_clean</bpmn:incoming>
@@ -49,7 +49,7 @@
       <bpmn:incoming>flow_drive_end</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="flow_gw1_clean" sourceRef="gateway_1" targetRef="task_clean">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(item.data.needsCleaning=="Yes")</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(item.data.needsCleaning=="Yes")</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="flow_clean_gw2" sourceRef="task_clean" targetRef="gateway_2" />
     <bpmn:sequenceFlow id="flow_gw1_gw2" sourceRef="gateway_1" targetRef="gateway_2" />
@@ -59,7 +59,7 @@
     <bpmn:startEvent id="StartEvent_158yep3" camunda:initiator="starterUserId" camunda:candidateUsers="Ralph" camunda:candidateGroups="drivers">
       <bpmn:extensionElements>
         <camunda:executionListener event="end">
-          <camunda:script scriptFormat="JavaScript">$data.startDate=this.endedAt;</camunda:script>
+          <camunda:script scriptFormat="JavaScript">data.startDate=this.endedAt;</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:outgoing>flow_start_buy</bpmn:outgoing>

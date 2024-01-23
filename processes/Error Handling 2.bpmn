@@ -8,14 +8,14 @@
     <bpmn2:sequenceFlow id="Flow_0yzfmf7" sourceRef="Activity_1id767s" targetRef="Gateway_0kqbwj0" />
     <bpmn2:sequenceFlow id="Flow_1wtvi3k" name="No Error" sourceRef="Gateway_0kqbwj0" targetRef="Activity_0mucnjs" />
     <bpmn2:sequenceFlow id="Flow_0pantx8" sourceRef="Gateway_0kqbwj0" targetRef="Activity_0mucnjs">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.ErrorCode=='Fixable'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.ErrorCode=='Fixable'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:outgoing>Flow_1sopzjy</bpmn2:outgoing>
     </bpmn2:startEvent>
     <bpmn2:sequenceFlow id="Flow_0pbqohc" sourceRef="Activity_0mucnjs" targetRef="Event_1i3s5jb" />
     <bpmn2:sequenceFlow id="Flow_099kko7" name="data.ErrorCode==&#39;Abort&#39;" sourceRef="Gateway_0kqbwj0" targetRef="Event_0oa7x54">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.ErrorCode=='Abort'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.ErrorCode=='Abort'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:serviceTask id="Activity_1id767s" name="Service A">
       <bpmn2:incoming>Flow_1sopzjy</bpmn2:incoming>
@@ -23,7 +23,7 @@
       <bpmn2:outgoing>Flow_0yzfmf7</bpmn2:outgoing>
     </bpmn2:serviceTask>
     <bpmn2:sequenceFlow id="Flow_0bxyg19" name="data.ErrorCode==&#39;Manual&#39;" sourceRef="Gateway_0kqbwj0" targetRef="Activity_0xyyjc0">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.ErrorCode=='Manual'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.ErrorCode=='Manual'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_0i2r0nd" sourceRef="Activity_0xyyjc0" targetRef="Activity_0mucnjs" />
     <bpmn2:endEvent id="Event_0oa7x54">
@@ -45,7 +45,7 @@
       <bpmn2:outgoing>Flow_0i2r0nd</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="Flow_19lsvtg" name="data.ErrorCode==&#39;Auto&#39;" sourceRef="Gateway_0kqbwj0" targetRef="Event_10z0srb">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.ErrorCode=='Auto'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.ErrorCode=='Auto'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_0w9dof1" sourceRef="Gateway_0kqbwj0" targetRef="Event_18jgzre" />
     <bpmn2:sequenceFlow id="Flow_0ysg7mr" sourceRef="Event_10z0srb" targetRef="Activity_0mucnjs" />

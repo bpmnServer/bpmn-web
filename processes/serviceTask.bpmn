@@ -16,7 +16,7 @@
         <camunda:inputOutput>
           <camunda:inputParameter name="repeat">100</camunda:inputParameter>
           <camunda:inputParameter name="inputVar2">
-            <camunda:script scriptFormat="JavaScript">$data.result</camunda:script>
+            <camunda:script scriptFormat="JavaScript">data.result</camunda:script>
           </camunda:inputParameter>
           <camunda:outputParameter name="sequence">$output.seq</camunda:outputParameter>
           <camunda:outputParameter name="returnText">$('out text:'+output.text)</camunda:outputParameter>

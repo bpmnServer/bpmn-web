@@ -46,7 +46,7 @@ console.log(item.data);</camunda:script>
           <camunda:inputParameter name="text5">Just Text</camunda:inputParameter>
           <camunda:inputParameter name="text6">$[data.val1,data.val2,data.val3]</camunda:inputParameter>
           <camunda:inputParameter name="script1">
-            <camunda:script scriptFormat="JavaScript">['a','b',123]</camunda:script>
+            <camunda:script scriptFormat="JavaScript">{var1:1,var2:2}</camunda:script>
           </camunda:inputParameter>
           <camunda:outputParameter name="echoOutput">$data.text1</camunda:outputParameter>
         </camunda:inputOutput>

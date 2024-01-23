@@ -63,10 +63,10 @@ bookHotelFailed=true;</camunda:script>
       </bpmn2:scriptTask>
       <bpmn2:scriptTask id="Activity_cancelFlight" name="Cancel Flight" isForCompensation="true" />
       <bpmn2:sequenceFlow id="Flow_0wr2wqs" sourceRef="Activity_1r00y1z" targetRef="Event_raise_errr_trans">
-        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$bookHotelFailed</bpmn2:conditionExpression>
+        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">bookHotelFailed</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:sequenceFlow id="Flow_1adnx4h" sourceRef="Activity_1r00y1z" targetRef="Event_raise_errr_trans">
-        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$bookFlightFailed</bpmn2:conditionExpression>
+        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">bookFlightFailed</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:endEvent id="Event_raise_errr_trans">
         <bpmn2:incoming>Flow_0wr2wqs</bpmn2:incoming>

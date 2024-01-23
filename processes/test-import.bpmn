@@ -63,10 +63,10 @@ bookHotelFailed=true;</camunda:script>
       </bpmn2:scriptTask>
       <bpmn2:scriptTask id="Activity_cancelFlight" name="Cancel Flight" isForCompensation="true" />
       <bpmn2:sequenceFlow id="Flow_0wr2wqs" sourceRef="Activity_1r00y1z" targetRef="Event_raise_errr_trans">
-        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$bookHotelFailed</bpmn2:conditionExpression>
+        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">bookHotelFailed</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:sequenceFlow id="Flow_1adnx4h" sourceRef="Activity_1r00y1z" targetRef="Event_raise_errr_trans">
-        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$bookFlightFailed</bpmn2:conditionExpression>
+        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">bookFlightFailed</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:endEvent id="Event_raise_errr_trans">
         <bpmn2:incoming>Flow_0wr2wqs</bpmn2:incoming>
@@ -87,7 +87,7 @@ bookHotelFailed=true;</camunda:script>
         <bpmn2:outgoing>Flow_158r114</bpmn2:outgoing>
       </bpmn2:task>
       <bpmn2:sequenceFlow id="Flow_17axcuw" sourceRef="Activity_1r00y1z" targetRef="Activity_123wbxy">
-        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$(1==2)</bpmn2:conditionExpression>
+        <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">(1==2)</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:sequenceFlow id="Flow_158r114" sourceRef="Activity_123wbxy" targetRef="Event_end_trans" />
       <bpmn2:association id="Association_0k0lxqp" associationDirection="One" sourceRef="Event_comp_flight" targetRef="Activity_cancelFlight" />

@@ -145,15 +145,15 @@ block content
 							tr
 								td 
 								td
-								td #{line[0]}
-								td #{line[1]}
+								td  !{line[0]}
+								td  !{line[1].replace('\n','<br />')}
 						each behav in el.behaviours
 							each line in behav
 								tr
 									td
 									td
 									td #{line[0]}
-									td #{line[1]}
+									td !{line[1].replace("\n",'<br />')}
 						if (el.docs)
 							each doc in el.docs
 								tr
@@ -182,8 +182,8 @@ block content
 								td
 								td
 								td
-								td #{line[0]}
-								td #{line[1]}
+								td !{line[0]}
+								td !{line[1]}
 						if (el.docs)
 							each doc in el.docs
 								tr

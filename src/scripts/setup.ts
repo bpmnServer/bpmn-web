@@ -30,7 +30,6 @@ async function main() {
     }
     else {
             const server=await install();
-            await docModels(server);
 
     }
 

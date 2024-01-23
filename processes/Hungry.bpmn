@@ -13,10 +13,10 @@
     <sequenceFlow id="sid-FFF01EF7-1FEC-4B83-986C-018858D97835" name="" sourceRef="sid-D0BED8B1-BB93-411E-8E26-49C51C4AAF75" targetRef="UserTask_1a8i191" />
     <sequenceFlow id="sid-1CA5065E-3A33-4024-93CF-B7148AD79095" name="" sourceRef="UserTask_1llznb6" targetRef="sid-433EEF5E-4740-4E48-9503-61C492767C56" />
     <sequenceFlow id="sid-E943A666-80E2-4D38-9AEF-ACD1EFE0D128" name="pasta" sourceRef="sid-433EEF5E-4740-4E48-9503-61C492767C56" targetRef="userTask_pasta">
-      <conditionExpression>$(item.data.meal=="pasta")</conditionExpression>
+      <conditionExpression>(item.data.meal=="pasta")</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-4C1A6A53-32E3-46D3-BECE-5B3555133586" name="steak" sourceRef="sid-433EEF5E-4740-4E48-9503-61C492767C56" targetRef="userTask_steak">
-      <conditionExpression>$(item.data.meal=="steak")</conditionExpression>
+      <conditionExpression>(item.data.meal=="steak")</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-5244058D-4A1C-49C7-A975-3D2AF4BFAFE0" name="" sourceRef="UserTask_1a8i191" targetRef="UserTask_1llznb6" />
     <sequenceFlow id="sid-F031AA0F-ABDF-4866-A905-7EF8FF7A899B" name="" sourceRef="userTask_steak" targetRef="sid-47D7385A-388F-40C4-892E-F814C0659C54" />

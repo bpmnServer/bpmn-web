@@ -82,10 +82,10 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="Flow_1ufmnuh" name="Approved" sourceRef="Gateway_1kqewfd" targetRef="Activity_1rx1txe" />
     <bpmn2:sequenceFlow id="Flow_1ef1q1u" name="Rejected" sourceRef="Gateway_1kqewfd" targetRef="Event_02om8ew">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.approval=='Reject'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.approval=='Reject'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:sequenceFlow id="Flow_0rvg1ym" name="Require Information" sourceRef="Gateway_1kqewfd" targetRef="Request">
-      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">$data.approval=='InformationRequired'</bpmn2:conditionExpression>
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression" language="JavaScript">data.approval=='InformationRequired'</bpmn2:conditionExpression>
     </bpmn2:sequenceFlow>
     <bpmn2:endEvent id="Event_02om8ew">
       <bpmn2:incoming>Flow_1ef1q1u</bpmn2:incoming>

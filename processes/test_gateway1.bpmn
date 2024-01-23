@@ -37,10 +37,10 @@
     <bpmn:sequenceFlow id="Flow_0z8mxn1" sourceRef="Activity_3" targetRef="Event_0l04zdk" />
     <bpmn:sequenceFlow id="Flow_0m1mz5r" sourceRef="Gateway_1" targetRef="Gateway_2" />
     <bpmn:sequenceFlow id="Flow_07gtiyg" name="1==1" sourceRef="Gateway_2" targetRef="Activity_2_4_1">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(1==1)</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(1==1)</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0ub0gls" name="1==0" sourceRef="Gateway_2" targetRef="Activity_2_4_2">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">$(1==0)</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">(1==0)</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0stsdn2" sourceRef="Activity_2_4_1" targetRef="Gateway_3" />
     <bpmn:sequenceFlow id="Flow_110cmz7" sourceRef="Activity_2_4_2" targetRef="Gateway_3" />
