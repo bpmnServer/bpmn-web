@@ -1,4 +1,3 @@
-import { BPMNServer,configuration} from '../';
 import * as fs from 'fs';
 import * as readline from "readline";
 
@@ -15,7 +14,6 @@ main();
 async function main() {
 
     console.log('This routine will copy initial files and setup bpmn-server database');
-
 
 
     const ret = await copyFiles();
@@ -63,14 +61,17 @@ function copyFile(from, to) {
 
 async function install() {
 
+    
+    const pack = require("../");
+
     console.log('Installing a new Database');
 
     console.log('current directory is ' + process.cwd());
     console.log('Installing a new Database based on configuration in current directory');
     console.log('current directory is ' + process.cwd());
-    console.log('database configuration:',configuration.database);
+    console.log('database configuration:',pack.configuration.database);
 
-    const server = new BPMNServer(configuration, null, { cron: false });
+    const server = new pack.BPMNServer(pack.configuration, null, { cron: false });
 
     const dataStore = server.dataStore;
 

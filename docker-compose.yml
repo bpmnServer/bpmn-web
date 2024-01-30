@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+ bpmn-server:
+    image: node:21-alpine
+    command: sh -c "
+        apk update && apk upgrade && apk add git &&
+        rm bpmn-web -rf && 
+        git clone https://github.com/bpmnServer/bpmn-web.git && 
+        cd bpmn-web &&
+        npm install &&
+        npm run setup && npm run setup &&
+        sed -i 's/0.0.0.0/mongo/g' .env &&
+        echo 'starting bpmn-server' &&
+        npm run start"
+    ports:
+      - 3000:3000
+    working_dir: /app
+    volumes:
+      - 'app:/app'
+    depends_on:
+      - mongo      
+ mongo:
+   image: mongo
+   ports:
+     - 27017:27017
+   volumes:
+     - mongodb:/db
+volumes:
+  mongodb:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'd:/docker/bpmnServer/mongodb_volume'    
+  app:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: 'd:/docker/bpmnServer/bpmn_server_volume'    

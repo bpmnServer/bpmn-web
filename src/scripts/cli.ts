@@ -334,17 +334,22 @@ async function recover() {
 
 		for (var i = 0; i < list.length; i++) {
 			let item = list[i];
+
 			if (item.type == 'bpmn:ScriptTask' || item.type == 'bpmn:ServiceTask') {
 				console.log(item.processName, item.elementId, item.type, item.startedAt, item.status,'since:',dateDiff(item.startedAt));
 
 				const response = await question('RE-INVOKE this item(Y/N?')
 				if (response == 'Y' || response == 'y') {
-					console.log('invoking item');
+					console.log('invoking item',item.id);
+
+					await server.dataStore.locker.delete({id: item.instanceId});
+
 					let ret = await server.engine.invoke({ "items.id": item.id }, {}, null, { recover: true });
+					console.log('done');
 				}
 			}
-//			else
-//				console.log(item.processName, item.elementId, item.type, item.startedAt, 'status', item.status, 'since:', dateDiff(item.startedAt));
+			else
+				console.log(item.processName, item.elementId, item.type, item.startedAt, 'status', item.status, 'since:', dateDiff(item.startedAt));
 
 		}
 		console.log('recovering is complete');
