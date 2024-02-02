@@ -12,3 +12,5 @@
 *.bak
 *.cmd
 *.tsbuildinfo
+docker/mongodb_volume
+docker/bpmn_server_volume

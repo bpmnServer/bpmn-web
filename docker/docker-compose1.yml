@@ -24,8 +24,7 @@ services:
    ports:
      - 27017:27017
    volumes:
-     - mongodb:/db
-volumes:
+     - mongodb:/data/db
   mongodb:
     driver: local
     driver_opts:
