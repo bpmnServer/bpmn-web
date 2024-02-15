@@ -172,7 +172,7 @@ block content
 				th details
 			each el in docs.flows
 
-				if (el.description)
+				if (el.description.length >0)
 					tr
 						td #{el.id}
 						td #{el.from}

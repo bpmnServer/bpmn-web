@@ -68,7 +68,7 @@ userSchema.virtual('isAdmin').get(function () {
     return userSchema.methods.hasGroup('ADMIN');
 });
 userSchema.methods.hasGroup = function hasGroup(group) {
-    if (this.userGroups.indexOf(group) === -1)
+    if (this.userGroups && this.userGroups.indexOf(group) === -1)
         return false;
     else
         return true;

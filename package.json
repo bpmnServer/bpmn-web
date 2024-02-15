@@ -1,6 +1,6 @@
 {
   "name": "bpmn-web",
-  "version": "2.1.0",
+  "version": "2.0.11",
   "homepage": "https://github.com/bpmnServer/bpmn-server/blob/rel2.0.0/docs/README.md",
   "scripts": {
     "setup": "ts-node src/scripts/setup.ts",
@@ -25,7 +25,7 @@
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "bpmn-moddle": "^7.0.2",
-    "bpmn-server": "alpha",
+    "bpmn-server": "^2.0.11",
     "camunda-bpmn-moddle": "^4.4.0",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
