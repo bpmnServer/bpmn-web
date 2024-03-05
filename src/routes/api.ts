@@ -221,7 +221,43 @@ export class API extends Common {
 
 
         }));
+///
 
+        router.put('/engine/restart', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+
+            let query, data,startNodeId,userName,options;
+            if (request.body.query) {
+                query = request.body.query;
+            }
+            if (request.body.data) {
+                data = request.body.data;
+            }
+            if (request.body.options) {
+                options = request.body.options;
+            }
+
+            if (request.body.userName) {
+                userName= request.body.userName;
+            }
+            let context;
+            let instance;
+            let errors;
+            try {
+                context = await this.bpmnServer.engine.restart(query, data,userName,options );
+                instance = context.instance;
+                if (context && context.errors)
+                    errors = context.errors.toString();
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+            }
+            response.json({ errors: errors, instance });
+
+
+        }));
+
+///
         router.get('/engine/get', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let query;

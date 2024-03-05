@@ -1,6 +1,6 @@
 {
   "name": "bpmn-web",
-  "version": "2.0.11",
+  "version": "2.1.0",
   "homepage": "https://github.com/bpmnServer/bpmn-server/blob/rel2.0.0/docs/README.md",
   "scripts": {
     "setup": "ts-node src/scripts/setup.ts",
@@ -9,7 +9,7 @@
     "start": "ts-node src/app",
     "compileRun": "npm run build && node dist/app.js",
     "compileAllRun": "tsc --build && tsc --build ../bpmn-server && node dist/app.js",
-    "compileRunEx": "npm run build && node dist/examples/EX.js",
+    "compileRunEx": "tsc --build && tsc --build ../bpmn-server && node dist/examples/EX.js",
     "dev": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileAllRun\"",
     "example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"npm run compileRunEx\"",
     "clean": "tsc --build --clean",
@@ -25,7 +25,7 @@
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "bpmn-moddle": "^7.0.2",
-    "bpmn-server": "^2.0.11",
+    "bpmn-server": "^2.1.0",
     "camunda-bpmn-moddle": "^4.4.0",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",

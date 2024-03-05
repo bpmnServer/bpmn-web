@@ -1,4 +1,4 @@
 
 console.log('----------------------------- EX.ts ------------------');
 
-require('./input');
+require('./restart');

@@ -32,7 +32,9 @@ export const configuration = new Configuration(
 			return new TestAppDelegate(server);
 		},		
 		dataStore: function (server) {
-			return new DataStore(server);
+			let ds=new DataStore(server);
+			ds.enableSavePoints=true;
+			return ds;
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);

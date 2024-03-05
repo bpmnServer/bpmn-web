@@ -34,7 +34,9 @@ var configuration = new Configuration(
 			return new MyAppDelegate(server);
 		},
 		dataStore: function (server) {
-			return new DataStore(server);
+			let ds=new DataStore(server);
+			ds.enableSavePoints=false;
+			return ds;
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);

@@ -12,6 +12,9 @@ and here
 
 ### Changed
 -->
+## Release 2.1.0 -- 2024-03
+- Added engine.restart
+
 ## Release 2.0.1 -- 2024-02
 - Moved webApp as a separate Repo (this repo)
 - New Folder structure

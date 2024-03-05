@@ -4,6 +4,8 @@
     <bpmn:participant id="Participant_1c0lpx5" processRef="Process_1hf9394" />
   </bpmn:collaboration>
   <bpmn:process id="Process_1hf9394" isExecutable="true">
+    <bpmn:documentation>Demo Model, to show: \n User Tasks \n Conditional Flow
+Gateways</bpmn:documentation>
     <bpmn:laneSet id="LaneSet_15ojlwy">
       <bpmn:lane id="Lane_0ehtkwq" name="Mechanic">
         <bpmn:flowNodeRef>task_repair</bpmn:flowNodeRef>
@@ -56,7 +58,8 @@
     <bpmn:sequenceFlow id="flow_gw2_drive" sourceRef="gateway_2" targetRef="task_Drive" />
     <bpmn:sequenceFlow id="flow_drive_end" sourceRef="task_Drive" targetRef="Event_19ebav7" />
     <bpmn:sequenceFlow id="flow_buy_gw" sourceRef="task_Buy" targetRef="gateway_1" />
-    <bpmn:startEvent id="StartEvent_158yep3" camunda:initiator="starterUserId" camunda:candidateUsers="Ralph" camunda:candidateGroups="drivers">
+    <bpmn:startEvent id="StartEvent_158yep3" name="Start Event" camunda:initiator="starterUserId" camunda:candidateUsers="Ralph" camunda:candidateGroups="drivers">
+      <bpmn:documentation>Buy a Used Car, Starting the process</bpmn:documentation>
       <bpmn:extensionElements>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="JavaScript">data.startDate=this.endedAt;</camunda:script>
@@ -191,7 +194,7 @@ this.dueDate=date.toISOString();</camunda:script>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_158yep3">
         <dc:Bounds x="222" y="238" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="161" y="184" width="90" height="20" />
+          <dc:Bounds x="213" y="281" width="56" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1bp4iyj_di" bpmnElement="task_Buy">

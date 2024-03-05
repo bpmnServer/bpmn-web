@@ -1,11 +1,14 @@
-import { BPMNServer, DefaultAppDelegate, Logger } from "bpmn-server";
+import { BPMNServer,dateDiff, DefaultAppDelegate, Logger, SystemUser ,BPMNAPI} from "bpmn-server";
 import { configuration} from '../WorkflowApp/configuration';
 import * as readline from "readline";
 import "dotenv/config";
 
 const logger = new Logger({ toConsole: false});
 
+
 const server = new BPMNServer(configuration, logger,{cron:false});
+
+const api=new BPMNAPI(server);
 
 const cl = readline.createInterface({input: process.stdin, output: process.stdout,terminal:false});
 
@@ -17,7 +20,13 @@ const question = function(q: string) {
   });
 };
 
-completeUserTask();
+start();
+
+async function start() {
+	completeUserTask();
+}
+
+
 
 function menu() {
 	console.log('Commands:');
@@ -30,6 +39,7 @@ function menu() {
 	console.log('	i	Invoke Task');
 	console.log('	sgl	Signal Task');
 	console.log('	msg	Message Task');
+	console.log('	rs	Restart an Instance');
 	console.log('	d	delete instnaces');
 	console.log('	lm	List of Models');
 	console.log('	lme	List of Model Events');
@@ -81,10 +91,14 @@ async function completeUserTask() {
 			console.log("invoking");
 			await invoke();
 			break;
-			
+		case 'rs':
+				console.log("restarting");
+				await restart();
+				break;
+				
 		case 's':
 			console.log("Starting Process");
-			await start();
+			await startProc();
 			break;
 		case 'sgl':
 			console.log("Signalling Process");
@@ -104,6 +118,7 @@ async function completeUserTask() {
 			var list=await server.definitions.getList({});
 			list.forEach(m=>{console.log(m.name);});
 			console.log();
+
 			break;
 		case 'lme':
 			console.log("listing Models");
@@ -138,7 +153,7 @@ async function completeUserTask() {
 	process.exit();
 
 }
-async function start()
+async function startProc()
 {
   const name = await question('Please provide your process name: ');
   const taskDataString = await question('Please provide your Task Data (json obj) if any: ');
@@ -171,9 +186,10 @@ async function findItems(query) {
 		let item = items[i];
 		console.log(`${item['processName']}	${item.name}	${item.elementId}	${item['instanceId']}	${item.id}`);
 	}
+	return items;
 
 }
-async function listItems() {
+async function getCriteria() {
 	const answer = await question('Please items criteria name value pair; example: items.status wait ');
 	let str=''+ answer;
 
@@ -186,6 +202,12 @@ async function listItems() {
     }
 	console.log(criteria);	
 
+	return criteria;
+
+}
+async function listItems() {
+
+	var criteria = await getCriteria();
 	var items = await server.dataStore.findItems(criteria)
 	console.log(items.length);
 
@@ -196,9 +218,9 @@ async function listItems() {
 }
 
 async function listInstances() {
-	const name = await question('Please provide your process name: ');
+	var criteria = await getCriteria();
 
-	let insts = await server.dataStore.findInstances({ name: name },'full')
+	let insts = await server.dataStore.findInstances(criteria,'full')
 
 	for (var i = 0; i < insts.length; i++) {
 		let inst = insts[i];
@@ -252,6 +274,21 @@ async function invoke()
 		console.log("Invoking task failed for:", taskId, instanceId);
 		await findItems({ id: instanceId, "items.elementId": taskId });
 
+
+    }
+}
+
+async function restart()
+{
+  const query=await getCriteria();
+
+	try {
+		let response = await server.engine.restart(query,{},'');
+		console.log(' Instance restarted: new Instance follows:');
+		return await displayInstance(response.id);
+	}
+	catch (exc) {
+		console.log("Invoking task failed for:", exc);
 
     }
 }
@@ -335,7 +372,8 @@ async function recover() {
 		for (var i = 0; i < list.length; i++) {
 			let item = list[i];
 
-			if (item.type == 'bpmn:ScriptTask' || item.type == 'bpmn:ServiceTask') {
+//			if (item.type == 'bpmn:ScriptTask' || item.type == 'bpmn:ServiceTask') 
+			{
 				console.log(item.processName, item.elementId, item.type, item.startedAt, item.status,'since:',dateDiff(item.startedAt));
 
 				const response = await question('RE-INVOKE this item(Y/N?')
@@ -348,45 +386,11 @@ async function recover() {
 					console.log('done');
 				}
 			}
-			else
-				console.log(item.processName, item.elementId, item.type, item.startedAt, 'status', item.status, 'since:', dateDiff(item.startedAt));
 
 		}
-		console.log('recovering is complete');
 	}
 	else
 		console.log('nothing to recover');
 
-}
-function dateDiff(dateStr: string) {
-
-    var endDate = new Date();
-    var startTime = new Date(dateStr);
-    var seconds = Math.abs(endDate.getTime() - startTime.getTime()) / 1000;
-
-	// get total seconds between the times
-	var delta = seconds; //Math.abs(date_future - date_now) / 1000;
-
-	// calculate (and subtract) whole days
-	var days = Math.floor(delta / 86400);
-	delta -= days * 86400;
-
-	// calculate (and subtract) whole hours
-	var hours = Math.floor(delta / 3600) % 24;
-	delta -= hours * 3600;
-
-	// calculate (and subtract) whole minutes
-	var minutes = Math.floor(delta / 60) % 60;
-	delta -= minutes * 60;
-
-	// what's left is seconds
-	var seconds = Math.floor(delta % 60);  // in theory the modulus is not required
-	if (days > 0)
-		return (days + " days");
-	if (hours > 0)
-		return (hours + " hours");
-	if (minutes > 0)
-		return (minutes + " minutes");
-	return (seconds + " seconds");
 }
 

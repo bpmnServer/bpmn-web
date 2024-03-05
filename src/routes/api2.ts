@@ -9,9 +9,6 @@ import { BPMNServer,BPMNAPI, dateDiff, Behaviour_names, SecureUser } from '..';
 
 var caseId = Math.floor(Math.random() * 10000);
 
-/* GET users listing. */
-
-
 const awaitAppDelegateFactory = (middleware) => {
     return async (req, res, next) => {
         try {
@@ -37,6 +34,9 @@ function loggedIn(req, res, next) {
     }
 }
 import { Common } from './common';
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////
 
 export class API2 extends Common {
     getUser(request): SecureUser {
@@ -50,8 +50,13 @@ export class API2 extends Common {
         var router = express.Router();
         var bpmnServer = this.bpmnServer;
         var api=new BPMNAPI(this.bpmnServer);
+        let self = this;
 
-        router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        //---------------------- data  -----------------------------------------------
+        //==getPendingUserTasks(query, user: ISecureUser): Promise<IItemData[]>;
+        //==findItem(query, user?: ISecureUser): Promise<IItemData>;
+       
+        router.get('/data/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let query;
             if (request.body.query) {
@@ -64,7 +69,7 @@ export class API2 extends Common {
             let items;
             let errors;
             try {
-                items = await api.data.findItems(query,this.getUser(request));
+                items = await api.data.findItems(query,self.getUser(request));
             }
             catch (exc) {
                 errors = exc.toString();
@@ -73,8 +78,7 @@ export class API2 extends Common {
             response.json({ errors: errors, items });
         }));
 
-        router.get('/datastore/findInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
-
+        router.get('/data/findInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             //console.log(request.body);
             let query;
@@ -88,7 +92,7 @@ export class API2 extends Common {
             let errors;
             try {
 
-                instances = await api.data.findInstances(query,this.getUser(request), 'full');
+                instances = await api.data.findInstances(query,self.getUser(request), 'full');
             }
             catch (exc) {
                 errors = exc.toString();
@@ -96,6 +100,30 @@ export class API2 extends Common {
             }
             response.json({ errors: errors, instances });
         }));
+        router.delete('/data/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+
+            let query;
+            if (request.body.query) {
+                query = request.body.query;
+            }
+            else
+                query = request.body;
+
+            //console.log(query);
+
+            let errors;
+            let result;
+            try {
+                result = await self.bpmnServer.dataStore.deleteInstances(query);
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+            }
+            response.json({ errors: errors, result });
+
+        }));
+        // ---------------- engine ----------------------------------
 
         router.post('/engine/start/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
@@ -113,7 +141,7 @@ export class API2 extends Common {
                 let context;
                 //console.log(data,userName);
 
-                context = await api.engine.start(name, data,this.getUser(request), options);
+                context = await api.engine.start(name, data,self.getUser(request), options);
                 response.json(context.instance);
             }
             catch (exc) {
@@ -140,7 +168,7 @@ export class API2 extends Common {
             let errors;
             try {
 
-                context = await api.engine.assign(query, data, assignment, this.getUser(request));
+                context = await api.engine.assign(query, data, assignment, self.getUser(request));
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -173,7 +201,7 @@ export class API2 extends Common {
             let errors;
             try {
 
-                context = await api.engine.invoke(query, data,this.getUser(request),options );
+                context = await api.engine.invoke(query, data,self.getUser(request),options );
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -207,7 +235,7 @@ export class API2 extends Common {
                 }
     
                 context = await api.engine.throwMessage(messageId, data, messageMatchingKey,
-                    this.getUser(request),options);
+                    self.getUser(request),options);
                 if (context)
                     response.json(context.instance);
                 else
@@ -225,9 +253,6 @@ export class API2 extends Common {
  *  engine.throwSignal     - issue a signal by id
  *  ------------------
  *      same as message except multiple receipients
- *
- *
- *
  */
 
         router.post('/engine/throwSignal', loggedIn, awaitAppDelegateFactory(async (request, response) => {
@@ -248,7 +273,7 @@ export class API2 extends Common {
                 }
 
                 context = await api.engine.throwSignal(signalId, data, messageMatchingKey,
-                    this.getUser(request),options);
+                    self.getUser(request),options);
                 response.json(context);
             }
             catch (exc) {
@@ -256,9 +281,14 @@ export class API2 extends Common {
                 response.json({ error: exc.toString() });
             }
         }));
-        ////
+        //// ---------------------  Model -----------------------
+
         var fsx = require('fs-extra');       //File System - for file manipulation
 
+//        save(name, source, svg, user?: ISecureUser);
+//        getSource(name, user?: ISecureUser);
+//        export(query, folder, user?: ISecureUser) ;
+       
         router.post('/model/import/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let name = request.params.name;
@@ -299,7 +329,7 @@ export class API2 extends Common {
                             svgFile= files[1];
 
                         try {
-                            await api.model.save(name, bpmnFile,svgFile,this.getUser(request));
+                            await api.model.save(name, bpmnFile,svgFile,self.getUser(request));
                             }
                         catch(exc)
                             {
@@ -332,7 +362,7 @@ export class API2 extends Common {
             let newName = req.body.newName;
             //console.log('renaming ', name, newName);
             try {
-                var ret = await api.model.rename(name, newName,this.getUser(req));
+                var ret = await api.model.rename(name, newName,self.getUser(req));
                 //console.log('ret:',ret);
                 response.json(ret);
             }
@@ -347,7 +377,7 @@ export class API2 extends Common {
             let name = req.body.name;
             //console.log('deleting ', name);
             try {
-                var ret = await api.model.delete(name,this.getUser(req));
+                var ret = await api.model.delete(name,self.getUser(req));
                 //console.log('ret: ',ret);
                 response.json(ret);
             }
@@ -361,11 +391,23 @@ export class API2 extends Common {
 
             let query=req.body.query;
             
-            let list = await api.model.list(query,this.getUser(req));
+            let list = await api.model.list(query,self.getUser(req));
             //console.log(list);
             response.json(list);
         });
-        router.get('/definitions/load/:name?', loggedIn, async function (request, response) {
+        router.get('/model/findEvents', loggedIn, async function (req, response) {
+
+            let query=req.body.query;
+            let list = await api.model.findEvents(query,self.getUser(req));
+            response.json(list);
+        });
+        router.get('/model/findStartEvents', loggedIn, async function (req, response) {
+
+            let query=req.body.query;
+            let list = await api.model.findStartEvents(query,self.getUser(req));
+            response.json(list);
+        });
+        router.get('/model/load/:name?', loggedIn, async function (request, response) {
 
             //console.log(request.params);
             let name = request.params.name;
@@ -374,40 +416,10 @@ export class API2 extends Common {
             response.json(JSON.parse(definition.getJson()));
         });
 
-        router.delete('/datastore/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
-
-            let query;
-            if (request.body.query) {
-                query = request.body.query;
-            }
-            else
-                query = request.body;
-
-            //console.log(query);
-
-            let errors;
-            let result;
-            try {
-                result = await this.bpmnServer.dataStore.deleteInstances(query);
-            }
-            catch (exc) {
-                errors = exc.toString();
-                console.log(errors);
-            }
-            response.json({ errors: errors, result });
-
-        }));
-
         router.put('/rules/invoke', loggedIn, awaitAppDelegateFactory(async (request, response) => {
             /*
              * 
              * 
-        export async function WebService(request, response) {
-        console.log(request);
-        console.log(response);
-        let { definition, data, options, loadFrom } = request.body;
-        response.json(Execute(request.body));
-    }
              */
             try {
                 throw new Error("Decision Table not supported this release.");

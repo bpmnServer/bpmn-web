@@ -1,4 +1,4 @@
-import {  Item, FLOW_ACTION , NODE_ACTION, IExecution  } from './';
+import {  Item, FLOW_ACTION , NODE_ACTION, IExecution , dateDiff } from './';
 import { DefaultAppDelegate } from './';
 import { AppServices } from './appServices';
 import { AppUtils } from './appUtils';
@@ -72,7 +72,21 @@ class MyAppDelegate extends DefaultAppDelegate{
         var list = await this.server.dataStore.findItems(query);
         if (list.length > 0) {
             this.server.logger.log("** There are " + list.length," items that seems to be hung");
+            list.forEach(it=>{
+                console.log('   item:',it.elementId,it.processName);
+            });
         }
+
+        var list = await this.server.dataStore.locker.list();
+        console.log('-- Current Locks --')
+        if (list.length > 0) {
+            console.log('current locks ...', list.length);
+            for (var i = 0; i < list.length; i++) {
+                let item = list[i];
+                console.log('lock:', item.id, item.server, item.time,dateDiff(item.time));
+            }
+        }
+    
 
     }
     /**

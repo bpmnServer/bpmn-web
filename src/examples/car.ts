@@ -1,9 +1,10 @@
-import { configuration } from './';
-import { BPMNServer, Logger, Definition } from './';
+import { SystemUser, configuration } from './';
+import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
 //import { MyDelegate } from './test2.js';
 const logger = new Logger({ toConsole: true});
 const server = new BPMNServer(configuration, logger, { cron: false });
+const api = new BPMNAPI(server);
 
 test2();
 //listAssign();
@@ -13,17 +14,22 @@ let response;
 let instanceId;
 
 async function test2() {
-    await server.dataStore.deleteInstances({ "data.caseId": 1050 });
 
-    let response = await server.engine.start('Buy Used Car', { caseId: 1050 }, null, 'user1');
+    let user = new SecureUser({userName:'user1',userGroups:['admin']});
+    api.defaultUser= user;
+    let caseId =1051;
 
-    response = await server.engine.invoke({ "data.caseId": 1050, "items.elementId": 'task_Buy' },
+    //await api.data.deleteInstances({ "data.caseId": 1050 });
+
+    let response = await api.engine.start('Buy Used Car', { caseId } );
+
+    response = await server.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_Buy' },
         { needsCleaning: "Yes", needsRepairs: "Yes" });
 
 
-    await server.engine.invoke({ "data.caseId": 1050, "items.elementId": 'task_repair' });
+    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_repair' },{},user,{noWait:false,myOption:'abc',anObj:{}});
 
-    await server.engine.invoke({ "data.caseId": 1050, "items.elementId": 'task_clean' });
+    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_clean' },{},user);
 
 }
 function listen(listener) {

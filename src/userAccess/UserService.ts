@@ -60,9 +60,7 @@ export class UserService implements IUserService {
     }
 
 	init() {
-		console.log('UserService.init()');
 		dotenv.config();
-		console.log("MongoDB URL", process.env.MONGO_DB_URL)
 		mongoose.set('strictQuery', false);
 		mongoose.connect(process.env.MONGO_DB_URL);
 		mongoose.connection.on('error', (err) => {
@@ -71,7 +69,6 @@ export class UserService implements IUserService {
 			process.exit();
 		});
 		mongoose.connection.on('connected',()=> {
-			console.log('Connected.');
 		});
 
 	}
