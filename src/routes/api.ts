@@ -123,7 +123,7 @@ export class API extends Common {
                 //console.log(request.body);
                 let data = request.body.data;
 
-                let startNodeId, options = {}, userName;
+                let startNodeId, options = {}, userId;
                 if (request.body.startNodeId) {
                     startNodeId = request.body.startNodeId;
                 }
@@ -131,15 +131,15 @@ export class API extends Common {
                     options = request.body.options;
                 }
 
-                if(options['userName'] !== undefined){
-                    userName = options['userName']
-                }else if (request.body.userName) {
-                    userName = request.body.userName;
+                if(options['userId'] !== undefined){
+                    userId = options['userId']
+                }else if (request.body.userId) {
+                    userId = request.body.userId;
                 }
 
                 let context;
                 //console.log(data,userName);
-                context = await this.bpmnServer.engine.start(name, data, startNodeId, userName, options);
+                context = await this.bpmnServer.engine.start(name, data, startNodeId, userId, options);
                 response.json(context.instance);
             }
             catch (exc) {
@@ -150,7 +150,7 @@ export class API extends Common {
         router.put('/engine/assign', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             //console.log(request.body);
-            let query, data,userName,assignment;
+            let query, data,userId,assignment;
             if (request.body.query) {
                 query = request.body.query;
             }
@@ -161,8 +161,8 @@ export class API extends Common {
                 assignment = request.body.assignment;
             }
 
-            if (request.body.userName) {
-                userName= request.body.userName;
+            if (request.body.userId) {
+                userId= request.body.userId;
             }
 
             //console.log(query);
@@ -171,7 +171,7 @@ export class API extends Common {
             let errors;
             try {
 
-                context = await this.bpmnServer.engine.assign(query, data, assignment, userName);
+                context = await this.bpmnServer.engine.assign(query, data, assignment, userId);
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -188,7 +188,7 @@ export class API extends Common {
         router.put('/engine/invoke', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             //console.log('---------invoke',request.body);
-            let query, data,userName,options;
+            let query, data,userId,options;
             if (request.body.query) {
                 query = request.body.query;
             }
@@ -199,8 +199,8 @@ export class API extends Common {
                 options = request.body.options;
             }
 
-            if (request.body.userName) {
-                userName= request.body.userName;
+            if (request.body.userId) {
+                userId= request.body.userId;
             }
 
             let context;
@@ -208,7 +208,7 @@ export class API extends Common {
             let errors;
             try {
 
-                context = await this.bpmnServer.engine.invoke(query, data,userName,options );
+                context = await this.bpmnServer.engine.invoke(query, data,userId,options );
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
@@ -225,7 +225,7 @@ export class API extends Common {
 
         router.put('/engine/restart', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
-            let query, data,startNodeId,userName,options;
+            let query, data,startNodeId,userId,options;
             if (request.body.query) {
                 query = request.body.query;
             }
@@ -236,14 +236,14 @@ export class API extends Common {
                 options = request.body.options;
             }
 
-            if (request.body.userName) {
-                userName= request.body.userName;
+            if (request.body.userId) {
+                userId= request.body.userId;
             }
             let context;
             let instance;
             let errors;
             try {
-                context = await this.bpmnServer.engine.restart(query, data,userName,options );
+                context = await this.bpmnServer.engine.restart(query, data,userId,options );
                 instance = context.instance;
                 if (context && context.errors)
                     errors = context.errors.toString();
