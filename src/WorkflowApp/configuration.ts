@@ -35,14 +35,11 @@ var configuration = new Configuration(
 		},
 		dataStore: function (server) {
 			let ds=new DataStore(server);
-			ds.enableSavePoints=false;
+			ds.enableSavePoints=true;
 			return ds;
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);
-		},
-		userService: function (server) {
-			return new UserService(server);
 		}
 		
 	});

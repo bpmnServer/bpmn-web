@@ -38,9 +38,6 @@ export const configuration = new Configuration(
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);
-		},
-		userService: function (server) {
-			return new UserService(server);
 		}
 
 	});

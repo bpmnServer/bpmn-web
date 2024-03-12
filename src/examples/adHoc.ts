@@ -2,27 +2,37 @@ import { exec } from 'child_process';
 import { SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
-const logger = new Logger({ toConsole: false});
+const logger = new Logger({ toConsole: true});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
-//testBoundaryEvent();
-testRestartEvent();
+
+testAdHoc();
+//testSubProcess();
 
 let process;
 let response;
 let instanceId;
 
-async function testBoundaryEvent() {
+async function testAdHoc() {
     
 
 
 //    let id = await execute('boundary-event', ['user_task'] ,'user_task');
-let id = await execute('Buy Used Car',{ needsCleaning: "Yes", needsRepairs: "Yes" },['task_Buy','task_repair','task_clean','task_Drive'],'task_Buy')
+let id = await execute('ad hoc',{ needsCleaning: "Yes", needsRepairs: "Yes" },['task2','option1','option2','option3','closeOption'],'')
 
 
 }
+async function testSubProcess() {
+    
+
+
+    //    let id = await execute('boundary-event', ['user_task'] ,'user_task');
+    let id = await execute('SubProcess',{ needsCleaning: "Yes", needsRepairs: "Yes" },['Task_design','sub_usertask_2'],'')
+    
+    
+    }
 async function execute(process,data,tasks,restartTask) {
     let user = new SecureUser({userName:'user1',userGroups:['admin']});
     api.defaultUser= user;
@@ -36,6 +46,8 @@ async function execute(process,data,tasks,restartTask) {
     for(let i=0;i<tasks.length;i++)
     {
         response = await server.engine.invoke({ "id": id, "items.elementId": tasks[i] },{});
+        await delay(300);
+
 
     }
 
@@ -48,11 +60,12 @@ async function execute(process,data,tasks,restartTask) {
     });
     console.log('data:',response.instance.data);
 
+    return;
     console.log("-------------------- restart -----------------");
 
     console.log('restarting ',itemId);
 
-    response=await server.engine.restart({"items.id":itemId},{},user,{});
+ //   response=await server.engine.restart({"items.id":itemId},{},user,{});
     console.log('restarted ',itemId);
     console.log("-------------------- restart Items-----------------");
 
@@ -170,3 +183,13 @@ async function car() {
     return id;
 
 }
+async function delay(time) {
+    console.log("delaying ... " + time)
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            console.log("delayed is done.");
+            resolve(time);
+        }, time);
+    });
+}
+ 

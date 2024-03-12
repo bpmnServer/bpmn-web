@@ -2,11 +2,14 @@ import { BPMNServer,dateDiff, DefaultAppDelegate, Logger, SystemUser ,BPMNAPI} f
 import { configuration} from '../WorkflowApp/configuration';
 import * as readline from "readline";
 import "dotenv/config";
+import { UserService } from "../userAccess/UserService";
 
 const logger = new Logger({ toConsole: false});
 
 
 const server = new BPMNServer(configuration, logger,{cron:false});
+
+const userService =new UserService(server);
 
 const api=new BPMNAPI(server);
 
@@ -127,7 +130,7 @@ async function completeUserTask() {
 			break;
 		case 'lu':
 			console.log("listing Users");
-			var list = await server.userService.findUsers({});
+			var list = await userService.findUsers({});
 			console.log('users:\n name\t email\t userGroups');
 			list.forEach(u => {
 				console.log(`${u.userName} \t${u.email} \t ${u.userGroups}`)
@@ -140,7 +143,7 @@ async function completeUserTask() {
 			const userName = await question('UserName: ');
 			const newPassword = await question('NewPassword: ');
 //			server.userService['initMongo']();
-			var list = await server.userService.setPassword(userName, newPassword);
+			list = await userService.setPassword(userName, newPassword);
 
 
 	}
@@ -193,7 +196,10 @@ async function getCriteria() {
 	const answer = await question('Please items criteria name value pair; example: items.status wait ');
 	let str=''+ answer;
 
-	const list = str.split(' ');
+	const list = str.match(/(?:[^\s"]+|"[^"]*")+/g);//str.split(' ');
+
+	// s = 'Time:"Last 7 Days" Time:"Last 30 Days"'
+
 	let criteria = {};
 	console.log(list);
 	for (var i = 0; i < list.length; i += 2) {
