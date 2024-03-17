@@ -248,7 +248,43 @@ export class API2 extends Common {
             }
         }));
 
+        router.post('/engine/startEvent', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
+            let instanceId, data,startNodeId,userName,options;
+            if (request.body.instanceId) {
+                instanceId = request.body.instanceId;
+            }
+            if (request.body.startNodeId) {
+                startNodeId = request.body.startNodeId;
+            }
+    
+            if (request.body.data) {
+                data = request.body.data;
+            }
+            if (request.body.options) {
+                options = request.body.options;
+            }
+    
+            let context;
+            let instance;
+            let errors;
+            try {
+                context = await api.engine.startEvent(instanceId, startNodeId, data,self.getUser(request), options);
+                //context = await this.bpmnServer.engine.restart(query, data,userName,options );
+                instance = context.instance;
+                if (context && context.errors)
+                    errors = context.errors.toString();
+            }
+            catch (exc) {
+                errors = exc.toString();
+                console.log(errors);
+            }
+            response.json({ errors: errors, instance });
+    
+    
+        }));
+    
+    
 /*
  *  engine.throwSignal     - issue a signal by id
  *  ------------------
@@ -281,6 +317,8 @@ export class API2 extends Common {
                 response.json({ error: exc.toString() });
             }
         }));
+
+
         //// ---------------------  Model -----------------------
 
         var fsx = require('fs-extra');       //File System - for file manipulation

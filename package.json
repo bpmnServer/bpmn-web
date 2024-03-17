@@ -1,10 +1,10 @@
 {
   "name": "bpmn-web",
-  "version": "2.1.0",
+  "version": "2.1.5",
   "homepage": "https://github.com/bpmnServer/bpmn-server/blob/rel2.0.0/docs/README.md",
   "scripts": {
     "setup": "ts-node src/scripts/setup.ts",
-    "cli": "ts-node src/scripts/cli.ts",
+    "cli": "ts-node src/scripts/cli.ts lu",
     "build": "tsc --build",
     "start": "ts-node src/app",
     "compileRun": "npm run build && node dist/app.js",

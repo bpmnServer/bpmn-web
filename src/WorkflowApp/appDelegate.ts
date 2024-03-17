@@ -78,6 +78,12 @@ class MyAppDelegate extends DefaultAppDelegate{
         }
 
         var list = await this.server.dataStore.locker.list();
+
+        let date=new Date();
+        date.setDate(date.getDate() -1);
+
+        var list = await this.server.dataStore.locker.delete({ Expiration: { $lte: date } });
+
         console.log('-- Current Locks --')
         if (list.length > 0) {
             console.log('current locks ...', list.length);

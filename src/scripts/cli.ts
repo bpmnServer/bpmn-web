@@ -13,19 +13,45 @@ const userService =new UserService(server);
 
 const api=new BPMNAPI(server);
 
-const cl = readline.createInterface({input: process.stdin, output: process.stdout,terminal:false});
+//const cl = readline.createInterface(process.stdin,null);
 
-const question = function(q: string) {
-  return new Promise<string>( (res, rej) => {
-      cl.question( q, answer => {
-          res(answer);
-      })
-  });
-};
+
+function removeBS(str:string):string {
+	if (str.indexOf('\b')===-1)
+		return str;
+	let l;
+	while(str.indexOf('\b')>-1)
+	{
+		l=str.indexOf('\b');
+		str=str.substring(0,l-1)+str.substring(l+1);
+
+	}
+	return str;
+
+}
+const question = function(q):Promise<string> {
+
+	const cl = readline.createInterface({input: process.stdin, output: process.stdout,terminal:false});
+
+    console.log(q);
+    cl.setPrompt('>');
+    cl.prompt();
+  
+    return new Promise( (res, rej) => {
+        cl.on('line', answer => {
+			answer=removeBS(answer);
+	        res(answer);
+			cl.close();
+        })
+    });
+}
+
 
 start();
 
 async function start() {
+	let option='';
+	console.log('')
 	completeUserTask();
 }
 
@@ -42,6 +68,7 @@ function menu() {
 	console.log('	i	Invoke Task');
 	console.log('	sgl	Signal Task');
 	console.log('	msg	Message Task');
+	console.log('	se	Start Event');
 	console.log('	rs	Restart an Instance');
 	console.log('	d	delete instnaces');
 	console.log('	lm	List of Models');
@@ -56,12 +83,11 @@ function menu() {
 async function completeUserTask() {
 
 	menu();
-	
-  let option = '';
+  let option='';
   let command = '';
   while(option!=='q')
   {
-	command= await question('Enter Command, q to quit, or ? to list commands\n\r>');
+	command= await question('Enter Command, q to quit, or ? to list commands');
 	let opts=command.split(' ');
 	option=opts[0];
 	switch(option)
@@ -95,9 +121,9 @@ async function completeUserTask() {
 			await invoke();
 			break;
 		case 'rs':
-				console.log("restarting");
-				await restart();
-				break;
+			console.log("restarting a workflow");
+			await restart();
+			break;
 				
 		case 's':
 			console.log("Starting Process");
@@ -111,7 +137,11 @@ async function completeUserTask() {
 			console.log("Message Process");
 			await message();
 			break;
-
+		case 'se':
+			console.log("Start Event");
+			await startEvent();
+			break;
+	
 		case 'd':
 			console.log("deleting");
 			await delInstances();
@@ -142,39 +172,21 @@ async function completeUserTask() {
 
 			const userName = await question('UserName: ');
 			const newPassword = await question('NewPassword: ');
-//			server.userService['initMongo']();
+
 			list = await userService.setPassword(userName, newPassword);
-
-
 	}
   
   }
 
 
   console.log("bye");
-	cl.close();
 	process.exit();
 
 }
 async function startProc()
 {
   const name = await question('Please provide your process name: ');
-  const taskDataString = await question('Please provide your Task Data (json obj) if any: ');
-	let taskData = {};
-	console.log(taskDataString);
-
-	try {
-		if (taskDataString === "") {
-			taskData = {};
-		} else {
-			taskData = JSON.parse(taskDataString.toString());
-		}
-
-	}
-	catch (exc) {
-		console.log(exc);
-		return;
-    }
+  const taskData = await getCriteria('Please provide your Task Data: ');
   
   let response=await server.engine.start(name, taskData);
 
@@ -192,19 +204,33 @@ async function findItems(query) {
 	return items;
 
 }
-async function getCriteria() {
-	const answer = await question('Please items criteria name value pair; example: items.status wait ');
+async function getCriteria(prompt) {
+	const answer = await question(prompt+',in name value pair; example: items.status wait ');
 	let str=''+ answer;
 
-	const list = str.match(/(?:[^\s"]+|"[^"]*")+/g);//str.split(' ');
+	if (str.trim()==='')
+		return {};
 
-	// s = 'Time:"Last 7 Days" Time:"Last 30 Days"'
+	//const list = str.match(/li(".*?"|[^"\s]+)+(?=\s*|\s*$)/g);//.match(/(?:[^\s"]+|"[^"]*")+/g);//str.split(' ');
+	const list = str.split(/ +(?=(?:(?:[^"]*"){2})*[^"]*$)/g);
+	
+	if ((list.length % 2)!==0)
+		{
+			console.log("must be pairs");
+			return await getCriteria(prompt);
+		}
 
 	let criteria = {};
 	console.log(list);
 	for (var i = 0; i < list.length; i += 2) {
-		console.log(list[i], list[i + 1]);
-		criteria[list[i]] = list[i + 1];
+		let key=list[i];
+		if (key.startsWith('"'))
+			key=key.substring(1,key.length-1);
+		let val=list[i+1]
+		if (val.startsWith('"'))
+			val=val.substring(1,val.length-1);
+		console.log(key,val);
+		criteria[key] = val;
     }
 	console.log(criteria);	
 
@@ -213,7 +239,7 @@ async function getCriteria() {
 }
 async function listItems() {
 
-	var criteria = await getCriteria();
+	var criteria = await getCriteria("provide Items search criteria");
 	var items = await server.dataStore.findItems(criteria)
 	console.log(items.length);
 
@@ -224,7 +250,7 @@ async function listItems() {
 }
 
 async function listInstances() {
-	var criteria = await getCriteria();
+	var criteria = await getCriteria("Instances search criteria");
 
 	let insts = await server.dataStore.findInstances(criteria,'full')
 
@@ -259,15 +285,9 @@ async function invoke()
 {
   const instanceId = await question('Please provide your Instance ID: ');
   const taskId = await question('Please provide your Task ID: ');
-  let taskDataString = await question('Please provide your Task Data (json obj) if any: ');
-	let taskData = {};
-  if (taskDataString === ""){
-      taskData = {};
-  }else{
-      taskData = JSON.parse(taskDataString.toString());
-  }
+  let taskData = await question('Please provide your Task Data ');
 
-	try {
+  try {
 		let response = await server.engine.invoke(
 			{ id: instanceId, "items.elementId": taskId }
 			, taskData);
@@ -286,7 +306,7 @@ async function invoke()
 
 async function restart()
 {
-  const query=await getCriteria();
+  const query=await getCriteria("Instance Search criteria");
 
 	try {
 		let response = await server.engine.restart(query,{},'');
@@ -302,20 +322,7 @@ async function restart()
 async function signal() {
 	const signalId = await question('Please provide signal ID: ');
 
-	const signalDataString = await question('Please provide your Data (json obj) if any: ');
-	let signalData = {};
-	//if (typeof signalData === 'string' && signalData.trim() === '') {
-	if (signalDataString === "") {
-		signalData = {};
-	} else {
-		try {
-			signalData = JSON.parse(signalDataString.toString());
-		}
-		catch (exc) {
-			console.log(exc);
-			return;
-        }
-	}
+	const signalData = await question('Please provide your Data');
 
 	let response = await server.engine.throwSignal(signalId, signalData);
 
@@ -325,14 +332,7 @@ async function signal() {
 async function message() {
 	const messageId = await question('Please provide message ID: ');
 
-	const messageDataString = await question('Please provide your Data (json obj) if any: ');
-	let messageData = {};
-	if (typeof messageDataString === 'string' && messageDataString.trim() === '') {
-		messageData = {};
-	} else {
-		messageData = JSON.parse(messageDataString.toString());
-	}
-
+	const messageData = await question('Please provide your Data');
 	let response = await server.engine.throwMessage(messageId, messageData);
 
 	if (response['id'])
@@ -342,6 +342,23 @@ async function message() {
 		return null;
     }
 }
+async function startEvent()
+{
+  const instanceId = await question('Please provide your Instance ID: ');
+  const nodeId = await question('Please provide start Event ID: ');
+  const data = await getCriteria('provide input data');
+
+	try {
+		let response = await server.engine.startEvent(instanceId,nodeId,data);
+
+		return await displayInstance(response.id);
+	}
+	catch (exc) {
+		console.log("Invoking task failed for:", nodeId, instanceId);
+    }
+}
+
+
 
 async function delInstances() {
 	const name = await question('Please provide process name to delete instances for process: ');

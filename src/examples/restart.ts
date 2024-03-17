@@ -2,19 +2,19 @@ import { exec } from 'child_process';
 import { SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
-const logger = new Logger({ toConsole: false});
+const logger = new Logger({ toConsole: true});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
 //testBoundaryEvent();
-testRestartEvent();
+testRestartEvent2();
 
 let process;
 let response;
 let instanceId;
 
-async function testBoundaryEvent() {
+async function testBoundaryEvent2() {
     
 
 
@@ -113,7 +113,6 @@ console.log("-------------------- restart results-----------------");
 //    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_clean' },{},user);
 
 }
-
 async function testRestartEvent() {
 
     let user = new SecureUser({userName:'user1',userGroups:['admin']});
@@ -140,6 +139,37 @@ console.log('---------------- invoke 2');
     response=await api.engine.startEvent(response.id,"start2",{},user,{restart:true});
 
     response.instance.items.forEach(it=>{console.log('item',it.id,it.elementId);});
+
+//    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_clean' },{},user);
+
+}
+
+async function testRestartEvent2() {
+
+    let user = new SecureUser({userName:'user1',userGroups:['admin']});
+    api.defaultUser= user;
+    let caseId =1051;
+    let id;
+    //await api.data.deleteInstances({ "data.caseId": 1050 });
+
+    let response = await api.engine.start('restart', { caseId } , user, {startNodeId:'StartEvent_1'} );
+
+    id=response.id;
+console.log('---------------- invoke 1');
+
+//    response = await server.engine.invoke({ "id": response.id, "items.elementId": 'task1' },
+//        { needsCleaning: "Yes", needsRepairs: "Yes" });
+
+console.log('---------------- invoke 2');
+//    response=await api.engine.invoke({ "id": response.id, "items.elementId": 'task2' },{},user,{noWait:false,myOption:'abc',anObj:{}});
+
+    response.instance.items.forEach(it=>{
+        console.log('item=>',it.elementId,it.status);
+    });
+
+    response=await api.engine.startEvent(response.id,"start2",{},user);
+
+    response.instance.items.forEach(it=>{console.log('item',it.id,it.elementId,it.status);});
 
 //    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_clean' },{},user);
 
