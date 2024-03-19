@@ -2,20 +2,90 @@ import { exec } from 'child_process';
 import { SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
-const logger = new Logger({ toConsole: false});
+const logger = new Logger({ toConsole: true});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
 
 
-test();
+testErr();
 //testLoop();
 
 let process;
 let response;
 let instanceId;
 
+async function testErr() {
+    
+
+    //    let id = await execute('boundary-event', ['user_task'] ,'user_task');
+        let user = new SecureUser({userName:'user1',userGroups:['admin']});
+        api.defaultUser= user;
+        let caseId =1051;
+        let id;
+    
+        console.log('-------------------');
+        
+        let response = await api.engine.start('multi-instanceErr',{} );
+    
+        id =response.id;
+    
+    //    console.log(response.instance.tokens);
+    
+        
+        let helper=new Helper(response);
+        {
+            response = await server.engine.invoke({ "id": id, "items.elementId": 'Activity_1olobi3' , "items.status":"wait" },{"votedBy":"IT-User","vote":85});
+//            response = await server.engine.invoke({ "id": id, "items.elementId": 'Activity_vote' , "items.status":"wait"  },{"votedBy":"HR-User","vote":100});
+//            response = await server.engine.invoke({ "id": id, "items.elementId": 'Activity_vote' , "items.status":"wait"  },{"votedBy":"Billing-User","vote":80});
+        
+        }
+    
+        //new Helper(response).report();
+    
+        let total=0;
+        response.getItems().filter(itm=>(itm.elementId=='Activity_vote')).forEach(voteItem=>{
+            
+            let vote =voteItem['data']['vote'];
+            let parent=voteItem.token.parentToken;
+            let dept=parent.data['key'];
+            total+=vote;
+            console.log("vote Item",voteItem.seq,'dept:',dept,'key:',voteItem.itemKey,'vote',vote,total);
+    
+        });
+        console.log('----------------------------');
+        console.log('using data ',response.instance.data);
+        console.log('HR Vote:',response.instance.data.department.HR);
+    
+    
+        console.log('----------------------------');
+        new Helper(response).report();
+    
+        console.log('----------------------------');
+        
+        let list=await api.data.findItems({ "id": id,"items.elementId": 'Activity_vote' },user);
+        
+        list.forEach(item=>{
+                console.log('findItems: item:',item);
+        });    
+    
+        return;
+        response.getItems().filter(itm=>(itm.elementId=='Activity_vote')).forEach(voteItem=>{
+            let vote =voteItem['data']['vote'];
+            console.log("vote Item",voteItem.seq,'vote',vote);
+    
+        });
+        
+    return;
+    //    response = await server.engine.invoke({ "id": id, "items.elementId": 'Activity_summary' , "items.itemKey":".department.HR.department" },{"MyVote":"Billing"});
+    
+    console.log('======================================');
+        new Helper(response).report();
+    
+    
+    }
+    
 async function test() {
     
 

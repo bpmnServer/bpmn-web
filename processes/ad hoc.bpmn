@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
   <bpmn2:process id="Process_1" isExecutable="false">
-    <bpmn2:startEvent id="StartEvent_1">
-      <bpmn2:outgoing>Flow_089lrxf</bpmn2:outgoing>
-    </bpmn2:startEvent>
     <bpmn2:sequenceFlow id="Flow_089lrxf" sourceRef="StartEvent_1" targetRef="task1" />
     <bpmn2:sequenceFlow id="Flow_1u002ok" sourceRef="task1" targetRef="Options" />
     <bpmn2:scriptTask id="task1" name="Task 1">
@@ -68,6 +65,9 @@ Subprocess is terminated 3 ways:
       <bpmn2:outgoing>Flow_17fkjo8</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="Flow_1c29b2f" sourceRef="Gateway_1k9ulvy" targetRef="Event_0uishsm" />
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>Flow_089lrxf</bpmn2:outgoing>
+    </bpmn2:startEvent>
   </bpmn2:process>
   <bpmn2:message id="Message_129ike9" name="TerminateOptions" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -101,14 +101,14 @@ Subprocess is terminated 3 ways:
         <di:waypoint x="268" y="190" />
         <di:waypoint x="400" y="190" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="232" y="172" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0pwsjb9_di" bpmnElement="task1">
         <dc:Bounds x="400" y="150" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0uishsm_di" bpmnElement="Event_0uishsm">
         <dc:Bounds x="1152" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0dn0ayh_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="232" y="172" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0s04ayh_di" bpmnElement="Options" isExpanded="true">
         <dc:Bounds x="360" y="300" width="570" height="360" />

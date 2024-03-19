@@ -82,7 +82,7 @@ class MyAppDelegate extends DefaultAppDelegate{
         let date=new Date();
         date.setDate(date.getDate() -1);
 
-        var list = await this.server.dataStore.locker.delete({ Expiration: { $lte: date } });
+        var list = await this.server.dataStore.locker.delete({ time: { $lte: date } });
 
         console.log('-- Current Locks --')
         if (list.length > 0) {
@@ -174,6 +174,14 @@ class MyAppDelegate extends DefaultAppDelegate{
 
     }
     */
+
+    /**
+     * is Called everytime a workflow is completed
+     * @param execution 
+     */
+    async executionEnded(execution: IExecution) {
+        
+    }
     async executionStarted(execution: IExecution) {
         await super.executionStarted(execution);
     }
@@ -201,5 +209,8 @@ class MyAppDelegate extends DefaultAppDelegate{
         this.server.logger.log("service called");
 
     }
+}
+class Utils {
+
 }
 export {MyAppDelegate}

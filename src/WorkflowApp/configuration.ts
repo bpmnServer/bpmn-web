@@ -40,8 +40,8 @@ var configuration = new Configuration(
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);
-		}
-		
+		},
+
 	});
 
 

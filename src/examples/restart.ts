@@ -2,17 +2,33 @@ import { exec } from 'child_process';
 import { SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
-const logger = new Logger({ toConsole: true});
+const logger = new Logger({ toConsole: false});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
 //testBoundaryEvent();
-testRestartEvent2();
+
+console.profile();
+//testRestartEvent2();
+stressLoad(100);
+
+console.profileEnd();
 
 let process;
 let response;
 let instanceId;
+async function stressLoad(count) {
+    console.time('STRESS');
+    for(var i=0;i<=count;i++)
+    {
+        console.log('   ');
+        console.time('car-'+i);
+        await car();
+        console.timeEnd('car-'+i);
+    }
+    console.timeEnd('STRESS');
+}
 
 async function testBoundaryEvent2() {
     
