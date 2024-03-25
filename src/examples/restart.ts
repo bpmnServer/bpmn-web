@@ -7,28 +7,16 @@ const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
-//testBoundaryEvent();
+testBoundaryEvent2();
+console.log('restart.ts');
 
-console.profile();
 //testRestartEvent2();
-stressLoad(100);
 
-console.profileEnd();
+
 
 let process;
 let response;
 let instanceId;
-async function stressLoad(count) {
-    console.time('STRESS');
-    for(var i=0;i<=count;i++)
-    {
-        console.log('   ');
-        console.time('car-'+i);
-        await car();
-        console.timeEnd('car-'+i);
-    }
-    console.timeEnd('STRESS');
-}
 
 async function testBoundaryEvent2() {
     
@@ -45,6 +33,7 @@ async function execute(process,data,tasks,restartTask) {
     let caseId =1051;
     let id;
 
+    console.log('starting process',process);
     let response = await api.engine.start(process, data );
 
     id =response.id;
@@ -78,6 +67,7 @@ async function execute(process,data,tasks,restartTask) {
         console.log('item:',item.id,item.elementId,item.status);
     });
     console.log('data:',response.instance.data);
+    console.log('process:',response.instance.status,response.instance.endedAt);
 
     return id;
 

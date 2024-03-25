@@ -6,7 +6,7 @@ const User = require('./models/User');
 
 export class UserService implements IUserService {
 	static initialized = false;	
-	constructor(server) {
+	constructor() {
 
 		if (UserService.initialized)
 			return;

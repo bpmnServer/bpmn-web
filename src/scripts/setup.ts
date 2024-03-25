@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as readline from "readline";
+import {UserService } from '../userAccess/UserService'
 
 const cl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
 
@@ -81,7 +82,9 @@ async function install() {
 
         await modelsDataStore.install();
 
-        await server.userService.install();
+        let userService=new UserService();
+
+        await userService.install();
     }
     catch (exc) {
         console.log(exc);
