@@ -19,7 +19,7 @@
       <bpmn:incoming>Flow_18xinq3</bpmn:incoming>
       <bpmn:outgoing>Flow_0xpjff0</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="$(item.data.records)" />
-      <bpmn:script>this.log('this is a script task');</bpmn:script>
+      <bpmn:script>this.log('this is a script task'+item.seq);</bpmn:script>
     </bpmn:scriptTask>
     <bpmn:serviceTask id="service_task" name="Service Task" camunda:delegateExpression="serviceX">
       <bpmn:incoming>Flow_0xpjff0</bpmn:incoming>

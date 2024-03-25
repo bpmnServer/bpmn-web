@@ -14,4 +14,3 @@
 *.tsbuildinfo
 docker/mongodb_volume
 docker/bpmn_server_volume
-tsconfig.tsbuildinfo
