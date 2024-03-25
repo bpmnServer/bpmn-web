@@ -9,7 +9,7 @@ const logger = new Logger({ toConsole: false});
 
 const server = new BPMNServer(configuration, logger,{cron:false});
 
-const userService =new UserService(server);
+const userService =new UserService();
 
 const api=new BPMNAPI(server);
 
