@@ -70,8 +70,17 @@ Gateways</bpmn:documentation>
     <bpmn:userTask id="task_Buy" name="Buy" camunda:assignee="$(this.userId)" camunda:dueDate="$this.dueDate">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="needsRepairs" label="Repairs Required?" type="boolean" />
-          <camunda:formField id="needsCleaning" label="Cleaning Required?" type="boolean" />
+          <camunda:formField id="needsRepairs" label="Repairs Required?" type="enum" defaultValue="No">
+            <camunda:properties>
+              <camunda:property id="Property_20jsiiu" />
+            </camunda:properties>
+            <camunda:value id="Yes" name="Yes" />
+            <camunda:value id="No" name="No" />
+          </camunda:formField>
+          <camunda:formField id="needsCleaning" label="Cleaning Required?" type="enum" defaultValue="No">
+            <camunda:value id="Yes" name="Yes" />
+            <camunda:value id="No" name="No" />
+          </camunda:formField>
         </camunda:formData>
         <camunda:executionListener event="start">
           <camunda:script scriptFormat="JavaScript">var date=new Date();

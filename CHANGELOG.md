@@ -12,6 +12,10 @@ and here
 
 ### Changed
 -->
+## Release 2.1.10 
+- Minor change to Modeler UI: allow resizable property panel from the left side
+- Added more test sceanrio
+- Moved docs to github.io
 ## Release 2.1.5 -- 2024-03
 - Added engine.startEvent to API
 ### Enhanced cli

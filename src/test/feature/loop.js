@@ -27,8 +27,8 @@ Feature('Loop', () => {
 
       and('User Task', async () => {
           let items = response.instance.items;
-          expect(items.filter(i => i.elementId == 'script_task').length).equals(5);
-          expect(items.filter(i => i.elementId == 'service_task').length).equals(5);
+          expect(items.filter(i => i.elementId == 'script_task').length).equals(6);
+          expect(items.filter(i => i.elementId == 'service_task').length).equals(6);
       });
 
       and('write log file to' + name + '.log', async () => {

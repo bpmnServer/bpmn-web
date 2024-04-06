@@ -1,5 +1,6 @@
 ﻿/node_modules
 /obj
+/docs/api
 *.log
 *.map
 *.d.ts

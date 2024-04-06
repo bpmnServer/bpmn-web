@@ -147,7 +147,7 @@ export class WF extends Common {
 
             let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
             let vars = ViewHelper.formatData(instance.data);
-
+console.log('fields',fields);
             if (fields && fields.length > 0) {
                 response.render('invokeItem', { node,
                     id, fields, processName, elementId ,instance,vars

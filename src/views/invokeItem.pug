@@ -22,10 +22,14 @@ block content
 
 					td #{field.label}
 					td  
-						if (field['$children'])
+						if (field.type=='enum')
 							select(name=`${field.id}`)
 								each v in (field['$children'])
-									option(value=`${v.id}`) #{v.name}
+									if (v.$type=='camunda:value')
+										if (v.id == field.defaultValue)
+											option(value=`${v.id}` selected) #{v.name}
+										else
+											option(value=`${v.id}`) #{v.name}
 						else if (field.type=='date')
 							input(name=`${field.id}` type='date')
 						else

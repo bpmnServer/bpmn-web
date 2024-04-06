@@ -5,7 +5,7 @@ import { EventEmitter } from 'events';
 const logger = new Logger({ toConsole: true });
 //readMe();
 
-test("C");
+test("B");
 async function test(scenario) {
     console.log('test');
     const server = new BPMNServer(configuration, logger, { cron: false });

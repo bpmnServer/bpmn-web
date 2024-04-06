@@ -10,6 +10,14 @@
     background-color: #f8f8f8;
     position: relative;
     border-left: 1px solid #ccc;
+    
+    overflow: auto;   /* Ralph */
+    resize: both;     /* Ralph */
+    direction: rtl;   /* Ralph */ 
+
+}
+.bpp-properties {
+  direction: ltr;     /* Ralph */
 }
 /* line 20, node_modules\bpmn-js-properties-panel\styles\properties.less */
 .bpp-properties-panel:empty {
@@ -734,7 +742,7 @@ a:link {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 260px;
+  min-width: 260px;   /* Ralph */
   z-index: 10;
   overflow: auto;
 }
