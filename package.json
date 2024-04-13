@@ -74,7 +74,6 @@
     "@types/serve-static": "^1.15.1",
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
-    "markdown-toc": "^1.2.0",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typedoc": "^0.25.4",
