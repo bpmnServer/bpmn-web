@@ -1,0 +1,70 @@
+const { BPMNServer, DefaultAppDelegate, Logger } = require('./');
+const { configuration } = require('./');
+
+
+const logger = new Logger({ toConsole: false });
+
+const server = new BPMNServer(configuration, logger);
+
+
+//=-=-=-==============================
+
+let name = 'Issue 196';
+
+let response;
+let needsRepairs = true;
+let needsCleaning = true;
+let items;
+
+Feature('Loop inside loop', () => {
+  Scenario('All path', () => {
+    Given('a bpmn source with one user task',async () => {
+
+        response = await server.engine.start(name, {});
+        response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_UT1',"items.itemKey":"1"});
+        response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_UT1',"items.itemKey":"2"});
+        
+    });
+
+      and('User Task', async () => {
+          let items = response.instance.items;
+          expect(items.filter(i => i.status == 'wait').length).equals(12);
+          items.forEach(item=>{
+            console.log('item>:',item.seq,item.elementId,item.status,item.endedAt);
+          });
+      });
+
+      and('write log file to' + name + '.log', async () => {
+          let fileName = __dirname + '/../logs/' + name + '.log';
+          logger.save(fileName);
+      });
+
+  });
+
+  Scenario('Cancel', () => {
+    Given('a bpmn source with one user task',async () => {
+
+        response = await server.engine.start(name, {});
+        response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_UT1',"items.itemKey":"1"});
+        response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_UT1',"items.itemKey":"2"});
+        response=await server.engine.invoke({id:response.id,"items.elementId":'Event_Cancel',"items.itemKey":"2"});
+        
+    });
+
+      and('User Task', async () => {
+          let items = response.instance.items;
+          items.forEach(item=>{
+            console.log('item>:',item.seq,item.elementId,item.status,item.endedAt,item.itemKey);
+          });
+          expect(items.filter(i => i.status == 'wait').length).equals(0);
+      });
+
+      and('write log file to' + name + '.log', async () => {
+          let fileName = __dirname + '/../logs/' + name + '.log';
+          logger.save(fileName);
+      });
+
+  });
+
+}); 
+

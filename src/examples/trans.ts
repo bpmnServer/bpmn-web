@@ -1,4 +1,4 @@
-import  { configuration }   from './';
+import  { Execution, configuration }   from './';
 import { BPMNServer, Logger } from './';
 import { EventEmitter } from 'events';
 import { Definition } from './';
@@ -15,18 +15,50 @@ let items;
 let item;
 let query, query1;
 
-let server;
 let instanceId;
+const server = new BPMNServer(configuration, logger, { cron: false });
 
-test();
-async function test() {
+testAll();
+
+async function testAll() {
+
+    await test(6010,'Complete Process',{},{},'Event_end','end');  //works fine
+    //await test(6011,'Error thrown',{error:'true'},null,'Event_end_error','end');
+    //await test(6012,'Cancel thrown',{cancel:'true'},null,'Activity_after_trans_cancel','end');
+  //  await test(6013,'Cancel after Complete Process',{},{cancel2:'true'},'Activity_cancelHotel','end'); 
+    
+    await logger.save('trans.log');
+}
+
+async function test(caseId,scenario,data1,data2,checkItem,checkStatus) {
 
     console.log("st");
-    const server = new BPMNServer(configuration, logger, { cron: false });
 
+    let response;
 
-    await server.engine.start(name);
-    await logger.save('trans.log');
+    response=await server.engine.start(name,{caseId,scenario});
+
+    response=await server.engine.invoke({id:response.instance.id,'items.elementId':'Activity_bookFlight'},{});
+    response=await server.engine.invoke({id:response.instance.id,'items.elementId':'Activity_bookHotel'},{});
+    response=await server.engine.invoke({id:response.instance.id,'items.elementId':'Activity_confirm'},data1);
+    if (data2)
+        response=await server.engine.invoke({id:response.instance.id,'items.elementId':'Activity_after_trans'},data2);
+
+    if (checkItem) {
+
+        let result=false;
+        response.getItems().forEach(item=>{
+            if (item.elementId==checkItem && item.status==checkStatus)
+                result=true;
+        });
+    console.log(scenario+' Check is true',result)
+    }
+    response.getItems().forEach(item=>{
+ //       console.log('item:',item.elementId,item.seq,item.status);
+    });
+
+    //open('http://localhost:3000/instanceDetails?id='+response.id);
+
     return;
 
 }

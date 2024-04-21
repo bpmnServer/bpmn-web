@@ -12,7 +12,7 @@ const { BPMNServer, DefaultHandler, Logger } = require("./");
 const { configuration } = require('./');
 
 
-const logger = new Logger({ toConsole: true });
+const logger = new Logger({ toConsole: false });
 
 const server = new BPMNServer(configuration, logger);
 var caseId = Math.floor(Math.random() * 10000);

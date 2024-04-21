@@ -1,7 +1,7 @@
 import  { configuration } from './';
 import { BPMNServer, Logger } from './';
 
-const logger = new Logger({ toConsole: true});
+const logger = new Logger({ toConsole: false});
 
 test();
 
@@ -9,9 +9,17 @@ async function test() {
     let name = 'SubProcess';
 
     const server = new BPMNServer(configuration, logger);
+    let listener= server.listener;
 
     let response = await server.engine.start(name, { task_subProcess: { clients: ['abc', 'mbc', 'cbc'] } });
 
+    listener.on('all', async function ({ context, event, }) {
+        if (context.item)
+            console.log(`----->Event: '${event}' for ${context.item.element.type} '${context.item.element.id}' data: ${JSON.stringify(context.instance.data)}`);
+        else
+            console.log('----->All:' + event, context.definition.name);
+        });
+    
     listItems(response.instance);
     response = await server.engine.invoke({
         "items.elementId": "Task_design",

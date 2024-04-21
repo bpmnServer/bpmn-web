@@ -269,6 +269,7 @@ console.log('fields',fields);
         router.get('/instanceDetails', awaitAppDelegateFactory(async (request, response) => {
 
             let imageId = request.query.id;
+            console.log(request.query,request.query.version);
             await instanceDetails(response, imageId);
 
         }));

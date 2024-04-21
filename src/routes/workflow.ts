@@ -301,7 +301,8 @@ export class Workflow extends Common {
         router.get('/instanceDetails', awaitAppDelegateFactory(async (request, response) => {
 
             let imageId = request.query.id;
-            await instanceDetails(response, imageId);
+            let version = request.query.version;
+            await instanceDetails(response, imageId,version);
 
         }));
 
@@ -504,7 +505,7 @@ async function display(req,res, title, output, logs = [], items = []) {
 function show(output) {
     return output;
 }
-async function instanceDetails(response,instanceId) {
+async function instanceDetails(response,instanceId,version) {
 
     let instance = await bpmnServer.dataStore.findInstance({ id: instanceId }, 'Full');
 
@@ -519,7 +520,15 @@ async function instanceDetails(response,instanceId) {
 
     }
 
-    const lastItem = instance.items[instance.items.length - 1];
+    let data = instance.data;
+    let items = instance.items;
+    if (version) {
+        let savePoint=instance.savePoints[version];
+        data = savePoint.data;
+        items= savePoint.items;
+
+    }
+    let lastItem = items[items.length - 1];
 
     const def = await bpmnServer.definitions.load(instance.name);
     await def.load();
@@ -529,14 +538,14 @@ async function instanceDetails(response,instanceId) {
 
     let vars = ViewHelper.formatData(instance.data);
 
-    let decorations = JSON.stringify(ViewHelper.calculateDecorations(instance.items));
+    let decorations = JSON.stringify(ViewHelper.calculateDecorations(items));
 
     response.render('InstanceDetails',
         {
             instance, vars,
             accessRules: def.accessRules,
             title: 'Instance Details',
-            logs,items: instance.items, svg,
+            logs,items:items, svg,
             decorations, definition: defJson, lastItem,
         });
 

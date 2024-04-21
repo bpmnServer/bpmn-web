@@ -1,5 +1,5 @@
 import { exec } from 'child_process';
-import { SystemUser, configuration } from './';
+import { ScriptHandler, SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
 const logger = new Logger({ toConsole: true});
@@ -8,26 +8,47 @@ const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
 
-testAdHoc();
 //testSubProcess();
 
 let process;
 let response;
 let instanceId;
 
+
+testAdHoc();
+
+
+async function debugScript(instanceId,itemSeq,script) {
+    
+    let ex=await server.engine.get({id:instanceId});
+
+    let items=ex.getItems();
+    
+    let item=items[itemSeq];
+    
+    logger.callback=logCall;
+
+    await ScriptHandler.executeScript(item,script);
+
+    logger.callback=null;
+    
+    return;
+
+}
+function logCall(msg,type) {
+    console.log('>>logCall',msg,type);
+}
 async function testAdHoc() {
     
 
-
-//    let id = await execute('boundary-event', ['user_task'] ,'user_task');
-let id = await execute('ad hoc',{ needsCleaning: "Yes", needsRepairs: "Yes" },['task2','option1','option2','option3','closeOption'],'')
+    //    let id = await execute('boundary-event', ['user_task'] ,'user_task');
+    let id = await execute('ad hoc',{ needsCleaning: "Yes", needsRepairs: "Yes" },['option1','option2'],'')
+    //let id = await execute('ad hoc',{ needsCleaning: "Yes", needsRepairs: "Yes" },['closeOption'],'')
 
 
 }
 async function testSubProcess() {
     
-
-
     //    let id = await execute('boundary-event', ['user_task'] ,'user_task');
     let id = await execute('SubProcess',{ needsCleaning: "Yes", needsRepairs: "Yes" },['Task_design','sub_usertask_2'],'')
     
@@ -53,10 +74,11 @@ async function execute(process,data,tasks,restartTask) {
 
     console.log('executed '+process);
     let itemId;
+
     response.instance.items.forEach(item=>{
         if (item.elementId==restartTask)
             itemId=item.id;
-        console.log('item:',item.id,item.elementId,item.status);
+        console.log('item:',item.seq,item.type,item.elementId,item.status);
     });
     console.log('data:',response.instance.data);
 

@@ -397,17 +397,41 @@ async function recover() {
 
 //			if (item.type == 'bpmn:ScriptTask' || item.type == 'bpmn:ServiceTask') 
 			{
-				console.log(item.processName, item.elementId, item.type, item.startedAt, item.status,'since:',dateDiff(item.startedAt));
+				console.log();
+				console.log('>Process:',item.processName, 'item:',item.elementId, item.type, item.startedAt, item.status,'since:',dateDiff(item.startedAt));
 
-				const response = await question('RE-INVOKE this item(Y/N?')
-				if (response == 'Y' || response == 'y') {
+				const response = await question('\n\tRE-INVOKE this item(Y/N) or D to delete instance');
+
+				if (response.toUpperCase()=='D') {
+
+					console.log('deleting ',item.id);
+
+					try {
+						await server.dataStore.locker.delete({id: item.instanceId});
+						await server.dataStore.deleteInstances({id: item.instanceId});
+					}
+					catch(exc) {
+						console.log(exc);
+					}
+					
+					console.log('deleted',item.id);
+					console.log();
+
+				}
+				else if (response.toUpperCase() == 'Y') {
 					console.log('invoking item',item.id);
+
+					try {
 
 					await server.dataStore.locker.delete({id: item.instanceId});
 
 					let ret = await server.engine.invoke({ "items.id": item.id }, {}, null, { recover: true });
 					console.log('done');
 				}
+				catch(exc) {
+					console.log(exc);
+				}
+			}
 			}
 
 		}

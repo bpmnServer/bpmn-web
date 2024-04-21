@@ -23,13 +23,15 @@ async function test2() {
 
     let response = await api.engine.start('Buy Used Car', { caseId } );
 
-    response = await server.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_Buy' },
+    response = await server.engine.invoke({ "id": response.id, "items.elementId": 'task_Buy' },
         { needsCleaning: "Yes", needsRepairs: "Yes" });
 
 
-    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_repair' },{},user,{noWait:false,myOption:'abc',anObj:{}});
+    response=await api.engine.invoke({ "id": response.id, "items.elementId": 'task_repair' },{},user,{noWait:false,myOption:'abc',anObj:{}});
 
-    await api.engine.invoke({ "data.caseId": caseId, "items.elementId": 'task_clean' },{},user);
+    response= await api.engine.invoke({ "id": response.id, "items.elementId": 'task_clean' },{},user);
+
+    await logger.save('car.log');
 
 }
 function listen(listener) {

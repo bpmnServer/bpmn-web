@@ -35,22 +35,28 @@
     <bpmn:subProcess id="SubProcess" name="SubProcess">
       <bpmn:incoming>Flow_0s8ghrk</bpmn:incoming>
       <bpmn:outgoing>Flow_1qyp7h6</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ez1frs</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="[&#39;A&#39;,&#39;B&#39;,&#39;C&#39;]" />
       <bpmn:startEvent id="Event_0an0xl3">
         <bpmn:outgoing>Flow_09jx33a</bpmn:outgoing>
       </bpmn:startEvent>
-      <bpmn:sequenceFlow id="Flow_09jx33a" sourceRef="Event_0an0xl3" targetRef="Activity_1lzds0i" />
+      <bpmn:sequenceFlow id="Flow_09jx33a" sourceRef="Event_0an0xl3" targetRef="Sub_script" />
       <bpmn:endEvent id="Event_1j62ljq">
         <bpmn:incoming>Flow_0yr8zl8</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_0yr8zl8" sourceRef="Activity_1lzds0i" targetRef="Event_1j62ljq" />
-      <bpmn:scriptTask id="Activity_1lzds0i" name="script">
+      <bpmn:sequenceFlow id="Flow_0yr8zl8" sourceRef="Sub_script" targetRef="Event_1j62ljq" />
+      <bpmn:scriptTask id="Sub_script" name="script" scriptFormat="JavaScript">
         <bpmn:incoming>Flow_09jx33a</bpmn:incoming>
         <bpmn:outgoing>Flow_0yr8zl8</bpmn:outgoing>
-        <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="[&#39;S1&#39;,&#39;S2&#39;,&#39;S3&#39;]" />
+        <bpmn:multiInstanceLoopCharacteristics camunda:collection="[1,2]" />
+        <bpmn:script>console.log('Script:',item.data);</bpmn:script>
       </bpmn:scriptTask>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_1qyp7h6" sourceRef="SubProcess" targetRef="Event_0bf16wv" />
+    <bpmn:endEvent id="Event_0m985mm">
+      <bpmn:incoming>Flow_0ez1frs</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0ez1frs" sourceRef="SubProcess" targetRef="Event_0m985mm" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0q44ppb">
@@ -84,6 +90,10 @@
           <dc:Bounds x="498.5" y="129" width="90" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ez1frs_di" bpmnElement="Flow_0ez1frs">
+        <di:waypoint x="664" y="380" />
+        <di:waypoint x="742" y="380" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1ohx91b">
         <dc:Bounds x="232" y="165" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -102,6 +112,9 @@
           <dc:Bounds x="545" y="172" width="90" height="20" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0m985mm_di" bpmnElement="Event_0m985mm">
+        <dc:Bounds x="742" y="362" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ej3q6j_di" bpmnElement="SubProcess" isExpanded="true">
         <dc:Bounds x="314" y="280" width="350" height="200" />
       </bpmndi:BPMNShape>
@@ -119,7 +132,7 @@
       <bpmndi:BPMNShape id="Event_1j62ljq_di" bpmnElement="Event_1j62ljq">
         <dc:Bounds x="582" y="362" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_08mjzw4_di" bpmnElement="Activity_1lzds0i">
+      <bpmndi:BPMNShape id="Activity_08mjzw4_di" bpmnElement="Sub_script">
         <dc:Bounds x="430" y="340" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
