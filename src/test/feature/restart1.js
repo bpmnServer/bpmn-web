@@ -20,7 +20,6 @@ Feature('Buy Used Car- and Driver', () => {
         Scenario('Simple', () => {
             Given('Start Buy Used Car Process',async () => {
                 response = await server.engine.start(name, {caseId: caseId},null,userId);
-                console.log('**instanceId',  response.id,'vars:',response.instance.vars);
 
                 instanceId = response.id;
 

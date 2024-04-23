@@ -20,9 +20,7 @@ Feature('Buy Used Car- clean and repair', () => {
         Scenario('Simple', () => {
             Given('Start Buy Used Car Process',async () => {
                 response = await server.engine.start(name, {caseId: caseId},null,userId);
-                console.log('**instanceId',  response.id,'vars:',response.instance.vars);
                 instanceId = response.id;
-                console.log('data:',response.instance.data);
                 //console.log('item',getItem('task_Buy'));
                 
 //                console.log(' after start ', response.instance.caseId);
@@ -43,8 +41,6 @@ Feature('Buy Used Car- clean and repair', () => {
                 response = await server.engine.assign(query,null,assignment,userId);
 
                 const itm=getItem('task_Buy');
-
-                console.log(itm);
 
                 expect(itm.priority).equals(7);
 

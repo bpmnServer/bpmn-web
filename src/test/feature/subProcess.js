@@ -13,7 +13,7 @@ let process;
 let response;
 let instanceId;
 
-Feature('serviceTask', () => {
+Feature('SubProcess', () => {
 
         Scenario('All', () => {
 
@@ -34,7 +34,7 @@ Feature('serviceTask', () => {
             Then('task2 is waiting:', () => {
                 expect(getItem('sub_usertask_2').status).equals('wait');
                 let items=response.instance.items.filter(item => { return item.elementId == 'sub_task_1'; })
-                expect(items.length).equals(4);
+                expect(items.length).equals(3);
             });
 
             Given('continue2 ', async () => {

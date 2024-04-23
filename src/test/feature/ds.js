@@ -29,7 +29,6 @@ Feature('DataStore', () => {
             response = await server.engine.start('Buy Used Car', data);
             instanceId = response.execution.id;
 
-            console.log(caseId+ " instnace Id: "+ instanceId);
         });
         
         and('get an item', async () => {
@@ -86,7 +85,6 @@ Feature('DataStore', () => {
             server = new BPMNServer(config, logger);
             let data = { caseId: caseId };
             response = await server.engine.start('Buy Used Car', data);
-            console.log(caseId);
         });
         and('get an item', async () => {
 

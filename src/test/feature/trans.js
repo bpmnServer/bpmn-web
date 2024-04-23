@@ -8,39 +8,56 @@ const logger = new Logger({ toConsole: false });
 const server = new BPMNServer(configuration, logger);
 
 const listener = server.listener;
-/*
+
 let lastCall;
-listener.on('all', async function ({ context, event }) {
+listener.on('all', async function ({ context, event,eventDetails }) {
     let r=false;
     let item=context.item;
     switch(event)
     {
         case 'enter':
         case 'transformInput':
-            break;
+        case 'process.saving':
+        case 'process.end':
+        case 'process.restored':
         case 'validate':
-            if (lastCall=='process.invoke')
-                console.log('Invoking item',item.elementId);
-            else
-                console.log(`----->Event: '${event}'    -#${item.seq}   for ${item.element.type} '${item.element.id}'  ${item.status} `);
             break;
         case 'end':
-            if (item.endedAt===null)
-                event='Cancel';
         default:
             if (item)
-                console.log(`----->Event: '${event}'    -#${item.seq}   for ${item.element.type} '${item.element.id}'  ${item.status} `);
+                {
+                    if (eventDetails.cancel===true)
+                        event='cancel';
+                    console.log(`----->Event: '${event}'    -#${item.seq}   for ${item.element.type} '${item.element.id}'`,eventDetails);
+
+                }
             else
-                console.log('----->All:' + event, context.definition.name);
+                console.log('----->All:' + event, context.definition.name,eventDetails);
        }
     });
-*/
+
 let name = 'Trans';
 
 let process;
 let response;
 let instanceId;
 
+/*
+let msg=logger.logS('msg1');
+msg=logger.log('msg2');
+msg=logger.log('msg3');
+msg=logger.log('msg4');
+msg=logger.logE('msg1-end');
+
+msg=logger.logS('msg11');
+msg=logger.log('msg12');
+msg=logger.log('msg13');
+msg=logger.log('msg14');
+msg=logger.logE('msg11-end')
+
+
+console.log(logger.debugMsgs);
+*/
 testAll();
 
 async function testAll() {
@@ -48,6 +65,7 @@ async function testAll() {
    await runTest(6010,'Complete Process',{},{},'Event_end','end');  //works fine
   
    await runTest(6011,'Error thrown',{error:'true'},null,'Event_end_error','end');
+
    await runTest(6012,'Cancel thrown',{cancel:'true'},null,'Activity_after_trans_cancel','end');
    
    await runTest(6013,'Cancel after Complete Process',{},{cancel2:'true'},'Activity_cancelHotel','end'); 
@@ -70,7 +88,7 @@ async function runTest(caseId,scenario,data1,data2,checkItem,checkStatus) {
                     response=await server.engine.invoke({id:response.instance.id,'items.elementId':'Activity_after_trans'},data2);
             });
             Then('output:'+checkItem+' to be '+checkStatus,()=>{
-                listItems();
+//                listItems();
                 expect(getItem(checkItem).status).equals(checkStatus);
 
             });

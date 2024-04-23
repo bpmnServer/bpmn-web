@@ -1,10 +1,11 @@
 // Support Repeat Timers using format R3 / PT3S
 
 var input = 'R3/PT3S';
+/*
 console.log(getRepeat("PT5M"));
 console.log(getRepeat(input));
 console.log(getRepeat('R3PT3S'));
-    
+  */  
 function getRepeat(input) {
     if (input.startsWith('R')) {
         var l = input.indexOf('/');

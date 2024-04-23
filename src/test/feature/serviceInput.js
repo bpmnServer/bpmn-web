@@ -27,7 +27,6 @@ Feature('Service Input', () => {
             instanceId = response.execution.id;
             displayItems();
             var item = getItem('service1');
-            console.log('item:',item.id,item.name);
             expect(getItem('service1').status).equals('end');
             //                expect(getItem('Expired-Timer').status).equals('wait');
             //                expect(getItem('Cancel-Message').status).equals('wait');

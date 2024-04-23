@@ -45,7 +45,6 @@ Feature('Test-Throw Test-Catch', () => {
                     name: 'test-catch', "data.caseId": caseId
                     
                 });
-                console.log('test-catch:', instances);
                 expect(instances.length).equals(1);
             });
             let fileName = __dirname + '/../logs/throw-catch.log';

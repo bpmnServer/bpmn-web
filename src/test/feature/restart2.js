@@ -20,7 +20,6 @@ Feature('Start Restart Process', () => {
         Scenario('Simple', () => {
             Given('Start Restart Process',async () => {
                 response = await server.engine.start(name, {caseId: caseId},null,userId);
-                console.log('**instanceId',  response.id,'vars:',response.instance.vars);
 
                 instanceId = response.id;
 

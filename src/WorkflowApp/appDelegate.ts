@@ -72,8 +72,9 @@ class MyAppDelegate extends DefaultAppDelegate{
         var list = await this.server.dataStore.findItems(query);
         if (list.length > 0) {
             this.server.logger.log("** There are " + list.length," items that seems to be hung");
+            console.log("** There are " + list.length," items that seems to be hung");
             list.forEach(it=>{
-                console.log('   item:',it.elementId,it.processName);
+                console.log(`   item hung: '${it.elementId}' seq: ${it.seq} ${it.type} ${it.status} in process:'${it.processName}' - Instance id: '${it.instanceId}' `);
             });
         }
 
@@ -84,9 +85,8 @@ class MyAppDelegate extends DefaultAppDelegate{
 
         var list = await this.server.dataStore.locker.delete({ time: { $lte: date } });
 
-        console.log('-- Current Locks --')
         if (list.length > 0) {
-            console.log('current locks ...', list.length);
+            console.log('Current locks ...', list.length);
             for (var i = 0; i < list.length; i++) {
                 let item = list[i];
                 console.log('lock:', item.id, item.server, item.time,dateDiff(item.time));
