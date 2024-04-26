@@ -1,7 +1,7 @@
 
 console.log('----------------------------- EX.ts ------------------');
 
-require('./listUsedModels');
+require('./car');
 
 /*
 import { configuration } from './';

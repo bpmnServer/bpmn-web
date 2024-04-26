@@ -2,7 +2,7 @@ import { SystemUser, configuration } from './';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from './';
 import { inherits } from 'util';
 //import { MyDelegate } from './test2.js';
-const logger = new Logger({ toConsole: true});
+const logger = new Logger({ toConsole: false});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 
@@ -13,6 +13,63 @@ let process;
 let response;
 let instanceId;
 
+function processLogs(instance) {
+    console.log('---------------------------------',instance.logs.length);
+    let logs=instance.logs;
+    logs.forEach(log=>{
+        let obj;
+        try {
+            
+            if ((log.message))
+                {
+                    obj=log.message;
+                    if (obj.execution)
+                        {                            
+                            let det = Object.assign({}, obj);
+                            delete det.node
+                            delete det.item
+                            delete det.method
+                            delete det.token;
+                            let level='.'.repeat(log.level);
+                            console.log(`>>${level}Execution:${obj.execution} node:${obj.node}  #${obj.item}  @${obj.method}`,det );
+                            
+                        }
+                    else if (obj.token)
+                        {                            
+                            let det = Object.assign({}, obj);
+                            delete det.node
+                            delete det.item
+                            delete det.method
+                            delete det.token;
+                            let level='.'.repeat(log.level);
+                            console.log(`>>${level}Token:${obj.token} node:${obj.node}  #${obj.item}  @${obj.method}`,det );
+                            
+                        }
+                    else if (obj.node)
+                        {
+                            let det = Object.assign({}, obj);
+                            delete det.node
+                            delete det.item
+                            delete det.method
+                            let level='.'.repeat(log.level);
+                            console.log(`>>${level}Node:${obj.node}   #${obj.item}  @${obj.method}`,det );
+                        }
+                    else 
+                        console.log('Log:>',log.message);
+
+
+                }
+            else 
+                console.log('log>',log.message);
+        }
+        catch(exc) {
+            console.log('log>>',log.message);
+
+        }
+    });
+    
+
+}
 async function test2() {
 
     let user = new SecureUser({userName:'user1',userGroups:['admin']});
@@ -23,9 +80,10 @@ async function test2() {
 
     let response = await api.engine.start('Buy Used Car', { caseId } );
 
-    response = await server.engine.invoke({ "id": response.id, "items.elementId": 'task_Buy' },
+     response = await server.engine.invoke({ "id": response.id, "items.elementId": 'task_Buy' },
         { needsCleaning: "Yes", needsRepairs: "Yes" });
 
+    return processLogs(response.instance);
 
     response=await api.engine.invoke({ "id": response.id, "items.elementId": 'task_repair' },{},user,{noWait:false,myOption:'abc',anObj:{}});
 
@@ -34,6 +92,7 @@ async function test2() {
     await logger.save('car.log');
 
 }
+
 function listen(listener) {
     listener.on('end', function ({ context, event }) {
         console.log('----->'+event+" "+ context.item.elementId);

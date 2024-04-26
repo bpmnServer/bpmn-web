@@ -15,12 +15,6 @@ let process;
 let response;
 let instanceId;
 
-logger.log('test1',1234,{abc:'abc'});
-
-debugScript('dce96d65-b6e9-4e8e-8f50-ab4b59b41599',2,`
-this.log("hi",this.data);
-`);
-
 
 
 async function debugScript(instanceId,itemSeq,script) {

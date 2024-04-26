@@ -7,12 +7,6 @@
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:outgoing>Flow_1ly2dyb</bpmn2:outgoing>
     </bpmn2:startEvent>
-    <bpmn2:scriptTask id="Activity_1aw4w97" name="Provide Departments" scriptFormat="JavaScript">
-      <bpmn2:incoming>Flow_1ly2dyb</bpmn2:incoming>
-      <bpmn2:outgoing>Flow_0hsbjmb</bpmn2:outgoing>
-      <bpmn2:script>item.data.includeDepartment = true;
-item.data.departments = ["IT", "HR"]</bpmn2:script>
-    </bpmn2:scriptTask>
     <bpmn2:endEvent id="Event_end1">
       <bpmn2:incoming>Flow_0ri93gq</bpmn2:incoming>
     </bpmn2:endEvent>
@@ -21,7 +15,7 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
       <bpmn2:outgoing>Flow_0ri93gq</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:subProcess id="department" name="Department">
-      <bpmn2:incoming>Flow_0hsbjmb</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1gxv8ti</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1umlt4b</bpmn2:outgoing>
       <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$(item.data.departments)" />
       <bpmn2:startEvent id="Event_03fca9f">
@@ -59,16 +53,22 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
     <bpmn2:endEvent id="Event_end2">
       <bpmn2:incoming>Flow_1moj2o6</bpmn2:incoming>
     </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="Flow_1moj2o6" sourceRef="Activity_deleteVotes" targetRef="Event_end2" />
+    <bpmn2:sequenceFlow id="Flow_1mrsorz" sourceRef="Event_cancel" targetRef="Activity_deleteVotes" />
+    <bpmn2:sequenceFlow id="Flow_0ri93gq" sourceRef="Activity_sum_votes" targetRef="Event_end1" />
+    <bpmn2:sequenceFlow id="Flow_1umlt4b" sourceRef="department" targetRef="Activity_sum_votes" />
+    <bpmn2:sequenceFlow id="Flow_1ly2dyb" sourceRef="StartEvent_1" targetRef="Activity_1aw4w97" />
     <bpmn2:boundaryEvent id="Event_cancel" attachedToRef="department">
       <bpmn2:outgoing>Flow_1mrsorz</bpmn2:outgoing>
       <bpmn2:cancelEventDefinition id="CancelEventDefinition_0rt3smt" />
     </bpmn2:boundaryEvent>
-    <bpmn2:sequenceFlow id="Flow_1moj2o6" sourceRef="Activity_deleteVotes" targetRef="Event_end2" />
-    <bpmn2:sequenceFlow id="Flow_1mrsorz" sourceRef="Event_cancel" targetRef="Activity_deleteVotes" />
-    <bpmn2:sequenceFlow id="Flow_0hsbjmb" sourceRef="Activity_1aw4w97" targetRef="department" />
-    <bpmn2:sequenceFlow id="Flow_0ri93gq" sourceRef="Activity_sum_votes" targetRef="Event_end1" />
-    <bpmn2:sequenceFlow id="Flow_1umlt4b" sourceRef="department" targetRef="Activity_sum_votes" />
-    <bpmn2:sequenceFlow id="Flow_1ly2dyb" sourceRef="StartEvent_1" targetRef="Activity_1aw4w97" />
+    <bpmn2:sequenceFlow id="Flow_1gxv8ti" sourceRef="Activity_1aw4w97" targetRef="department" />
+    <bpmn2:scriptTask id="Activity_1aw4w97" name="Provide Departments" scriptFormat="JavaScript">
+      <bpmn2:incoming>Flow_1ly2dyb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1gxv8ti</bpmn2:outgoing>
+      <bpmn2:script>item.data.includeDepartment = true;
+item.data.departments = ["IT", "HR"]</bpmn2:script>
+    </bpmn2:scriptTask>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1slhc2l">
@@ -77,7 +77,7 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1ly2dyb_di" bpmnElement="Flow_1ly2dyb">
         <di:waypoint x="178" y="258" />
-        <di:waypoint x="220" y="258" />
+        <di:waypoint x="260" y="258" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1umlt4b_di" bpmnElement="Flow_1umlt4b">
         <di:waypoint x="990" y="258" />
@@ -87,10 +87,6 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
         <di:waypoint x="1140" y="258" />
         <di:waypoint x="1192" y="258" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0hsbjmb_di" bpmnElement="Flow_0hsbjmb">
-        <di:waypoint x="320" y="258" />
-        <di:waypoint x="360" y="258" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1mrsorz_di" bpmnElement="Flow_1mrsorz">
         <di:waypoint x="1008" y="360" />
         <di:waypoint x="1040" y="360" />
@@ -99,11 +95,12 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
         <di:waypoint x="1140" y="360" />
         <di:waypoint x="1192" y="360" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gxv8ti_di" bpmnElement="Flow_1gxv8ti">
+        <di:waypoint x="360" y="258" />
+        <di:waypoint x="480" y="258" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="142" y="240" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1trqr8z_di" bpmnElement="Activity_1aw4w97">
-        <dc:Bounds x="220" y="218" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1jag0kh_di" bpmnElement="Event_end1">
         <dc:Bounds x="1192" y="240" width="36" height="36" />
@@ -111,14 +108,17 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
       <bpmndi:BPMNShape id="Activity_1oo3z2k_di" bpmnElement="Activity_sum_votes">
         <dc:Bounds x="1040" y="218" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1trqr8z_di" bpmnElement="Activity_1aw4w97">
+        <dc:Bounds x="260" y="218" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0dsqa5j_di" bpmnElement="department" isExpanded="true">
-        <dc:Bounds x="360" y="137" width="630" height="263" />
+        <dc:Bounds x="480" y="150" width="510" height="250" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_01wzvkh_di" bpmnElement="Flow_01wzvkh">
         <di:waypoint x="750" y="285" />
         <di:waypoint x="750" y="340" />
-        <di:waypoint x="580" y="340" />
-        <di:waypoint x="580" y="300" />
+        <di:waypoint x="640" y="340" />
+        <di:waypoint x="640" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_02xulvp_di" bpmnElement="Flow_02xulvp">
         <di:waypoint x="775" y="260" />
@@ -128,24 +128,24 @@ item.data.departments = ["IT", "HR"]</bpmn2:script>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1amvo76_di" bpmnElement="Flow_1amvo76">
-        <di:waypoint x="630" y="260" />
+        <di:waypoint x="690" y="260" />
         <di:waypoint x="725" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0exycdh_di" bpmnElement="Flow_0exycdh">
-        <di:waypoint x="438" y="260" />
-        <di:waypoint x="530" y="260" />
+        <di:waypoint x="538" y="260" />
+        <di:waypoint x="590" y="260" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_03fca9f_di" bpmnElement="Event_03fca9f">
-        <dc:Bounds x="402" y="242" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0f58zap_di" bpmnElement="Activity_create_vote">
-        <dc:Bounds x="530" y="220" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0ab9uaw_di" bpmnElement="Gateway_0ab9uaw" isMarkerVisible="true">
         <dc:Bounds x="725" y="235" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1ak5jjb_di" bpmnElement="Event_1ak5jjb">
         <dc:Bounds x="872" y="242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0f58zap_di" bpmnElement="Activity_create_vote">
+        <dc:Bounds x="590" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03fca9f_di" bpmnElement="Event_03fca9f">
+        <dc:Bounds x="502" y="242" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0768bpi_di" bpmnElement="Activity_deleteVotes">
         <dc:Bounds x="1040" y="320" width="100" height="80" />

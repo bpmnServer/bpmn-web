@@ -12,7 +12,7 @@
     "----": "---------------------for Development Scripts Only -------------------------------------",
     "dev:run": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && node dist/app.js\"",
     "dev:example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && node dist/examples/EX.js\"",
-    "dev:test": "nodemon -e ts,js --watch ./ --watch ../bpmn-server --exec \"ts-mocha -exit --config=src/test/.mocharc.json src/test/feature/trans.js || exit 1\""
+    "dev:test": "nodemon -e ts,js --watch ./ --watch ../bpmn-server --exec \"ts-mocha -exit --config=src/test/.mocharc.json src/test/feature/Issue197_cancel_loop.js || exit 1\""
   },
   "description": "bpmn-web Demo App",
   "author": {

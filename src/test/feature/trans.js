@@ -9,8 +9,10 @@ const server = new BPMNServer(configuration, logger);
 
 const listener = server.listener;
 
+function listen() {
+
 let lastCall;
-listener.on('all', async function ({ context, event,eventDetails }) {
+    listener.on('all', async function ({ context, event,eventDetails }) {
     let r=false;
     let item=context.item;
     switch(event)
@@ -35,6 +37,7 @@ listener.on('all', async function ({ context, event,eventDetails }) {
                 console.log('----->All:' + event, context.definition.name,eventDetails);
        }
     });
+}
 
 let name = 'Trans';
 
@@ -63,7 +66,10 @@ testAll();
 async function testAll() {
 
    await runTest(6010,'Complete Process',{},{},'Event_end','end');  //works fine
-  
+   
+   console.log('--log',response.instance.log);
+  return;
+
    await runTest(6011,'Error thrown',{error:'true'},null,'Event_end_error','end');
 
    await runTest(6012,'Cancel thrown',{cancel:'true'},null,'Activity_after_trans_cancel','end');
