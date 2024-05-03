@@ -1,4 +1,5 @@
 "use strict";
+console.log('----', __filename);
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestAppDelegate = void 0;
 const appDelegate_1 = require("../WorkflowApp/appDelegate");

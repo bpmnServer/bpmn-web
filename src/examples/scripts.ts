@@ -1,4 +1,4 @@
-console.log('start');
+/*console.log('start');
 
 import { ScriptHandler } from '../';
 
@@ -66,7 +66,7 @@ async function testScripter() {
 
 
     script = `$(this.data.v1+this.data.v2)`;
-    console.log('eval script:', script, 'ret:', ScriptHandler.evaluateExpression(myscope, script));
+    console.log('eval script:', script, 'ret:', ScriptHandler.evaluateExpression(token, script));
 
 
     script = `$(this.data.v1+this.data.v2)`;
@@ -131,3 +131,4 @@ console.log('----');
 }
 
 //main();
+*/

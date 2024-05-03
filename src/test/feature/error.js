@@ -2,12 +2,11 @@
 const { BPMNServer , DefaultHandler , Logger } = require('./');
 const { configuration } = require('./');
 
-
-const logger = new Logger({ toConsole: false });
+const logger = new Logger({ toConsole: true , includeLog: false });
 
 const server = new BPMNServer(configuration, logger);
 
-let name = 'Error Events';
+let name = 'Error events';
 
 let process;
 let response;
@@ -21,7 +20,6 @@ async function testAll(seq) {
    await runTest(7010,'Complete Process',{"Require_Review":"","Error_Code":""},
     ['UserTask2','EndEventNormal'],
     ['StartEvent_14s2cpf','BoundaryEvent_catchErrors','StartEvent_catchErrors']);  
-
 
     if (seq==2||seq==9)
     await runTest(7011,'Raise Escalation',{"Require_Review":"true","Error_Code":""},
@@ -62,9 +60,12 @@ async function runTest(caseId,scenario,data,completeItems,cancelledItems) {
     Feature('Error Events', () =>{
         Scenario(scenario, () => {
 
-            Given('invoke',async () =>{
+            Given('start',async () =>{
 
                 response=await server.engine.start(name,{caseId,scenario});
+
+            });
+            Given('invoke',async () =>{
 
                 response=await server.engine.invoke({id:response.instance.id,'items.elementId':'UserTask2'},data);
 //                listItems();

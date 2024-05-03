@@ -5,7 +5,10 @@ import { IConfiguration, DataStore, ILogger , NoCacheManager} from '../';
 import { Logger } from '../'
 import { UserService } from '../userAccess/UserService';
 import 'dotenv/config';
-
+console.log('cwd',process.cwd(),__dirname);
+let envirn=require('dotenv').config({ path: __dirname+'/.env' })
+console.log(envirn);
+console.log('==============================================');
 export const configuration = new Configuration(
 	{
 		definitionsPath: process.env.DEFINITIONS_PATH,

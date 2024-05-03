@@ -1,11 +1,19 @@
 "use strict";
+
+console.log('----', __filename);
+
+
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.configuration = void 0;
 const __1 = require("../");
 const appDelegate_1 = require("./appDelegate");
 const __2 = require("../");
 const __3 = require("../");
-require("dotenv/config");
+//require("dotenv/config");
+console.log('cwd',process.cwd(),__dirname);
+let envirn=require('dotenv').config({ path: __dirname+'/.env' })
+console.log(envirn);
+console.log('==============================================');
 exports.configuration = new __1.Configuration({
     definitionsPath: process.env.DEFINITIONS_PATH,
     templatesPath: __dirname + '/../emailTemplates',

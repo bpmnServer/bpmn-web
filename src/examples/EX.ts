@@ -1,20 +1,30 @@
 
 console.log('----------------------------- EX.ts ------------------');
 
-require('./car');
+//require('./concurrent');
 
-/*
+
 import { configuration } from './';
 import { BPMNServer, Logger } from './';
 import { EventEmitter } from 'events';
 
-const logger = new Logger({ toConsole: true });
+const logger = new Logger({ toConsole: false });
 const server = new BPMNServer(configuration, logger, { cron: false });
 let response;
 test197();
 async function test197() {
 
-    response=await server.engine.start('Issue197',{});
+    const del=await server.dataStore.deleteInstances({"data.caseId": 1005});
+    console.log('deleted ', del);
+
+    response=await server.engine.start('callTask',{caseId:1005});
+    let response1=response;
+    let instances=await server.dataStore.findInstances({"data.caseId":1005},{})
+    console.log(instances.length);
+
+    response=await server.engine.invoke({"data.caseId":1005,"items.elementId":'task_Buy'});
+    response=await server.engine.invoke({"data.caseId":1005,"items.elementId":'task_Drive'});
+    return;
     
     response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_create_vote',"items.itemKey":"IT"});
     //response=await server.engine.invoke({id:response.id,"items.elementId":'Activity_UT1',"items.itemKey":"2"});
@@ -72,4 +82,4 @@ function list() {
         console.log('item:',item.seq,item.elementId,item.itemKey,item.status,item.endedAt);
     });
 
-}*/
+}

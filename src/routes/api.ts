@@ -49,6 +49,20 @@ export class API extends Common {
         var router = express.Router();
         var bpmnServer = this.bpmnServer;
 
+        router.get('/status', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+
+            let status;
+            let errors;
+            try {
+                status = await this.bpmnServer.status();
+            }
+            catch (exc) {
+                errors = exc.toString();
+                //console.log(errors);
+            }
+            response.json({ errors: errors, status });
+        }));
+
         router.get('/datastore/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             //console.log(request.body);
