@@ -1,7 +1,4 @@
 "use strict";
-
-console.log('----', __filename);
-
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -21,5 +18,5 @@ exports.configuration = void 0;
 __exportStar(require("bpmn-server"), exports);
 var testConfiguration_1 = require("../testConfiguration");
 Object.defineProperty(exports, "configuration", { enumerable: true, get: function () { return testConfiguration_1.configuration; } });
-//export {configuration} from './configuration';
+console.log('----', __filename);
 //# sourceMappingURL=index.js.map

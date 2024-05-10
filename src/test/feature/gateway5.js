@@ -2,6 +2,7 @@
 const { BPMNServer , DefaultHandler , Logger } = require('./');
 const { configuration } = require('./');
 
+console.log('config',configuration);
 
 const logger = new Logger({ toConsole: false });
 

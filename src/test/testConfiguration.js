@@ -11,11 +11,11 @@ const __2 = require("../");
 const __3 = require("../");
 //require("dotenv/config");
 console.log('cwd',process.cwd(),__dirname);
-let envirn=require('dotenv').config({ path: __dirname+'/.env' })
+let envirn=require('dotenv').config({ path: __dirname+'/.env' }).parsed;
 console.log(envirn);
 console.log('==============================================');
 exports.configuration = new __1.Configuration({
-    definitionsPath: process.env.DEFINITIONS_PATH,
+    definitionsPath: envirn.DEFINITIONS_PATH,
     templatesPath: __dirname + '/../emailTemplates',
     timers: {
         //forceTimersDelay: 1000,
@@ -23,11 +23,11 @@ exports.configuration = new __1.Configuration({
     },
     database: {
         MongoDB: {
-            db_url: process.env.MONGO_DB_URL,
+            db_url: envirn.MONGO_DB_URL,
             db: 'bpmn'
         }
     },
-    apiKey: process.env.API_KEY,
+    apiKey: envirn.API_KEY,
     logger: function (server) {
         new __3.Logger(server);
     },

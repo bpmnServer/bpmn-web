@@ -6,12 +6,12 @@ import { Logger } from '../'
 import { UserService } from '../userAccess/UserService';
 import 'dotenv/config';
 console.log('cwd',process.cwd(),__dirname);
-let envirn=require('dotenv').config({ path: __dirname+'/.env' })
+let envirn=require('dotenv').config({ path: __dirname+'/.env' }).parsed;
 console.log(envirn);
 console.log('==============================================');
 export const configuration = new Configuration(
 	{
-		definitionsPath: process.env.DEFINITIONS_PATH,
+		definitionsPath: envirn.DEFINITIONS_PATH,
 		templatesPath: __dirname + '/../emailTemplates',
 		timers: {
 			//forceTimersDelay: 1000,
@@ -20,11 +20,11 @@ export const configuration = new Configuration(
 		database: {
 			MongoDB:
 			{
-				db_url: process.env.MONGO_DB_URL,
+				db_url: envirn.MONGO_DB_URL,
 				db: 'bpmn'
 			}
 		},
-		apiKey: process.env.API_KEY,
+		apiKey: envirn.API_KEY,
 		logger: function (server) {
 			new Logger(server);
 		},							
