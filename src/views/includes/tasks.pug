@@ -4,13 +4,12 @@ div(id="tasks")
 		tr
 			th Name -id
 			th Model
-			th(style="width:250px;") Data
+			th CaseId
 			th Started
 			th Action 
 			th Assignee
-			if user && user.isAdmin()
-				th Candidate Users
-				th Candidate Groups
+			th Candidate Users
+			th Candidate Groups
 			th Due date
 			th Follow-up date
 			th Priority
@@ -21,7 +20,7 @@ div(id="tasks")
 			tr
 				td #{item.name} - #{item.elementId}
 				td #{item.processName} 
-				td #{JSON.stringify(item.data)}
+				td #{item.data.caseId}
 				td #{item.fromNow}
 				td
 					if (user.userName==item.assignee)  || user.isAdmin()

@@ -35,7 +35,7 @@ export class UserController {
      * Edit user Page.
      */
     static getEdit(req, res) {
-        if (!req.user.isAdmin) {
+        if (!req.isAdmin) {
             return res.redirect('/');
         }
         console.log('req.params',req.params)
@@ -297,11 +297,9 @@ export class UserController {
      * POST /account/delete
      * Delete user account.
      */
-    static postDeleteAccount(req, res, next) {
-        User.deleteOne({ _id: req.body.id }, (err) => {
-            if (err) {
-                return next(err);
-            }
+    static async postDeleteAccount(req, res, next) {
+
+        let ret= await User.deleteOne({ _id: req.body.id });
             if (req.user.id == req.body.id) {
                 req.logout();
                 req.flash('info', { msg: 'Account has been deleted for user' + req.body.id + '.' });
@@ -313,7 +311,6 @@ export class UserController {
                 res.redirect('/admin');
 
             }
-        });
     }
     /**
      * GET /account/unlink/:provider

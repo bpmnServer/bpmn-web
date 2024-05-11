@@ -32,8 +32,33 @@ class AppServices {
         context.item.data['echo']=input;
         return input;
     }
-    async getSupervisorUser(input, context) {
-        return input+'Supervisor';
+    /**
+     * Sample Code for Leave Application 
+     * to demonstrate how to access DB and return results into scripts
+     * This is called as such:
+     *  	assignee	#(appServices.getSupervisorUser(this.data.requester))
+     * 
+     * @param userName
+     * @param context 
+     * @returns 
+     */
+    async getSupervisorUser(userName, context) {
+        console.log('getSupervisorUser for:',userName);
+
+
+        let ds=this.appDelegate.server.dataStore;
+        const dburl=ds.dbConfiguration.db; // process.env.MONGO_DB_URL;
+
+        const db=ds.dataStore.db;
+
+        // collection structure: {employee,manager}
+        
+        let list=await db.find(dburl,'usersManager',{employee:userName});
+        let manager;
+        if (list.length>0)
+            manager=list[0]['manager'];
+        
+        return manager;
     }
     async promptUser(input, context) {
         console.log('executing prompt user');

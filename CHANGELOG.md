@@ -12,6 +12,11 @@ and here
 
 ### Changed
 -->
+## Release 2.2.3
+- Clean up UI for security 
+- Improve UI for model docs
+- Moved test processes to separate folder 'src/test/processes'
+- Added test scenarios
 ## Release 2.1.10 
 - Minor change to Modeler UI: allow resizable property panel from the left side
 - Added more test sceanrio

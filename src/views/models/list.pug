@@ -1,8 +1,8 @@
-extends layoutHome
+extends ../layoutHome
 
 block content
-	h1 bpmn-server Workbench Demo WF
-	include includes/dashboardHeader.pug
+	h1 bpmn-server Workbench Demo WF2
+	include ../includes/dashboardHeader.pug
 
 	script(type="text/javascript").
 		$( function() {
@@ -11,12 +11,7 @@ block content
 
 	div(id="tab13s")
 		div(id="processes",style="border-bottom: solid;border-width: thin;")
-			include includes/models.pug
-		div(id="tasks")
-			include includes/tasks.pug
-		div(id="instances")
-			include includes/instances.pug
-
+			include ../includes/models.pug
 		div(id='footer',style="padding-bottom:20px;")
 	
 	

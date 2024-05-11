@@ -5,6 +5,7 @@ const FS = require('fs');
 import { BPMNServer, dateDiff, Behaviour_names, SystemUser   } from '../';
 import { BPMNAPI , SecureUser } from '../';
 import { Common } from './common';
+import { ViewHelper } from './ViewHelper';
 
 
 var caseId = Math.floor(Math.random() * 10000);
@@ -46,22 +47,19 @@ export class WF extends Common {
         router.get('/home', home);
 
         router.get('/', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
-            let output = [];
-            output = show(output);
 		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             
-            display(request,response, 'Show', output);
+            display(request,response, 'Show');
         }));
 
         router.get('/setUser', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
-            let output = [];
             setForUser(request);
-            output = show(output);
             //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
 
-            display(request, response, 'Show', output);
+            display(request, response, 'Show');
         }));
         router.get('/tasks', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
+            console.log('/tasks');
             return await this.tasks(request, response);
         }));
 
@@ -111,6 +109,14 @@ export class WF extends Common {
             response.redirect('/instanceDetails?id=' + execution.id);
         }));
 
+        router.get('/select/:processName', awaitAppDelegateFactory(async (request, response) => {
+
+            let processName = request.params.processName;
+            request.session.processName = processName;
+		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
+            
+            display(request,response, 'Show',processName);
+        }));
 
         router.post('/execute', awaitAppDelegateFactory(async (request, response) => {
 
@@ -145,7 +151,7 @@ export class WF extends Common {
             const instance = instances[0];
 
 
-            let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
+            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let vars = ViewHelper.formatData(instance.data);
 console.log('fields',fields);
             if (fields && fields.length > 0) {
@@ -193,7 +199,7 @@ console.log('fields',fields);
             let processName = request.query.processName;
             let elementId = request.query.elementId;
             let itemId = request.query.itemId;
-            let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
+            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let item = await bpmnAPI.data.findItem({"items.id": id},getSecureUser(request));
             //console.log('item:', item);
             if (!item) {
@@ -262,9 +268,7 @@ console.log('fields',fields);
                 displayError(response, exec.errors);
             }
 
-            let output = ['run ' + process];
-            output = show(output);
-            display(request,response, 'Run Prcesses', output, exec.instance.logs, exec.instance.items);
+            display(request,response, 'Run Prcesses', exec.instance.logs, exec.instance.items);
         }));
         router.get('/instanceDetails', awaitAppDelegateFactory(async (request, response) => {
 
@@ -312,9 +316,6 @@ console.log('fields',fields);
 
 
 async function home(request, response)  {
-        let output = [];
-        output = show(output);
-
         if (request.session.views) {
             request.session.views++
         } else {
@@ -324,33 +325,14 @@ async function home(request, response)  {
 
 
 
-        display(request,response, 'Show', output);
+        display(request,response, 'Show');
 }
 
-async function getProcs() {
-    let list=[];
-    let procs=await bpmnAPI.model.get({},SystemUser);
-
-        procs.forEach(r => { 
-            let docs;
-            let evnts=[];
-            r.processes.forEach(p=>{ 
-                if (p.documentation)
-                    docs+=p.documentation});
-            r.events.forEach(e=>{
-                evnts.push({name: e.name, documentation: e.documentation});
-
-            });
-
-             list.push({ name: r.name, documentation: docs , events:evnts}); 
-        }); 
-    return list;
-}
 
 async function manage(req, res) {
     res.render('manageProcesses',
         {
-            procs: await getProcs()
+            procs: await this.getProcs(bpmnAPI)
         });
 
 }
@@ -389,7 +371,7 @@ function getSecureUser(req) {
     else
          user=SecureUser.SystemUser();
      
-    //console.log('getSecureUser',user);
+    console.log('getSecureUser',user);
     return user;        
  }
 
@@ -413,11 +395,18 @@ function setForUser(req) {
 }
 
 
-async function display(req,res, title, output, logs = [], items = []) {
+async function display(req,res, title, logs = [], items = []) {
 
     let user = getSecureUser(req);
-    var instances = await bpmnAPI.data.findInstances({}, user,'summary');
-    let waiting = await bpmnAPI.data.findItems({ "items.status": 'wait', "items.type": 'bpmn:UserTask' }, getSecureUser(req)); 
+    let query={};
+    let process=req.session.processName;
+
+    if (process)
+        query={"name":process};
+    var instances = await bpmnAPI.data.findInstances(query, user,'summary');
+        query["items.status"]='wait';
+        query["items.type"]='bpmn:UserTask';
+    let waiting = await bpmnAPI.data.findItems(query, getSecureUser(req)); 
 
     waiting.forEach(item => {
         item['fromNow'] = dateDiff(item.startedAt);
@@ -437,27 +426,12 @@ async function display(req,res, title, output, logs = [], items = []) {
         else
             item['endFromNow'] = '';
     });
-    let procs=await getProcs();
-    let procsDocs={};
-    procs.forEach(proc=>{
-            let doc='';
-            console.log('proc:',proc);
-            if (proc.processes) {
-                proc.processes.forEach(p=>{
-                    if (p.documentation)
-                        doc+=p.documentation;
-                });
-    
-            }
-            proc.events.forEach(e=>{
-                if (e.documentation)
-                    doc+='Event:'+e.id+':'+e.documentation;
-            });
-            procsDocs[proc.name]=doc;
-    });
+    let procs=await this.getProcs(bpmnAPI,process);
+    let procsDocs=this.getProcsDocs(procs);
+
     res.render('wf',
         {
-            title: title, output: output,
+            title: title, output: '',
             engines,
             user,
             procs,
@@ -470,9 +444,6 @@ async function display(req,res, title, output, logs = [], items = []) {
             forUserGroups: req.session.forUserGroups, forUserName: req.session.forUserName
         });
 
-}
-function show(output) {
-    return output;
 }
 async function instanceDetails(response,instanceId) {
 
@@ -494,9 +465,7 @@ async function instanceDetails(response,instanceId) {
     const def = await bpmnServer.definitions.load(instance.name);
     await def.load();
     const defJson = def.getJson();
-    let output = ['View Process Log'];
-    output = show(output);
-
+    
     let vars = ViewHelper.formatData(instance.data);
 
     let decorations = JSON.stringify(ViewHelper.calculateDecorations(instance.items));
@@ -511,75 +480,5 @@ async function instanceDetails(response,instanceId) {
         });
 
 }
-export class ViewHelper {
 
-    static dateDisplay(date) {
-        if (date)
-            return (date).toISOString().split('T')[0];
-        else
-            return '';
-
-    }
-    static dateInput(dateString) {
-        if (dateString === '' || dateString=='Invalid Date')
-            return null;
-        else
-            return new Date(dateString);
-    }
-    static formatData(data) {
-        let vars = [];
-        Object.keys(data).forEach(function (key) {
-            let value = data[key];
-            if (Array.isArray(value))
-                value = JSON.stringify(value);
-            if (typeof value === 'object' && value !== null)
-                value = JSON.stringify(value);
-
-            vars.push({ key, value });
-        });
-        return vars;
-
-    }
-
-    static async getNodeInfo(processName, elementId) {
-
-        let definition = await bpmnServer.definitions.load(processName);
-        let node = definition.getNodeById(elementId);
-        let extName = Behaviour_names.CamundaFormData;
-        let ext = node.getBehaviour(extName);
-        let fields;
-        if (ext)
-            fields = ext.fields;
-        return { node, fields };
-    }
-
-    static parseField(field, value, data) {
-        if (field) {
-            if (value.substring(0, 1) == '[') {
-                value = value.substring(1);
-                value = value.substring(0, value.length - 1);
-                let array = value.split(',');
-                value = array;
-            }
-            data[field] = value;
-        }
-    }
-    static calculateDecorations(items) {
-        let decors = [];
-        let seq = 1;
-        items.forEach(item => {
-            let color = 'red';
-            if (item.status == 'end') {
-                if (item.endedAt == null && item.type != 'bpmn:SequenceFlow')
-                    color = 'gray';
-                else
-                    color = 'black';
-            }
-            let decor = { id: item.elementId, color, seq };
-            decors.push(decor);
-            seq++;
-        });
-        return decors;
-    }
-}
 //export default router;

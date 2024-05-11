@@ -4,11 +4,13 @@
 import express = require('express');
 import { ModelerNoProp } from '../views/Modeler-noProp';
 import { ModelerWProp } from '../views/Modeler-wProp';
+import { ViewHelper } from './ViewHelper';
+
 var bodyParser = require('body-parser')
 
 const FS = require('fs');
 
-import { BPMNServer} from '../';
+import { BPMNServer,BPMNAPI} from '../';
 import { Common } from './common';
 
 
@@ -21,6 +23,7 @@ const awaitHandlerFactory = (middleware) => {
         }
     }
 }
+var bpmnAPI;
 
 export class Model extends Common {
     config() {
@@ -28,9 +31,19 @@ export class Model extends Common {
         const bpmnServer = this.webApp.bpmnServer;
 
         const definitions = bpmnServer.definitions;
+        bpmnAPI = new BPMNAPI(bpmnServer);
 
 
         var router = express.Router();
+
+        router.get('/list', awaitHandlerFactory(async (request, response) => {
+
+            let procs=await ViewHelper.getProcs(bpmnAPI);
+            let procsDocs=ViewHelper.getProcsDocs(procs);
+            
+            response.render('models/list', {procs,request, procsDocs: JSON.stringify(procsDocs)});
+
+        }));
 
         router.get('/new', awaitHandlerFactory(async (request, response) => {
 
@@ -70,7 +83,7 @@ export class Model extends Common {
         router.get('/export', awaitHandlerFactory(async (request, response) => {
             console.log(request.params);
             let procs = await bpmnServer.definitions.getList();
-            response.render('models/export', { procs });
+            response.render('models/export', { procs});
 
         }));
         router.get('/download/:file', awaitHandlerFactory(async (request, response) => {

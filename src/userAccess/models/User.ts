@@ -68,10 +68,10 @@ userSchema.virtual('isAdmin').get(function () {
     return userSchema.methods.hasGroup('ADMIN');
 });
 userSchema.methods.hasGroup = function hasGroup(group) {
-    if (this.userGroups && this.userGroups.indexOf(group) === -1)
-        return false;
-    else
+    if (this.userGroups && this.userGroups.indexOf(group) !== -1)
         return true;
+    else
+        return false;
 };
 /**
  * Helper method for getting user's gravatar.

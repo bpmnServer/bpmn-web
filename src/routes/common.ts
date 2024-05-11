@@ -6,6 +6,8 @@ const path = require('path');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
+import { BPMNAPI , SystemUser } from '../';
+
 export class Common {
 	webApp;
 	constructor(webApp) {
@@ -31,9 +33,12 @@ export class Common {
 			&&
 			(typeof req.isAuthenticated === "function")) {
 			let check=req.isAuthenticated();
-console.log('is auth',check);
 			if (check==true) {
-console.log('calling next?');
+				console.log('is auth',check,req.user.userGroups,req.user.isAdmin);
+				if (req.user.userGroups && req.user.userGroups.indexOf('ADMIN') === -1)
+					req.isAdmin=false;
+				else
+					req.isAdmin=true;
 				return next();
 			}
 			else {
@@ -44,6 +49,7 @@ console.log('calling next?');
 		else
 			return next();
 	}
+	
 }
 
 export function config(webApp) {

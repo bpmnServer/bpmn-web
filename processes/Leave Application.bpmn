@@ -15,9 +15,9 @@
         <bpmn2:flowNodeRef>Request</bpmn2:flowNodeRef>
       </bpmn2:lane>
       <bpmn2:lane id="Lane_0a5bph6" name="Manager">
-        <bpmn2:flowNodeRef>Approve</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>Event_02om8ew</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>Gateway_1kqewfd</bpmn2:flowNodeRef>
+        <bpmn2:flowNodeRef>Approve</bpmn2:flowNodeRef>
         <bpmn2:flowNodeRef>timer-event</bpmn2:flowNodeRef>
       </bpmn2:lane>
       <bpmn2:lane id="Lane_05wy8pe" name="HR">
@@ -31,9 +31,7 @@
     <bpmn2:startEvent id="StartEvent_1" camunda:initiator="requester">
       <bpmn2:extensionElements>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="JavaScript">/*console.log('appDel',appDelegate);
-console.log('services',appServices); */
-console.log('inst ', item.token.execution.getItems().length);</camunda:script>
+          <camunda:script scriptFormat="JavaScript">console.log(item.token.execution.getItems().length);</camunda:script>
         </camunda:executionListener>
       </bpmn2:extensionElements>
       <bpmn2:outgoing>Flow_0xa1hl7</bpmn2:outgoing>
@@ -53,32 +51,10 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
           <camunda:formField id="StartDate" label="Start Date" type="date" />
           <camunda:formField id="EndDate" label="End Date" type="date" />
         </camunda:formData>
-        <camunda:taskListener event="assignment">
-          <camunda:script scriptFormat="JavaScript">console.log('assignment');</camunda:script>
-        </camunda:taskListener>
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_0xa1hl7</bpmn2:incoming>
       <bpmn2:incoming>Flow_0rvg1ym</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1ig8mx7</bpmn2:outgoing>
-    </bpmn2:userTask>
-    <bpmn2:userTask id="Approve" name="Approve">
-      <bpmn2:extensionElements>
-        <camunda:executionListener event="start">
-          <camunda:script scriptFormat="JavaScript">this.assignee='Supervisor';</camunda:script>
-        </camunda:executionListener>
-        <camunda:formData>
-          <camunda:formField id="approval" label="Approval Outcome" type="enum">
-            <camunda:value id="A" name="Approve" />
-            <camunda:value id="Reject" name="Reject" />
-            <camunda:value id="InformationRequired" name="Information Required" />
-          </camunda:formField>
-        </camunda:formData>
-        <camunda:taskListener event="assignment">
-          <camunda:script scriptFormat="JavaScript">console.log(' item is now assigned ',item.assignee);</camunda:script>
-        </camunda:taskListener>
-      </bpmn2:extensionElements>
-      <bpmn2:incoming>Flow_1ig8mx7</bpmn2:incoming>
-      <bpmn2:outgoing>Flow_1my72g7</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="Flow_1ufmnuh" name="Approved" sourceRef="Gateway_1kqewfd" targetRef="Activity_1rx1txe" />
     <bpmn2:sequenceFlow id="Flow_1ef1q1u" name="Rejected" sourceRef="Gateway_1kqewfd" targetRef="Event_02om8ew">
@@ -105,6 +81,23 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
       <bpmn2:incoming>Flow_00etx8n</bpmn2:incoming>
       <bpmn2:script>/*appUtils.notify();*/</bpmn2:script>
     </bpmn2:scriptTask>
+    <bpmn2:serviceTask id="Activity_1rx1txe" name="Process">
+      <bpmn2:incoming>Flow_1ufmnuh</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1un6mui</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="Approve" name="Approve" camunda:assignee="#(appServices.getSupervisorUser(this.data.requester))">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="approval" label="Approval Outcome" type="enum">
+            <camunda:value id="A" name="Approve" />
+            <camunda:value id="Reject" name="Reject" />
+            <camunda:value id="InformationRequired" name="Information Required" />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1ig8mx7</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1my72g7</bpmn2:outgoing>
+    </bpmn2:userTask>
     <bpmn2:boundaryEvent id="timer-event" cancelActivity="false" attachedToRef="Approve">
       <bpmn2:documentation>Repeat 3 times after 2 days</bpmn2:documentation>
       <bpmn2:outgoing>Flow_00etx8n</bpmn2:outgoing>
@@ -112,10 +105,6 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
         <bpmn2:timeCycle xsi:type="bpmn2:tFormalExpression">R3P2D</bpmn2:timeCycle>
       </bpmn2:timerEventDefinition>
     </bpmn2:boundaryEvent>
-    <bpmn2:serviceTask id="Activity_1rx1txe" name="Process">
-      <bpmn2:incoming>Flow_1ufmnuh</bpmn2:incoming>
-      <bpmn2:outgoing>Flow_1un6mui</bpmn2:outgoing>
-    </bpmn2:serviceTask>
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_04y2yh2">
@@ -132,8 +121,8 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
         <dc:Bounds x="190" y="80" width="620" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_00etx8n_di" bpmnElement="Flow_00etx8n">
-        <di:waypoint x="312" y="270" />
-        <di:waypoint x="300" y="270" />
+        <di:waypoint x="312" y="280" />
+        <di:waypoint x="300" y="280" />
         <di:waypoint x="300" y="350" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0rvg1ym_di" bpmnElement="Flow_0rvg1ym">
@@ -163,7 +152,9 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
         <di:waypoint x="592" y="400" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1my72g7_di" bpmnElement="Flow_1my72g7">
-        <di:waypoint x="430" y="260" />
+        <di:waypoint x="430" y="270" />
+        <di:waypoint x="453" y="270" />
+        <di:waypoint x="453" y="260" />
         <di:waypoint x="475" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0xa1hl7_di" bpmnElement="Flow_0xa1hl7">
@@ -172,16 +163,13 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ig8mx7_di" bpmnElement="Flow_1ig8mx7">
         <di:waypoint x="380" y="180" />
-        <di:waypoint x="380" y="220" />
+        <di:waypoint x="380" y="230" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="212" y="122" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0jq3ugg_di" bpmnElement="Request">
         <dc:Bounds x="330" y="100" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1aanvd6_di" bpmnElement="Approve">
-        <dc:Bounds x="330" y="220" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_11njyo2_di" bpmnElement="Event_02om8ew">
         <dc:Bounds x="652" y="242" width="36" height="36" />
@@ -198,8 +186,11 @@ console.log('inst ', item.token.execution.getItems().length);</camunda:script>
       <bpmndi:BPMNShape id="Activity_0jssmpk_di" bpmnElement="Activity_1rx1txe">
         <dc:Bounds x="450" y="360" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1aanvd6_di" bpmnElement="Approve">
+        <dc:Bounds x="330" y="230" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0dn083r_di" bpmnElement="timer-event">
-        <dc:Bounds x="312" y="252" width="36" height="36" />
+        <dc:Bounds x="312" y="262" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

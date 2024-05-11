@@ -44,8 +44,8 @@ async function promptForEdit() {
 
 function copyFiles() {
     const ret=copyFile('INSTALL.env', '.env');
+    copyFile('./src/test/INSTALL.env', './src/test/.env');
     copyFile('./src/WorkflowApp/INSTALL_configuration.ts', './src/WorkflowApp/configuration.ts');
-//    copyFile('./WorkflowApp/INSTALL_configuration.js', './WorkflowApp/configuration.js');
     copyFile('./src/WorkflowApp/INSTALL_appDelegate.ts', './src/WorkflowApp/appDelegate.ts');
 //    copyFile('./WorkflowApp/INSTALL_appDelegate.js', './WorkflowApp/appDelegate.js');
 

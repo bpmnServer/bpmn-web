@@ -5,6 +5,7 @@ const FS = require('fs');
 import { BPMNServer, dateDiff, Behaviour_names   } from '../';
 import { BPMNAPI , SecureUser } from '../';
 import { Common } from './common';
+import { ViewHelper } from './ViewHelper';
 
 
 var caseId = Math.floor(Math.random() * 10000);
@@ -108,7 +109,7 @@ export class Workflow extends Common {
 
             let execution = context.execution;
 
-            response.redirect('/instanceDetails?id=' + execution.id);
+            afterOperation(request,response,context);
         }));
 
 
@@ -132,7 +133,9 @@ export class Workflow extends Common {
             }
             let instance = context.execution;
 
-            response.redirect('/instanceDetails?id=' + instance.id);
+            afterOperation(request,response,context);
+
+
         }));
 
         router.get('/listDefinitions', function (req, res) {
@@ -172,7 +175,7 @@ export class Workflow extends Common {
             const instance = instances[0];
 
 
-            let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
+            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let vars = ViewHelper.formatData(instance.data);
 
             if (fields && fields.length > 0) {
@@ -184,7 +187,7 @@ export class Workflow extends Common {
             try {
                 let result = await bpmnAPI.engine.invoke({ "items.id": id }, {}, getSecureUser(request));
 
-                response.redirect('/instanceDetails?id=' + result.execution.id);
+                afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -205,7 +208,7 @@ export class Workflow extends Common {
 
                 let result = await bpmnAPI.engine.invoke({ "items.id": id }, data, getSecureUser(request));
 
-                response.redirect('/instanceDetails?id=' + result.execution.id);
+                afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -220,7 +223,7 @@ export class Workflow extends Common {
             let processName = request.query.processName;
             let elementId = request.query.elementId;
             let itemId = request.query.itemId;
-            let { node, fields } = await ViewHelper.getNodeInfo(processName, elementId);
+            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let item = await bpmnAPI.data.findItem({"items.id": id},getSecureUser(request));
             //console.log('item:', item);
             if (!item) {
@@ -272,7 +275,7 @@ export class Workflow extends Common {
                 //console.log('data', data, 'assignment', assignment);
                 let result = await bpmnAPI.engine.assign({ "items.id": id }, data, assignment, getSecureUser(request));
 
-                response.redirect('/instanceDetails?id=' + result.execution.id);
+                afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -302,7 +305,7 @@ export class Workflow extends Common {
 
             let imageId = request.query.id;
             let version = request.query.version;
-            await instanceDetails(response, imageId,version);
+            await instanceDetails(request,response, imageId,version);
 
         }));
 
@@ -399,6 +402,7 @@ async function getProcs() {
 async function manage(req, res) {
     res.render('manageProcesses',
         {
+            request:req,
             procs: await getProcs()
         });
 
@@ -465,7 +469,7 @@ function setForUser(req) {
 async function display(req,res, title, output, logs = [], items = []) {
 
     let user = getSecureUser(req);
-    var instances = await bpmnAPI.data.findInstances({}, user,'summary');
+    var instances = await bpmnAPI.data.findInstances({}, user,{sort:{saved:-1}});
     let waiting = await bpmnAPI.data.findItems({ "items.status": 'wait', "items.type": 'bpmn:UserTask' }, getSecureUser(req)); 
 
     waiting.forEach(item => {
@@ -491,7 +495,7 @@ async function display(req,res, title, output, logs = [], items = []) {
         {
             title: title, output: output,
             engines,
-            user,
+            user, 
             procs: await getProcs(),
             debugMsgs: [], // Logger.get(),
             waiting: waiting,
@@ -505,7 +509,19 @@ async function display(req,res, title, output, logs = [], items = []) {
 function show(output) {
     return output;
 }
-async function instanceDetails(response,instanceId,version) {
+async function afterOperation(request,response,result) {
+
+    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
+    
+    display(request,response, 'Show', []);
+
+//    response.redirect('/instanceDetails?id=' + result.execution.id);
+//    console.log('items#',result.instance.items.length);
+
+}
+async function instanceDetails(request,response,instanceId,version) {
+
+    let user = getSecureUser(request);
 
     let instance = await bpmnServer.dataStore.findInstance({ id: instanceId }, 'Full');
 
@@ -542,83 +558,11 @@ async function instanceDetails(response,instanceId,version) {
 
     response.render('InstanceDetails',
         {
-            instance, vars,
+            instance, vars, request, user,
             accessRules: def.accessRules,
             title: 'Instance Details',
             logs,items:items, svg,
             decorations, definition: defJson, lastItem,
         });
 
-}
-export class ViewHelper {
-
-    static dateDisplay(date) {
-        if (date)
-            return (date).toISOString().split('T')[0];
-        else
-            return '';
-
-    }
-    static dateInput(dateString) {
-        if (dateString === '' || dateString=='Invalid Date')
-            return null;
-        else
-            return new Date(dateString);
-    }
-    static formatData(data) {
-        let vars = [];
-        Object.keys(data).forEach(function (key) {
-            let value = data[key];
-            if (Array.isArray(value))
-                value = JSON.stringify(value);
-            if (typeof value === 'object' && value !== null)
-                value = JSON.stringify(value);
-
-            vars.push({ key, value });
-        });
-        return vars;
-
-    }
-
-    static async getNodeInfo(processName, elementId) {
-
-        let definition = await bpmnServer.definitions.load(processName);
-        let node = definition.getNodeById(elementId);
-        let extName = Behaviour_names.CamundaFormData;
-        let ext = node.getBehaviour(extName);
-        let fields;
-        if (ext)
-            fields = ext.fields;
-        return { node, fields };
-    }
-
-    static parseField(field, value, data) {
-        if (field) {
-            if (value.substring(0, 1) == '[') {
-                value = value.substring(1);
-                value = value.substring(0, value.length - 1);
-                let array = value.split(',');
-                value = array;
-            }
-            data[field] = value;
-        }
-    }
-    static calculateDecorations(items) {
-        let decors = [];
-        let seq = 1;
-        items.forEach(item => {
-            let color = 'red';
-            if (item.status == 'end') {
-                if (item.endedAt == null && item.type != 'bpmn:SequenceFlow')
-                    color = 'gray';
-                else
-                    color = 'black';
-            }
-            let decor = { id: item.elementId, color, seq };
-            decors.push(decor);
-            seq++;
-        });
-        return decors;
-    }
-}
-//export default router;
+}//export default router;

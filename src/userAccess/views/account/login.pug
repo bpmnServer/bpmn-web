@@ -3,7 +3,7 @@ extends ../../../views/layout
 block content
   .pb-2.mt-2.mb-4.border-bottom
     h3 Sign in
-  form(method='POST')
+  form(method='POST',style="max-width:400px;margin-left:20%")
     input(type='hidden', name='_csrf', value=_csrf)
     .form-group.row
       label.col-md-3.col-form-label.font-weight-bold.text-right(for='userName') User Name
@@ -13,13 +13,15 @@ block content
       label.col-md-3.col-form-label.font-weight-bold.text-right(for='password') Password
       .col-md-7
         input.form-control(type='password', name='password', id='password', placeholder='Password', autocomplete='current-password', required)
-    .form-group
-      .offset-md-3.col-md-3.pl-2
+    .form-group.row
+      .col-md-7
         button.col-md-3.btn.btn-primary(type='submit')
           | Login
-      .offset-md-3.col-md-3.pl-2
+    .form-group.row
+      .col-md-7
         a.btn.btn-link(href='/forgot') Forgot your password?
-      .offset-md-3.col-md-3.pl-2
+    .form-group.row
+      .col-md-7
         a.btn.btn-link(href='/signup') Signup
     .form-group
       .offset-md-3.col-md-7.pl-2

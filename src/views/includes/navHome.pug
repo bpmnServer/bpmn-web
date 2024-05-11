@@ -13,7 +13,7 @@ ul(class="nav navbar-nav navbar-right")
 			a(href='/account') 	
 				i.fa.fa-user(aria-hidden='true') &nbsp; #{request.user.userName}
 
-	if request.user && request.user.isAdmin
+	if request.user && request.isAdmin
 		li
 			a(href='/admin') Admin
 	li
