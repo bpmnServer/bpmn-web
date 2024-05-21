@@ -1,6 +1,6 @@
 {
   "name": "bpmn-web",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "homepage": "https://github.com/bpmnServer/bpmn-server/blob/rel2.0.0/docs/README.md",
   "scripts": {
     "setup": "ts-node src/scripts/setup.ts",
@@ -8,10 +8,10 @@
     "build": "tsc --build",
     "start": "ts-node src/app",
     "clean": "tsc --build --clean",
-    "test": "ts-mocha -exit --config=src/test/.mocharc.json src/test/feature",
+    "test": "ts-node src/test/setup.ts && ts-mocha -exit --config=src/test/.mocharc.json src/test/feature",
     "----": "---------------------for Development Scripts Only -------------------------------------",
     "dev:run": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && node dist/app.js\"",
-    "dev:example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && node dist/examples/EX.js\"",
+    "dev:example": "nodemon -e ts --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && node dist/examples/EX3.js\"",
     "dev:test": "nodemon -e ts,js --watch ./ --watch ../bpmn-server --exec \"tsc --build && tsc --build ../bpmn-server && ts-mocha -exit --config=src/test/.mocharc.json src/test/feature/gateway5.js || exit 1\""
   },
   "description": "bpmn-web Demo App",

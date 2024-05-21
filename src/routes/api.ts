@@ -85,23 +85,26 @@ export class API extends Common {
             }
             response.json({ errors: errors, items });
         }));
-
+//option: 'summary' | 'full' | any = 'summary'
         router.get('/datastore/findInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
 
             //console.log(request.body);
-            let query;
+            let query,projection='full';
             if (request.body.query) {
                 query = request.body.query;
             }
             else
                 query = request.body;
-            //console.log(query);
+
+            if (request.body.projection)
+                projection=request.body.projection;
+            
             let instances;
             let errors;
             try {
 
-                instances = await this.bpmnServer.dataStore.findInstances(query, 'full');
+                instances = await this.bpmnServer.dataStore.findInstances(query,{projection});
             }
             catch (exc) {
                 errors = exc.toString();

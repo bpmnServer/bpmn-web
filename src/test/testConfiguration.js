@@ -23,8 +23,7 @@ exports.configuration = new __1.Configuration({
     },
     database: {
         MongoDB: {
-            db_url: envirn.MONGO_DB_URL,
-            db: 'bpmn'
+            db_url: envirn.MONGO_DB_URL
         }
     },
     apiKey: envirn.API_KEY,

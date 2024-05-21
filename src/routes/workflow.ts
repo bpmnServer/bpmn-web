@@ -18,12 +18,6 @@ const docsFolder = __dirname + '/../bpmnServer/docs/';
 function awaitAppDelegateFactory (middleware) {
     return async (req, res, next) => {
         try {
-/*            if (req.query.userName && typeof (req.query.userName) !=='undefined' && req.query.userName !=='undefined') {
-                req.session.userName = req.query.userName;
-            }
-            else if (!req.session.userName)
-                req.session.userName = 'demoUser';
-                */
 
             await middleware(req, res, next)
         } catch (err) {
@@ -49,7 +43,6 @@ export class Workflow extends Common {
         router.get('/', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
             let output = [];
             output = show(output);
-		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             
             display(request,response, 'Show', output);
         }));
@@ -58,7 +51,6 @@ export class Workflow extends Common {
             let output = [];
             setForUser(request);
             output = show(output);
-            //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
 
             display(request, response, 'Show', output);
         }));
@@ -317,14 +309,6 @@ export class Workflow extends Common {
     }
     async tasks(request, response) {
 
-/*        console.log('request.params', request.params, request.query);
-
-        let forUserEmail = (!('forUserEmail' in request.query)) ? 'User1' : request.query.forUserEmail;
-        let forUserGroups = (!('forUserGroups' in request.query)) ? 'group1' : request.query.forUserGroups;
-        request.session.forUserEmail = forUserEmail;
-        request.session.forUserGroups = forUserGroups;
-        console.log('Session:', request.session);
-*/
 
         let items = await bpmnAPI.data.findItems({ "items.type": "bpmn:UserTask", "items.status": "wait" }, getSecureUser(request));
 
@@ -447,7 +431,6 @@ function getSecureUser(req) {
  }
 
 function getUser(req) {
-    //console.log('getUser', req.user, req.session.forUser);
     if (req.session.forUser)
         return req.session.forUser;
     else
@@ -512,8 +495,11 @@ function show(output) {
 async function afterOperation(request,response,result) {
 
     //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
-    
-    display(request,response, 'Show', []);
+    let user = getSecureUser(request);
+//    if (request.user && request.user.isAdmin())
+
+//    else
+        display(request,response, 'Show', []);
 
 //    response.redirect('/instanceDetails?id=' + result.execution.id);
 //    console.log('items#',result.instance.items.length);
