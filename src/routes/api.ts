@@ -86,6 +86,23 @@ export class API extends Common {
             response.json({ errors: errors, items });
         }));
 //option: 'summary' | 'full' | any = 'summary'
+
+        router.post('/query', async (req, res) => {
+            try {
+                const query = req.body.query;
+                console.log(query);
+                //const collection = db.collection(collectionName);
+                var results = await this.bpmnServer.dataStore.findInstances(query,{
+                    projections:    {name:1,status:1,data:1,
+                        items:{elementId:1,seq:1,type:1,status:1} },
+                    sort:{saved:-1}}).toArray();
+                console.log(results.length);
+                res.json(results);
+                console.log(results.length);
+            } catch (error) {
+                res.status(500).send(error);
+            }
+        });
         router.get('/datastore/findInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
 
@@ -400,6 +417,35 @@ export class API extends Common {
                 response.json({ error: exc.toString() });
             }
         }));
+
+
+    ///
+    router.put('/engine/upgrade', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+
+       let model, nodeIds;
+        if (request.body.model) {
+            model = request.body.model;
+        }
+        if (request.body.nodeIds) {
+            nodeIds = request.body.nodeIds;
+        }
+        let result;
+        let errors;
+        try {
+
+            result = await this.bpmnServer.engine.upgrade(model, nodeIds );
+            if (result && result.errors)
+                errors = result.errors.toString();
+        }
+        catch (exc) {
+            errors = exc.toString();
+            console.log(errors);
+        }
+        response.json({ errors: errors, result });
+
+    }));
+
+
         ////
         var fsx = require('fs-extra');       //File System - for file manipulation
 

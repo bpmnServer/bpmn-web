@@ -1,6 +1,4 @@
 import { IUserService } from '../';
-
-const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const User = require('./models/User');
 
@@ -60,7 +58,6 @@ export class UserService implements IUserService {
     }
 
 	init() {
-		dotenv.config();
 		mongoose.set('strictQuery', false);
 		mongoose.connect(process.env.MONGO_DB_URL);
 		mongoose.connection.on('error', (err) => {
