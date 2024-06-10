@@ -300,6 +300,24 @@ export class Workflow extends Common {
             await instanceDetails(request,response, imageId,version);
 
         }));
+        router.post('/query', async (req, res) => {
+            try {
+                const query = req.body.query;
+                console.log('query',query);
+                //const collection = db.collection(collectionName);
+                let user = getSecureUser(req);
+                var results = await bpmnServer.dataStore.findInstances(query,{
+                    projection:    {name:1,status:1,data:1,
+                        items:{elementId:1,seq:1,type:1,status:1} },
+                    sort:{saved:-1}});
+                console.log(results.length);
+                res.json(results);
+                console.log(results.length);
+            } catch (error) {
+                console.log(error);
+                res.status(500).send(error);
+            }
+        });
 
         router.get('/deleteInstance', deleteInstance);
         router.get('/shutdown', shutdown);
@@ -492,13 +510,24 @@ async function display(req,res, title, output, logs = [], items = []) {
 function show(output) {
     return output;
 }
+function isAdmin(request) {
+    console.log(process.env.REQUIRE_AUTHENTICATION,request.isAuthenticated(),request.user);
+
+    if (process.env.REQUIRE_AUTHENTICATION !== 'true')
+       return true;
+    else
+        return request.isAdmin;
+
+}
 async function afterOperation(request,response,result) {
 
     //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
-    let user = getSecureUser(request);
-//    if (request.user && request.user.isAdmin())
-
-//    else
+    // let user = getSecureUser(request);
+    if (isAdmin(request))
+        {
+         response.redirect('/instanceDetails?id=' + result.execution.id);
+        }
+    else
         display(request,response, 'Show', []);
 
 //    response.redirect('/instanceDetails?id=' + result.execution.id);

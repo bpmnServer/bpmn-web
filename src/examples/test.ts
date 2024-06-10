@@ -1,3 +1,5 @@
+import {} from './';
+
 var pokemon = {
     firstname: 'Pika',
     lastname: 'Chu ',

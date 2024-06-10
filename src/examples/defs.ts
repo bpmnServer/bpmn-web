@@ -25,6 +25,19 @@ function getTree(response) {
     let tokens = response.tokens;
     //tokens.forEach(t)
 }
+function descArray(arr) {
+
+    arr.forEach(desc=>{
+        if(Array.isArray(desc)){
+            console.log('   -',desc[0],':',desc[1]);
+        }
+        else if (desc.text)
+            console.log('   - Doc:',desc.text)
+        else 
+            console.log('else',desc);
+    })
+
+}
 async function defScripts() {
 
     var definition: Definition
@@ -35,25 +48,31 @@ async function defScripts() {
 
     const json = JSON.parse(definition.getJson());
 
+    console.log('## Processes')
     json.processes.forEach(proc => {
-        console.log('process', proc.id, proc.name, proc.description,proc.docs);
+        console.log('- Process', proc.id, proc.name, proc.description);
     });
+    console.log('## Elements')
     json.elements.forEach(el => {
         console.log();
-        console.log('Element:', el.id, el.type, el.name,el.docs);
+        console.log(`- Element: **${el.id}** `,el.type, el.name||'');
         el.description.forEach(desc => {
-            console.log('-', desc);
+            descArray([desc]);
+            //console.log('   - ', desc);
         });
         el.behaviours.forEach(desc => {
-            console.log('>', desc);
+            descArray(desc);
+            //console.log('   - > ', desc);
         });
+        if (el.docs)
+            descArray(el.docs);
+
     });
+    console.log('## Sequence Flows')
     json.flows.forEach(el => {
         console.log();
-        console.log('Flow:', el.id, el.type, el.name, el.from, el.to);
-        el.description.forEach(desc => {
-            console.log('-', desc);
-        });
+        console.log(`- Flow: **${el.id}** `, el.type, el.name||'', el.from, el.to);
+        descArray(el.description);
     });
     return;
     definition.nodes.forEach(node => {

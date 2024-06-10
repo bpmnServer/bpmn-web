@@ -42,7 +42,9 @@ export class ViewHelper {
         let definition = await bpmnServer.definitions.load(processName);
         let node = definition.getNodeById(elementId);
         let extName = Behaviour_names.CamundaFormData;
-        let ext = node.getBehaviour(extName);
+        let ext;
+        if (node)
+            ext = node.getBehaviour(extName);
         let fields;
         if (ext)
             fields = ext.fields;
