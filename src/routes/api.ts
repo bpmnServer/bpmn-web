@@ -121,7 +121,7 @@ export class API extends Common {
             let errors;
             try {
 
-                instances = await this.bpmnServer.dataStore.findInstances(query,{projection});
+                instances = await this.bpmnServer.dataStore.findInstances(query,projection);
             }
             catch (exc) {
                 errors = exc.toString();
