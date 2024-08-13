@@ -1,9 +1,9 @@
 import { exec } from 'child_process';
 
-import { Instance_collection, SystemUser, USER_ROLE } from "bpmn-server";
+import { SystemUser, USER_ROLE } from "bpmn-server";
 import { configuration} from '../WorkflowApp/configuration';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from "bpmn-server";
-import {Archive_collection } from "bpmn-server";
+import {Archive_collection ,  Instance_collection } from "bpmn-server-mongo";
 import { inherits } from 'util';
 const logger = new Logger({ toConsole: false});
 const server = new BPMNServer(configuration, logger, { cron: false });

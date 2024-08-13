@@ -17,11 +17,6 @@ async function test() {
     let items;
 
 
-    const servicesProvider = await server.appDelegate.getServicesProvider(server);
-
-    console.log(servicesProvider, Object.getOwnPropertyNames(servicesProvider));
-
-
     let data = {};// { records: [1, 2, 3] };
            context= await server.engine.start(name, data);
 

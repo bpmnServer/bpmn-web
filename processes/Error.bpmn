@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:collaboration id="Collaboration_1gasa4l">
+    <bpmn2:participant id="Participant_0o7sldb" processRef="Process_1" />
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:sequenceFlow id="Flow_13vbim3" sourceRef="StartEvent_1" targetRef="Activity_0ypxdj9" />
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>Flow_13vbim3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:transaction id="Activity_0ypxdj9">
+      <bpmn2:incoming>Flow_13vbim3</bpmn2:incoming>
+      <bpmn2:startEvent id="Event_053sh52">
+        <bpmn2:outgoing>Flow_15tesii</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:task id="Activity_05ra218">
+        <bpmn2:incoming>Flow_15tesii</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_06335iz</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:endEvent id="Event_0lq4k76">
+        <bpmn2:incoming>Flow_06335iz</bpmn2:incoming>
+        <bpmn2:errorEventDefinition id="ErrorEventDefinition_0hl499h" errorRef="Error_14iu65d" />
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="Flow_06335iz" sourceRef="Activity_05ra218" targetRef="Event_0lq4k76" />
+      <bpmn2:sequenceFlow id="Flow_15tesii" sourceRef="Event_053sh52" targetRef="Activity_05ra218" />
+    </bpmn2:transaction>
+  </bpmn2:process>
+  <bpmn2:error id="Error_0l7mibz" name="Error_136vu04" errorCode="Error_1" camunda:errorMessage="Not Good" />
+  <bpmn2:error id="Error_14iu65d" name="Error_35so01u" errorCode="Error_1" camunda:errorMessage="Not Good" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1gasa4l">
+      <bpmndi:BPMNShape id="Participant_0o7sldb_di" bpmnElement="Participant_0o7sldb" isHorizontal="true">
+        <dc:Bounds x="230" y="60" width="690" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_13vbim3_di" bpmnElement="Flow_13vbim3">
+        <di:waypoint x="348" y="150" />
+        <di:waypoint x="390" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="312" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_115u5zn_di" bpmnElement="Activity_0ypxdj9" isExpanded="true">
+        <dc:Bounds x="390" y="100" width="430" height="120" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_06335iz_di" bpmnElement="Flow_06335iz">
+        <di:waypoint x="620" y="150" />
+        <di:waypoint x="682" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15tesii_di" bpmnElement="Flow_15tesii">
+        <di:waypoint x="468" y="150" />
+        <di:waypoint x="520" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_053sh52_di" bpmnElement="Event_053sh52">
+        <dc:Bounds x="432" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05ra218_di" bpmnElement="Activity_05ra218">
+        <dc:Bounds x="520" y="110" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1je2qpf_di" bpmnElement="Event_0lq4k76">
+        <dc:Bounds x="682" y="132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

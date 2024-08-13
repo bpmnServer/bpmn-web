@@ -56,6 +56,9 @@
 date.setDate(date.getDate()+5);
 this.dueDate=date.toISOString();</camunda:script>
         </camunda:executionListener>
+        <camunda:taskListener event="validate">
+          <camunda:script scriptFormat="JavaScript">item.vars=item.input;</camunda:script>
+        </camunda:taskListener>
       </bpmn:extensionElements>
       <bpmn:incoming>flow_start_buy</bpmn:incoming>
       <bpmn:outgoing>flow_buy_gw</bpmn:outgoing>
@@ -63,7 +66,7 @@ this.dueDate=date.toISOString();</camunda:script>
     <bpmn:startEvent id="StartEvent_158yep3" camunda:initiator="starterUserId">
       <bpmn:extensionElements>
         <camunda:executionListener event="end">
-          <camunda:script scriptFormat="JavaScript">data.startDate=this.endedAt;</camunda:script>
+          <camunda:script scriptFormat="JavaScript">data.startDate=this.startedAt;</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:outgoing>flow_start_buy</bpmn:outgoing>

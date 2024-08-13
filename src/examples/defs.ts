@@ -1,13 +1,13 @@
 import  { configuration }   from './';
 import { BPMNServer, Logger } from './';
-import { EventEmitter } from 'events';
 import { Definition } from './';
-import { Token } from './';
 
-const logger = new Logger({ toConsole: true});
+const fs = require('fs');
+
+const logger = new Logger({ toConsole: false});
 
 
-let name = 'test_gateway1'; //      'error event';
+let name = 'Buy Used Car'; //      'error event';
 let process;
 let needsRepairs = true;
 let needsCleaning = true;
@@ -20,7 +20,98 @@ let server;
 let instanceId;
 
 //test();
-defScripts();
+describe(name,'md','test.html');
+
+
+class DefinitionSorter {
+
+    nodes=new Map();
+    sortedNodes=new Map();
+    sortedFlows=new Map();
+
+    sort(definition)  {
+
+        definition.nodes.forEach(el => {
+            if (el.type=='bpmn:StartEvent')
+                this.addSorted(el)
+            else
+                this.nodes.set(el.id,el);
+
+        });
+        let seq=0;
+        let newNodes=[];
+        this.sortedNodes.forEach(s=>{
+            console.log('sorted',seq,s.id,s.type);
+            newNodes.push(s);
+            s['seq']=seq++; 
+            }
+        );
+        let newFlows=[];
+        this.sortedFlows.forEach(f=>{newFlows.push(f)});
+
+        definition.nodes=this.sortedNodes;
+        definition.flows=this.sortedFlows;
+
+        return;
+        
+    }
+
+    addSorted(el) {
+        this.nodes.delete(el.id);
+        this.sortedNodes.set(el.id,el);
+        el.outbounds.forEach(o=>{
+            this.sortedFlows.set(o.id,o);
+            this.addSorted(o.to);
+        })
+    }
+}
+async function describe(model,format,outputFile) {
+
+    var definition: Definition
+    const server = new BPMNServer(configuration, logger, { cron: false });
+
+    definition = await server.definitions.load(model);
+//console.log(definition);
+    const json = JSON.parse(definition.getJson());
+
+    let ds=new DefinitionSorter();
+    ds.sort (definition);
+
+    json.elements=ds.sortedNodes;
+    json.flows=ds.sortedFlows;
+
+    json.elements.forEach(n=>{console.log('after el',n.id,n.type)});
+    json.flows.forEach(n=>{console.log('after fl',n.id)});
+
+    if (format=='json') {
+        fs.writeFileSync(outputFile,json);
+        console.log('file ',outputFile,' written');
+            
+        process.exit(0);
+        return;
+    }
+
+   const pug = require('pug');
+   const path = require('path');
+
+   let svg = null;
+   try {
+       svg = await server.definitions.getSVG(model);
+
+   }
+   catch (ex) {
+
+   }
+   let text="<div>"+svg+"</div>";
+
+   const templatePath = path.join(__dirname, '../views/includes/') ;
+   text = text + pug.renderFile(templatePath+ 'modelDoc.pug', { docs:json });
+   console.log(json.elements);
+
+   fs.writeFileSync(outputFile,text);
+}
+
+
 function getTree(response) {
     let tokens = response.tokens;
     //tokens.forEach(t)
@@ -200,15 +291,5 @@ function checkInstance(instances, criteria) {
             //expect(instance[key]).equals(criteria[key]);
         }
 
-    });
-}
-
-async function delay(time, result) {
-    console.log("delaying ... " + time)
-    return new Promise(function (resolve) {
-        setTimeout(function () {
-            console.log("delayed is done.");
-            resolve(result);
-        }, time);
     });
 }

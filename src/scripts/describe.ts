@@ -71,51 +71,22 @@ async function describe(model,format) {
         process.exit(0);
         return;
     }
-        
-        
 
-    output('## Processes')
-    json.processes.forEach(proc => {
-        output(`- Process  ${proc.id} ${proc.name} ${proc.description}`);
-    });
-    output('## Elements')
-    json.elements.forEach(el => {
-        output("");
-        output(`- Element: **${el.id}** ${el.type}, ${el.name||''}`);
-        el.description.forEach(desc => {
-            descArray([desc]);
-            //output('   - ', desc);
-        });
-        el.behaviours.forEach(desc => {
-            descArray(desc);
-            //output('   - > ', desc);
-        });
-        if (el.docs)
-            descArray(el.docs);
+   const pug = require('pug');
+   const path = require('path');
 
-    });
-    output('## Sequence Flows')
-    json.flows.forEach(el => {
-        output("");
-        output(`- Flow: **${el.id}** ${el.type} ${el.name||''} ${el.from} ${el.to}`);
-        descArray(el.description);
-    });
+   let svg = null;
+   try {
+       svg = await server.definitions.getSVG(model);
 
-}
-function output(text) {
-    console.log('>',text);
-    fs.writeFileSync(outputFile,"\n"+text,{flag: 'a+'})
-}
-function descArray(arr) {
+   }
+   catch (ex) {
 
-    arr.forEach(desc=>{
-        if(Array.isArray(desc)){
-            output(`   - ${desc[0]} : ${desc[1]}`);
-        }
-        else if (desc.text)
-            output(`   - Doc:  ${desc.text}`)
-        else 
-            output(desc);
-    })
+   }
+   let text="<div>"+svg+"</div>";
 
+   const templatePath = path.join(__dirname, '../views/includes/') ;
+   text = text + pug.renderFile(templatePath+ 'modelDoc.pug', { docs:json });
+
+   fs.writeFileSync(outputFile,text);
 }

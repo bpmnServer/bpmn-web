@@ -101,7 +101,9 @@ block content
 		div!= svg
 
 		h4 Model Documentation<button id="showDoc" onclick="showDocs()">&darr;</button>
-		include includes/modelDoc.pug
+		div(id="docs" style="display:none;border-width:.5px;border-style: solid;border-color: aliceblue;background: #f7f7f3;") 
+			include includes/modelDoc.pug
+
 		h4 Instance Items
 
 		span Times shown are from the start of the Execution

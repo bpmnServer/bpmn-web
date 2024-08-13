@@ -120,5 +120,8 @@ class AppServices {
         await delay(126000, '2.1mins'); // Wait for 2.1 mins
         context.item.data.service2Result = 'Service2Exec';
     }
+    async raiseBPMNError(input, context) {
+            return({bpmnError:' Something went wrong'});
+    }
 }
 export {AppServices}

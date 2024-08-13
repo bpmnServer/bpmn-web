@@ -1,7 +1,7 @@
 import  { configuration }   from './';;
 import { BPMNServer, Logger } from './';
 import { EventEmitter } from 'events';
-import { InstanceLocker } from './'
+export { InstanceLocker } from 'bpmn-server-mongo';
 
 const COLLECTION='wf_locks';
 const WAIT=1000;

@@ -11,19 +11,24 @@ async function test(scenario) {
     const server = new BPMNServer(configuration, logger, { cron: false });
     let context;
     let response;
+
+
+    context = await server.engine.start('error', { caseId: 1050, errorCode: "" });
+
+    return;
+    
     switch (scenario) 
     {
         case "A":
-            context = await server.engine.start('error event', { caseId: 1050, errorCode: "" });
+            context = await server.engine.start('Error events', { caseId: 1050, errorCode: "" });
             break;
         case "B":
-            context = await server.engine.start('error event', { caseId: 1051, errorCode: "error1" });
+            context = await server.engine.start('Error events', { caseId: 1051, Error_Code: "Error1" });
             break;
         case "C":
-            context = await server.engine.start('error event', { caseId: 1052, SubProcess_A: { errorCode: "error2" }});
+            context = await server.engine.start('Error events', { caseId: 1052, SubProcess_A: { Error_Code: "Error2" }});
             break;
     }
-    context.execution.report();
     
     console.log('cache : '+server.cache.list().length);
     server.cache.shutdown();
@@ -32,8 +37,10 @@ async function test(scenario) {
 
     console.log('--- invoking waiting item '+context.execution.id);
 
-    response = await server.engine.invoke({ id: context.execution.id, "items.elementId": 'UserTask1' });
-    context.execution.report();
+    response = await server.engine.invoke({ id: context.execution.id, "items.elementId": 'UserTask1' }, { Error_Code: "Error1" });
+    response = await server.engine.invoke({ id: context.execution.id, "items.elementId": 'UserTask2' }, { Error_Code: "Error1" });
+
+    response.execution.report();
 
     await logger.save('errorEvent.log');
 
