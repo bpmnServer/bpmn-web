@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.configuration = void 0;
 const __1 = require("../");
 const appDelegate_1 = require("./appDelegate");
-const bpmn_server_mongo_1 = require("bpmn-server-mongo");
 const __2 = require("../");
 const __3 = require("../");
 require("dotenv/config");
@@ -20,7 +19,8 @@ exports.configuration = new __1.Configuration({
     },
     database: {
         MongoDB: {
-            db_url: envirn.MONGO_DB_URL
+            db_url: envirn.MONGO_DB_URL,
+            db: 'bpmn'
         }
     },
     apiKey: envirn.API_KEY,
@@ -28,13 +28,13 @@ exports.configuration = new __1.Configuration({
         new __3.Logger(server);
     },
     definitions: function (server) {
-        return new bpmn_server_mongo_1.ModelsDatastore(server);
+        return new __1.ModelsDatastore(server);
     },
     appDelegate: function (server) {
         return new appDelegate_1.TestAppDelegate(server);
     },
     dataStore: function (server) {
-        let ds = new bpmn_server_mongo_1.DataStore(server);
+        let ds = new __2.DataStore(server);
         ds.enableSavePoints = true;
         return ds;
     },
