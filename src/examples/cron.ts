@@ -1,7 +1,7 @@
 import  { configuration }   from './';
 import { BPMNServer, Logger ,Cron  } from './';
 import { EventEmitter } from 'events';
-import { ModelsDatastore } from  "bpmn-server-mongo";
+import { ModelsDatastore } from  "bpmn-server";
 
 const logger = new Logger({ toConsole: true});
 

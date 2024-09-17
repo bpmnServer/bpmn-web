@@ -3,7 +3,6 @@ import { BPMNServer , Logger, ItemObject, InstanceObject, ITEM_STATUS } from '..
 import {configuration } from './'
 const FS = require('fs');
 import { EventEmitter } from 'events';
-import { DataStore } from 'bpmn-server-mongo';;
 import { parse } from 'querystring';
 import { BPMN_TYPE } from '..';
 import { EXECUTION_STATUS, Query } from '..';
