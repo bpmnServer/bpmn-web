@@ -1,6 +1,7 @@
 
 import { Configuration, ModelsDatastore, ModelsDatastoreDB, DataStore , Logger 
-	, NoCacheManager,CacheManager} from './';
+	, NoCacheManager,CacheManager,
+	ScriptHandler} from './';
 import { MyAppDelegate } from './appDelegate';
 import { UserService } from '../userAccess/UserService';
 
@@ -37,6 +38,9 @@ var configuration = new Configuration(
 			let ds=new DataStore(server);
 			ds.enableSavePoints=true;
 			return ds;
+		},
+		scriptHandler: function(server) {
+			return new ScriptHandler();
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);

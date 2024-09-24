@@ -38,6 +38,9 @@ exports.configuration = new __1.Configuration({
         ds.enableSavePoints = true;
         return ds;
     },
+    scriptHandler: function (server) {
+        return new __1.ScriptHandler();
+    },
     cacheManager: function (server) {
         return new __2.NoCacheManager(server);
     }

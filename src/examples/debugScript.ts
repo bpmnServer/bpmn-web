@@ -27,7 +27,7 @@ async function debugScript(instanceId,itemSeq,script) {
     
     logger.callback=logCall;
 
-    await ScriptHandler.executeScript(item,script);
+    await server.scriptHandler.executeScript(item,script);
 
     logger.callback=null;
     

@@ -76,27 +76,30 @@ async function testScripter() {
     var ret;
     var  token = myscope.token;
 
+    var scriptHandler= myscope.token.execution.scriptHandler;
+
     console.log(myscope.token.execution, myscope.token.execution.servicesProvider,token);
 
 
     script = `$(this.data.v1+this.data.v2)`;
-    console.log('eval script:', script, 'ret:', ScriptHandler.evaluateExpression(myscope, script));
+    console.log('eval script:', script, 'ret:', scriptHandler.evaluateExpression(myscope, script));
 
 
     script = `$(this.data.v1+this.data.v2)`;
-    ret = (await ScriptHandler.evaluateExpression(myscope, script));
+    ret = (await scriptHandler.evaluateExpression(myscope, script));
     console.log('expression script:', script, 'ret:', ret);
 
     script = `console.log(this,data,input)`;
-    console.log('expression script:', script, 'ret:', await ScriptHandler.executeScript(token,script));
+    console.log('expression script:', script, 'ret:', await scriptHandler.executeScript(token,script));
 
 
     script = `#(appServices.getSupervisorUser(this.data.requestor))`;
-    console.log('expression script:', script, 'ret:', await ScriptHandler.evaluateExpression(myscope, script));
+    console.log('expression script:', script, 'ret:', await scriptHandler.evaluateExpression(myscope, script));
 
 }
 async function runScripts(scripts, myscope) {
 	var l;
+    var scriptHandler= myscope.token.execution.scriptHandler;
 	for(l=0;l<scripts.length;l++)
 	{
         try {
@@ -105,20 +108,20 @@ async function runScripts(scripts, myscope) {
 	      const script=test[1];
 	      switch(type){
 		      case 'T':
-			    var ret=await ScriptHandler.evaluateInputExpression(myscope, script);
+			    var ret=await scriptHandler.evaluateInputExpression(myscope, script);
 			    console.log('Input Expression:', script, 'ret:',ret);
 		      break;
 		      case 'TD':
-			    var ret=await ScriptHandler.evaluateInputExpression(myscope, script,true);
+			    var ret=await scriptHandler.evaluateInputExpression(myscope, script,true);
 			    console.log('Expression:', script, 'ret:',ret);
 		      break;
 		      case 'X':
-			    var ret=await ScriptHandler.evaluateExpression(myscope, script);
+			    var ret=await scriptHandler.evaluateExpression(myscope, script);
 			    console.log('eval script:', script, 'ret:',ret);
 	  
 		      break;
 		      case 'S':
-			    var ret=await ScriptHandler.executeScript(myscope, script);
+			    var ret=await scriptHandler.executeScript(myscope, script);
 			    console.log('Script:', script, 'ret:',ret);
 	  
 		      break;

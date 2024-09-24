@@ -1,7 +1,8 @@
 
 import {
 	Configuration, ModelsDatastore, ModelsDatastoreDB, DataStore, Logger
-	, NoCacheManager, CacheManager
+	, NoCacheManager, CacheManager,
+	ScriptHandler
 } from './';
 import { MyAppDelegate } from './appDelegate';
 import { UserService } from '../userAccess/UserService';
@@ -37,6 +38,9 @@ var configuration = new Configuration(
 		},
 		dataStore: function (server) {
 			return new DataStore(server);
+		},
+		scriptHandler: function(server) {
+			return new ScriptHandler();
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);

@@ -12,6 +12,8 @@ and here
 
 ### Changed
 -->
+## Release 2.2.13
+- Change configuration to match new Release
 ## Release 2.2.4
 - Fix api dataStore/findInstances(query,projection)
 ## Release 2.2.3

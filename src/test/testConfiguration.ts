@@ -1,5 +1,5 @@
 
-import { ModelsDatastore, Configuration} from '../';
+import { ModelsDatastore, Configuration, ScriptHandler} from '../';
 import { TestAppDelegate } from './appDelegate';
 import { IConfiguration, DataStore, ILogger , NoCacheManager} from '../';
 import { Logger } from '../'
@@ -38,6 +38,9 @@ export const configuration = new Configuration(
 			let ds=new DataStore(server);
 			ds.enableSavePoints=true;
 			return ds;
+		},
+		scriptHandler: function(server) {
+			return new ScriptHandler();
 		},
 		cacheManager: function (server) {
 			return new NoCacheManager(server);
