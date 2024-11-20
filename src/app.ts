@@ -3,6 +3,7 @@ console.log('app.ts from ',__filename);
 
 import debug = require('debug');
 const flash = require('connect-flash');
+const cors = require('cors');
 
 import {UserManager } from './userAccess/UserManager'
 /**
@@ -82,6 +83,9 @@ export class WebApp {
 		  src: path.join(__dirname, 'public'),
 		  dest: path.join(__dirname, 'public')
 		}));*/
+        app.use(cors({
+            origin: '*'
+        }));
 		app.use(logger('dev'));
 		app.use(bodyParser.json({ limit: '200mb' }));
 		app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));

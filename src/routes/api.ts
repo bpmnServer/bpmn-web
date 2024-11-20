@@ -558,8 +558,8 @@ export class API extends Common {
             //console.log(request.params);
             let name = request.params.name;
 
-            let definition = await bpmnServer.definitions.load(name);
-            response.json(JSON.parse(definition.getJson()));
+            let definition = await bpmnServer.definitions.getSource(name);
+            response.send(definition);
         });
 
         router.delete('/datastore/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
