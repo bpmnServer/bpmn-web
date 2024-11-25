@@ -558,15 +558,18 @@ export class API extends Common {
                 //console.log(request.params);
                 let name = request.params.name;
 
-                let definition = await bpmnServer.definitions.getSource(name);
-                response.send(definition);
+                try {
+                    let definition = await bpmnServer.definitions.getSource(name);
+                    response.send(definition);
+                } catch (error) {
+                    response.status(404).send(error);
+                    return;
+                }
             });
 
-            router.post('/model/edit/:name?', loggedIn, async function (request, response) {
+            router.post('/model/save', loggedIn, async function (request, response) {
 
-                let name = request.params.name;
-                if (!name)
-                    name = request.body.name;
+                const name = request.body.name;
                 const bpmn = request.body.xml;
                 const svg = '';
                 let definitionsPath = bpmnServer.configuration.definitionsPath;
@@ -584,7 +587,6 @@ export class API extends Common {
                 response.status(200).send("");
 
             });
-
 
             router.delete('/datastore/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
