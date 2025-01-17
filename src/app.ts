@@ -84,7 +84,7 @@ export class WebApp {
 		  dest: path.join(__dirname, 'public')
 		}));*/
         app.use(cors({
-            origin: '*'
+            origin: process.env.ITSM_HOST,
         }));
 		app.use(logger('dev'));
 		app.use(bodyParser.json({ limit: '200mb' }));

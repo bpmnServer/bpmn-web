@@ -200,6 +200,7 @@ export class Model extends Common {
 
             let view = new ModelerWProp();
 
+            response.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${process.env.ITSM_HOST}`);
             view.display(processName,xml, request, response);
 
         }));
