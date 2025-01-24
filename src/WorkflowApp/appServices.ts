@@ -45,15 +45,15 @@ class AppServices {
     * @returns 
     */
     
-    async createAsset(input, context) {
+    async createTicket(input, context) {
         let item = context.item;
     
         console.log("Début de la tâche de service");
         console.log("ID de l'élément BPMN :", item.elementId);
     
-        const initSessionUrl = "http://192.168.1.14/~leo/itsm-ng/apirest.php/initSession";
-        const ticketApiUrl = "http://192.168.1.14/~leo/itsm-ng/apirest.php/Ticket/";
-        const appToken = "FYDJpt3ViPVrpL8EVjLiwCtUXpWcdGZ5LRp6aLft";
+        const initSessionUrl = process.env.ITSM_HOST +"/apirest.php/initSession";
+        const ticketApiUrl = process.env.ITSM_HOST +"/apirest.php/Ticket/";
+        const appToken = process.env.ITSM_APP_TOKEN;
     
         const payload = {
             input: {
@@ -66,7 +66,7 @@ class AppServices {
             const sessionResponse = await axios.get(initSessionUrl, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": "user_token CxP5lJu3PlnQVXLEe7uovnJtRjpD7UpsZvjl7uef",
+                    "Authorization": "user_token " + process.env.ITSM_USER_TOKEN,
                     "App-Token": appToken,
                 },
             });
