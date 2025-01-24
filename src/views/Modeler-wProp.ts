@@ -25,7 +25,7 @@ function getText(processName, xml) {
 <head>
 <meta charset="UTF-8">
 <!-- to render in iframe -->
-<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://latest.antoine.itsm-ng.local">
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' ${process.env.ITSM_HOST}">
 <title>Omni-WorkFlow</title>
 <script type='text/javascript' src='/javascripts/jquery.min.js'></script>
 <script type='text/javascript' src='/javascripts/bootstrap.min.js'></script>
