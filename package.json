@@ -6,7 +6,7 @@
     "setup": "ts-node src/scripts/setup.ts",
     "cli": "ts-node src/scripts/cli.ts",
     "build": "tsc --build",
-    "start": "ts-node src/app",
+    "start": "ts-node src/app.ts",
     "clean": "tsc --build --clean",
     "test": "ts-node src/test/setup.ts && ts-mocha -exit --config=src/test/.mocharc.json src/test/feature",
     "----": "---------------------for Development Scripts Only -------------------------------------",

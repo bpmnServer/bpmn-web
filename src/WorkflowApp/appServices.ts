@@ -47,7 +47,7 @@ class AppServices {
 
     async createTicket(input, context) {
         let item = context.item;
-
+    
         type Ticket = {
             id: number,
             title: string,
@@ -66,23 +66,43 @@ class AppServices {
                 suppliers: number[]
             }
         };
-
-        const ticketContent: Ticket = input;
-
+    
+        // Initialisation du ticket directement dans la fonction
+        let newTicket: Ticket = {
+            id: 0,
+            title: "truc",
+            description: "aled",
+            requester: {
+                users: [],
+                groups: [],
+            },
+            watchers: {
+                users: [],
+                groups: [],
+            },
+            assignee: {
+                users: [],
+                groups: [],
+                suppliers: [],
+            }
+        };
+    
+        console.log("Ticket généré :", newTicket);
+    
         console.log("Début de la tâche de service");
         console.log("ID de l'élément BPMN :", item.elementId);
-
-        const initSessionUrl = process.env.ITSM_HOST +"/apirest.php/initSession";
-        const ticketApiUrl = process.env.ITSM_HOST +"/apirest.php/Ticket/";
+    
+        const initSessionUrl = process.env.ITSM_HOST + process.env.ITSM_URI + "/apirest.php/initSession";
+        const ticketApiUrl = process.env.ITSM_HOST + process.env.ITSM_URI + "/apirest.php/Ticket/";
         const appToken = process.env.ITSM_APP_TOKEN;
-
+    
         const payload = {
             input: {
-                name: ticketContent.title,
-                content: ticketContent.description,
+                name: newTicket.title,
+                content: newTicket.description,
             },
         };
-
+    
         try {
             const sessionResponse = await axios.get(initSessionUrl, {
                 headers: {
@@ -91,18 +111,18 @@ class AppServices {
                     "App-Token": appToken,
                 },
             });
-
+    
             if (sessionResponse.status === 200 && sessionResponse.data && sessionResponse.data.session_token) {
                 const sessionToken = sessionResponse.data.session_token;
-
+    
                 const headers = {
                     "Content-Type": "application/json",
                     "Session-Token": sessionToken,
                     "App-Token": appToken,
                 };
-
+    
                 const ticketResponse = await axios.post(ticketApiUrl, payload, { headers });
-
+    
                 if (ticketResponse.status === 201) {
                     console.log("Asset créé avec succès :", ticketResponse.data);
                 } else {
@@ -114,9 +134,12 @@ class AppServices {
         } catch (error) {
             console.error("Erreur lors de la communication avec l'API :", error.message);
         }
-
+    
         console.log("Fin de la tâche de service");
     }
+    
+
+    
     // async service1(input, context) {
     //     let item = context.item;
     //     let wait=5000;

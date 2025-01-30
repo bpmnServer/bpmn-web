@@ -14,8 +14,6 @@ services:
       - mongo      
     env_file:
       - .env
-    volumes:
-      - .:/app
  mongo:
    image: mongo
    ports:
