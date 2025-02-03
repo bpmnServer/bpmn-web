@@ -6,6 +6,6 @@ if ! id "itsmworkflow" >/dev/null 2>&1; then
     useradd --system --no-create-home --shell /usr/sbin/nologin itsmworkflow
 fi
 
-chown -r itsmworkflow:itsmworkflow /usr/share/itsmng-workflows/src 
+chown itsmworkflow:itsmworkflow /usr/share/itsmng-workflows/src 
 
 exit 0
