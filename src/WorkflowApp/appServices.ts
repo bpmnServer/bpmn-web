@@ -67,27 +67,7 @@ class AppServices {
             }
         };
     
-        // Initialisation du ticket directement dans la fonction
-        let newTicket: Ticket = {
-            id: 0,
-            title: "truc",
-            description: "aled",
-            requester: {
-                users: [],
-                groups: [],
-            },
-            watchers: {
-                users: [],
-                groups: [],
-            },
-            assignee: {
-                users: [],
-                groups: [],
-                suppliers: [],
-            }
-        };
-    
-        console.log("Ticket généré :", newTicket);
+        const ticketContent: Ticket = input;
     
         console.log("Début de la tâche de service");
         console.log("ID de l'élément BPMN :", item.elementId);
@@ -98,8 +78,8 @@ class AppServices {
     
         const payload = {
             input: {
-                name: newTicket.title,
-                content: newTicket.description,
+                name: ticketContent.title,
+                content: ticketContent.description,
             },
         };
     
