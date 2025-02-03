@@ -24,6 +24,8 @@ function getText(processName, xml) {
 <html lang="en-CA" class="no-js">
 <head>
 <meta charset="UTF-8">
+<!-- to render in iframe -->
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' ${process.env.ITSM_HOST}">
 <title>Omni-WorkFlow</title>
 <script type='text/javascript' src='/javascripts/jquery.min.js'></script>
 <script type='text/javascript' src='/javascripts/bootstrap.min.js'></script>
@@ -77,12 +79,9 @@ function getText(processName, xml) {
         <ul class="nav navbar-nav">
         </ul>
 <ul class="nav navbar-nav navbar-right">
-<!--li><a href='/execute/${processName}' target="execute">Run</a></li-->
-<li><a href='javascript:window.saveDiagramFunct("run");'>Save & Run</a></li>
+<li><a href='/execute/${processName}' target="execute">Run</a></li>
 <li><a href='javascript:window.saveDiagramFunct();'>Save Model</a></li>
 
-<li><a href='/docs' target="docs">Docs</a>
-  </li>        
 </ul></div>
 </nav>         
   <div class='clearfix' height=0;></div>
