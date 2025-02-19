@@ -95,13 +95,15 @@ Feature('Buy Used Car- clean and repair', () => {
                     id: instanceId ,
                     "items.elementId": 'task_Drive'};
                 response=await server.engine.invoke(query, {});
+                console.log('status',response.execution.status);
+                console.log('drive?',getItem('task_Drive').status);
             });
 
             and('Case Complete', async () => {
 
-//                console.log(response.instance.status);
+                report();
 //                console.log(response.execution.status);
-              expect(response.execution.status).equals('end');
+                 expect(response.execution.status).equals('end');
                 expect(getItem('task_Drive').status).equals('end');
 
             });
@@ -116,7 +118,12 @@ Feature('Buy Used Car- clean and repair', () => {
         });
 
     });
-
+function report() 
+{
+    response.instance.items.filter(item=> {return (item.type=='bpmn:UserTask');}).forEach(item=>{
+        console.log('item',item.elementId,item.status,item.seq);
+    });
+}
 function getItem(id)
 {
     return response.instance.items.filter(item => { return item.elementId == id; })[0];

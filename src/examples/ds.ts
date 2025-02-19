@@ -3,7 +3,16 @@ import { BPMNServer, Logger } from './';
 import { EventEmitter } from 'events';
 
 const logger = new Logger({ toConsole: true});
+let token1={data:{}}
+let token2={data:Object.create(token1.data)};
 
+token1.data['abc']='abc';
+console.log(token2.data.abc);
+
+let data = {a:'a',b:'b'};
+let data2=Object.create(data);
+data2.c='c';
+console.log(data2);
 
 let name = 'ds';
 let process;
@@ -17,7 +26,7 @@ let query, query1;
 let server;
 let instanceId;
 
-find();
+//find();
 //test();
 function translateCriteria(query) {
 

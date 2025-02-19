@@ -15,6 +15,7 @@ const listener = server.listener;
     });
     */
 listener.on('all', async function ({ context, event, }) {
+    return;
     if (context.item)
         console.log(`----->Event: '${event}' for ${context.item.element.type} '${context.item.element.id}' id: ${context.item.id} Instance: ${context.instance.id}`);
     else
@@ -36,19 +37,21 @@ listener.on('all', async function ({ context, event, }) {
 listener.on('wait', function ({ object, event }) {
           console.log('----->Wait:' + event);
     });
-
+console.log('---------------------- noWait-invoke.ts')
 test(server);
+
 async function test(server)
 {
     console.log('-------------------------------------------------')
     let res = await api.engine.start('test-wait-invoke', {},user);
 
-    console.log('about to invoke')
+    console.log('about to invoke with noWait option')
     res=await api.engine.invoke({ "id": res.instance.id, "items.elementId": 'Activity_0z113lq'},{},user,{noWait:true}),
     console.log(`invoked`,res.item.element.type,res.item.status);
 
     report(res.instance);
 
+    /*
     await new Promise(function (resolve) {
         setTimeout(function () {
             console.log(`after wait`);
@@ -56,8 +59,8 @@ async function test(server)
             report(res.instance);
                 }, 500);
     });
-
-    console.log("Ready to drive");
+    */
+    console.log("Invoking script is all Done");
 }
 
 function report(instance) {

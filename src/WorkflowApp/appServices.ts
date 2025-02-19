@@ -99,7 +99,13 @@ class AppServices {
     async notifyhead() {
         console.log('>>>>>>>>>>appDelegate notifyhead');
     }
+    async getCollection(token) {
+        console.log('get collection',token.currentNode.id);
+        return ['A','B','C'];
+
+    }
     async service1(input, context) {
+        console.log('appService.service1 starting...');
         let item = context.item;
         let wait=5000;
         if (input.wait)
@@ -113,6 +119,7 @@ class AppServices {
         return { seq , text: 'test' };
     }
     async DummyService1(input, context) {
+        console.log('appServcie.DummyService1 starting');
         context.item.data.service1Result = 'Service1Exec';
     }
 

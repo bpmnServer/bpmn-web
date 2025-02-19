@@ -18,6 +18,19 @@ const dataStore:IDataStore = server.dataStore;
 
 const modelsDataStore = server.definitions;
 
+
+const fs = require('fs');
+
+module.exports = function () {
+  afterEach(function () {
+    if (this.currentTest.state === 'failed') {
+      const message = `❌ Test Failed: ${this.currentTest.fullTitle()}\nError: ${this.currentTest.err.message}\n\n`;
+      console.error(message);
+      fs.appendFileSync('failed-tests.log', message);
+    }
+  });
+};
+
 run();
 
 async function run() {

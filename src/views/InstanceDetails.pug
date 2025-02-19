@@ -132,11 +132,13 @@ block content
 				- if (item.candidateGroups) assign+=' groups: \''+item.candidateGroups+'\'';
 				- if (item.assignee) assign+=' Assigned to: \''+item.assignee+'\'';
 				- if (item.dueDate) assign+=' Due on:'+item.dueDate;
+				- var key='';
+				- if (item.itemKey) key='['+item.itemKey+']';
 				- seq++;
 					tr
 						td #{seq}
 						td #{item.elementId}
-						td #{item.name}
+						td #{item.name} #{key}
 						td(class='date') #{item.startedAt}
 						td(class='date') #{item.endedAt}
 						td #{item.status}
@@ -149,6 +151,9 @@ block content
 					tr
 						td
 						td(colspan=8) #{assign}
+
+	
+
 
 		h4 Instance Info 
 		div(id="info" ) 

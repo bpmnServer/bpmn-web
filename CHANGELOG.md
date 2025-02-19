@@ -12,6 +12,9 @@ and here
 
 ### Changed
 -->
+## Release 2.2.18
+- Release to match bpmn-server Release 2.2.18
+- Show itemKey in display
 ## Release 2.2.13
 - Change configuration to match new Release
 ## Release 2.2.4

@@ -4,7 +4,7 @@ const { configuration } = require('./');
 
 console.log('-------- restart2.js -----------');
 
-const logger = new Logger({ toConsole: true});
+const logger = new Logger({ toConsole: false});
 
 const server = new BPMNServer(configuration, logger);
 var caseId = Math.floor(Math.random() * 10000);
