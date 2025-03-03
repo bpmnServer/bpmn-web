@@ -80,6 +80,7 @@ function getText(processName, xml) {
         </ul>
 <ul class="nav navbar-nav navbar-right">
 <li><a href='/execute/${processName}' target="execute">Run</a></li>
+<li><a href='javascript:window.saveDiagramFunct("run");'>Save & Run</a></li>
 <li><a href='javascript:window.saveDiagramFunct();'>Save Model</a></li>
 
 </ul></div>

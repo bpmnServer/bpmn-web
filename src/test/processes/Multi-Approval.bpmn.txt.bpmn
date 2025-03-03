@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:collaboration id="Collaboration_1u7i6jb">
+    <bpmn2:participant id="Participant_0f1s26z" processRef="Process_1" />
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:outgoing>Flow_00wyzkb</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_00wyzkb" sourceRef="StartEvent_1" targetRef="Activity_01735pj" />
+    <bpmn2:userTask id="Activity_01735pj" name="Maker">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="ApprovalGroup" label="Approval Group" type="enum">
+            <camunda:value id="Board" name="Board" />
+            <camunda:value id="CEO" name="CEO" />
+          </camunda:formField>
+          <camunda:formField id="MinApprovals" label="Min Approval Required" type="string" defaultValue="2" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_00wyzkb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1f7ilxi</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="Flow_1f7ilxi" sourceRef="Activity_01735pj" targetRef="Activity_1gkmokp" />
+    <bpmn2:sequenceFlow id="Flow_08dr16i" sourceRef="Activity_1gkmokp" targetRef="Activity_1lg7box" />
+    <bpmn2:sequenceFlow id="Flow_0bqvsa8" sourceRef="Activity_1lg7box" targetRef="Activity_0wk3rin" />
+    <bpmn2:sequenceFlow id="Flow_1hozf68" sourceRef="Activity_0wk3rin" targetRef="Event_0pw9ww4" />
+    <bpmn2:userTask id="Activity_1lg7box" name="Approve" camunda:candidateUsers="$(data.ApprovalGroup)">
+      <bpmn2:incoming>Flow_08dr16i</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0bqvsa8</bpmn2:outgoing>
+      <bpmn2:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="$[...Array(parseInt(data.MinApprovals)).keys()]" />
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="Activity_0wk3rin" name="Process">
+      <bpmn2:incoming>Flow_0bqvsa8</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1hozf68</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="Event_0pw9ww4">
+      <bpmn2:incoming>Flow_1hozf68</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:serviceTask id="Activity_1gkmokp" name="Shashank">
+      <bpmn2:incoming>Flow_1f7ilxi</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_08dr16i</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1u7i6jb">
+      <bpmndi:BPMNShape id="Participant_0f1s26z_di" bpmnElement="Participant_0f1s26z" isHorizontal="true">
+        <dc:Bounds x="170" y="60" width="870" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1hozf68_di" bpmnElement="Flow_1hozf68">
+        <di:waypoint x="840" y="170" />
+        <di:waypoint x="892" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bqvsa8_di" bpmnElement="Flow_0bqvsa8">
+        <di:waypoint x="680" y="170" />
+        <di:waypoint x="740" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08dr16i_di" bpmnElement="Flow_08dr16i">
+        <di:waypoint x="520" y="170" />
+        <di:waypoint x="580" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1f7ilxi_di" bpmnElement="Flow_1f7ilxi">
+        <di:waypoint x="370" y="170" />
+        <di:waypoint x="420" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00wyzkb_di" bpmnElement="Flow_00wyzkb">
+        <di:waypoint x="248" y="170" />
+        <di:waypoint x="270" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="212" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u4zewt_di" bpmnElement="Activity_01735pj">
+        <dc:Bounds x="270" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0r4fnqu_di" bpmnElement="Activity_1lg7box">
+        <dc:Bounds x="580" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15l56zn_di" bpmnElement="Activity_0wk3rin">
+        <dc:Bounds x="740" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pw9ww4_di" bpmnElement="Event_0pw9ww4">
+        <dc:Bounds x="892" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0s0ugmr_di" bpmnElement="Activity_1gkmokp">
+        <dc:Bounds x="420" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

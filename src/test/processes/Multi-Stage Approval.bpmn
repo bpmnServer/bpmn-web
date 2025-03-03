@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:collaboration id="Collaboration_02tu39u">
+    <bpmn2:participant id="Participant_0eo8l7b" processRef="Process_1" />
+  </bpmn2:collaboration>
+  <bpmn2:process id="Process_1" isExecutable="false">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="caseTitle" type="string" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1xmgln3</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_1xmgln3" sourceRef="StartEvent_1" targetRef="Activity_prepare" />
+    <bpmn2:subProcess id="StageA">
+      <bpmn2:incoming>Flow_191e1wt</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_04bibtd</bpmn2:outgoing>
+      <bpmn2:startEvent id="Event_0ou7f7y">
+        <bpmn2:outgoing>Flow_0bt452n</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_0bt452n" sourceRef="Event_0ou7f7y" targetRef="Activity_Approve_A" />
+      <bpmn2:endEvent id="Event_1rup15x">
+        <bpmn2:incoming>Flow_0sueik1</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:userTask id="Activity_Approve_A" name="Stage A Approval" camunda:candidateGroups="$(item.itemKey).split(&#39;.&#39;)[1]">
+        <bpmn2:extensionElements>
+          <camunda:executionListener event="end">
+            <camunda:script scriptFormat="JavaScript">
+            if (item.vars.approval=='Rejected') {
+              item.token.execution.instance.data['approval']='Rejected';
+              return {escalation:"Rejected"}
+            }
+if (appServices.IsApprovalDone(this)==true) 
+  return {escalation:"Approved"};</camunda:script>
+          </camunda:executionListener>
+          <camunda:taskListener event="validate">
+            <camunda:script scriptFormat="JavaScript">console.log(item.input);
+item.vars.approval=item.input.approval;
+console.log('vars',item.vars);
+item.input={};</camunda:script>
+          </camunda:taskListener>
+          <camunda:formData>
+            <camunda:formField id="approval" label="Approval ?" type="enum">
+              <camunda:value id="Approved" name="Approved" />
+              <camunda:value id="Rejected" name="Rejected" />
+            </camunda:formField>
+          </camunda:formData>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0bt452n</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_0sueik1</bpmn2:outgoing>
+        <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$appServices.getApprovers(&#34;A&#34;)" />
+      </bpmn2:userTask>
+      <bpmn2:sequenceFlow id="Flow_0sueik1" sourceRef="Activity_Approve_A" targetRef="Event_1rup15x" />
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="StageB">
+      <bpmn2:incoming>Flow_04bibtd</bpmn2:incoming>
+      <bpmn2:incoming>Flow_19qi4yz</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1bk30bk</bpmn2:outgoing>
+      <bpmn2:startEvent id="Event_1beauxh">
+        <bpmn2:outgoing>Flow_0p87sg4</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_0p87sg4" sourceRef="Event_1beauxh" targetRef="Activity_Approve_B" />
+      <bpmn2:userTask id="Activity_Approve_B" name="Stage B Approval" camunda:candidateGroups="$(item.itemKey).split(&#39;.&#39;)[1]">
+        <bpmn2:extensionElements>
+          <camunda:executionListener event="end">
+            <camunda:script scriptFormat="JavaScript">
+                        if (item.vars.approval=='Rejected') {
+              item.token.execution.instance.data['approval']='Rejected';
+              return {escalation:"Rejected"}
+            }
+if (appServices.IsApprovalDone(this)==true) 
+  return {escalation:"Approved"};</camunda:script>
+          </camunda:executionListener>
+          <camunda:taskListener event="validate">
+            <camunda:script scriptFormat="JavaScript">console.log(item.input);
+item.vars.approval=item.input.approval;
+console.log('vars',item.vars);
+item.input={};</camunda:script>
+          </camunda:taskListener>
+          <camunda:formData>
+            <camunda:formField id="approval" label="Approval ?" type="enum">
+              <camunda:value id="Approved" name="Approved" />
+              <camunda:value id="Rejected" name="Rejected" />
+            </camunda:formField>
+          </camunda:formData>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0p87sg4</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1f1srdp</bpmn2:outgoing>
+        <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$appServices.getApprovers(&#34;B&#34;)" />
+      </bpmn2:userTask>
+      <bpmn2:endEvent id="Event_0nyz5ye">
+        <bpmn2:incoming>Flow_1f1srdp</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="Flow_1f1srdp" sourceRef="Activity_Approve_B" targetRef="Event_0nyz5ye" />
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="StageC">
+      <bpmn2:incoming>Flow_1bk30bk</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0xxuwmo</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1627yke</bpmn2:outgoing>
+      <bpmn2:startEvent id="Event_1ctwwlf">
+        <bpmn2:outgoing>Flow_0ym5j63</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_0ym5j63" sourceRef="Event_1ctwwlf" targetRef="Activity_Approve_C" />
+      <bpmn2:endEvent id="Event_1vfdb5d">
+        <bpmn2:incoming>Flow_1tp96y1</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="Flow_1tp96y1" sourceRef="Activity_Approve_C" targetRef="Event_1vfdb5d" />
+      <bpmn2:userTask id="Activity_Approve_C" name="Stage C Approval" camunda:candidateGroups="$(item.itemKey).split(&#39;.&#39;)[1]">
+        <bpmn2:extensionElements>
+          <camunda:executionListener event="end">
+            <camunda:script scriptFormat="JavaScript">
+                        if (item.vars.approval=='Rejected') {
+              item.token.execution.instance.data['approval']='Rejected';
+              return {escalation:"Rejected"}
+            }
+if (appServices.IsApprovalDone(this)==true) 
+  return {escalation:"Approved"};</camunda:script>
+          </camunda:executionListener>
+          <camunda:taskListener event="validate">
+            <camunda:script scriptFormat="JavaScript">console.log(item.input);
+item.vars.approval=item.input.approval;
+console.log('vars',item.vars);
+item.input={};</camunda:script>
+          </camunda:taskListener>
+          <camunda:formData>
+            <camunda:formField id="approval" label="Approval ?" type="enum">
+              <camunda:value id="Approved" name="Approved" />
+              <camunda:value id="Rejected" name="Rejected" />
+            </camunda:formField>
+          </camunda:formData>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0ym5j63</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1tp96y1</bpmn2:outgoing>
+        <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$appServices.getApprovers(&#34;C&#34;)" />
+      </bpmn2:userTask>
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="StageD">
+      <bpmn2:incoming>Flow_1627yke</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1lgzu4e</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0dkuth7</bpmn2:outgoing>
+      <bpmn2:startEvent id="Event_1xjkpx4">
+        <bpmn2:outgoing>Flow_0prf8y9</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_0prf8y9" sourceRef="Event_1xjkpx4" targetRef="Activity_Approve_D" />
+      <bpmn2:endEvent id="Event_042n7hh">
+        <bpmn2:incoming>Flow_09po4pg</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="Flow_09po4pg" sourceRef="Activity_Approve_D" targetRef="Event_042n7hh" />
+      <bpmn2:userTask id="Activity_Approve_D" name="Stage D Approval" camunda:candidateGroups="$(item.itemKey).split(&#39;.&#39;)[1]">
+        <bpmn2:extensionElements>
+          <camunda:executionListener event="end">
+            <camunda:script scriptFormat="JavaScript">            if (item.vars.approval=='Rejected') {
+              item.token.execution.instance.data['approval']='Rejected';
+              return {escalation:"Rejected"}
+            }
+if (appServices.IsApprovalDone(this)==true) 
+  return {escalation:"Approved"};</camunda:script>
+          </camunda:executionListener>
+          <camunda:taskListener event="validate">
+            <camunda:script scriptFormat="JavaScript">console.log(item.input);
+item.vars.approval=item.input.approval;
+console.log('vars',item.vars);
+item.input={};</camunda:script>
+          </camunda:taskListener>
+          <camunda:formData>
+            <camunda:formField id="approval" label="Approval ?" type="enum">
+              <camunda:value id="Approved" name="Approved" />
+              <camunda:value id="Rejected" name="Rejected" />
+            </camunda:formField>
+          </camunda:formData>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_0prf8y9</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_09po4pg</bpmn2:outgoing>
+        <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$appServices.getApprovers(&#34;D&#34;)" />
+      </bpmn2:userTask>
+    </bpmn2:subProcess>
+    <bpmn2:subProcess id="StageE">
+      <bpmn2:incoming>Flow_0dkuth7</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0z6nr7o</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0bporab</bpmn2:outgoing>
+      <bpmn2:startEvent id="Event_0dl3f65">
+        <bpmn2:outgoing>Flow_18ijwdi</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:sequenceFlow id="Flow_18ijwdi" sourceRef="Event_0dl3f65" targetRef="Activity_Approve_E" />
+      <bpmn2:endEvent id="Event_1c9o7zk">
+        <bpmn2:incoming>Flow_03s2m2y</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="Flow_03s2m2y" sourceRef="Activity_Approve_E" targetRef="Event_1c9o7zk" />
+      <bpmn2:userTask id="Activity_Approve_E" name="Stage E Approval" camunda:candidateGroups="$(item.itemKey).split(&#39;.&#39;)[1]">
+        <bpmn2:extensionElements>
+          <camunda:executionListener event="end">
+            <camunda:script scriptFormat="JavaScript">            if (item.vars.approval=='Rejected') {
+              item.token.execution.instance.data['approval']='Rejected';
+              return {escalation:"Rejected"}
+            }
+if (appServices.IsApprovalDone(this)==true) 
+  return {escalation:"Approved"};</camunda:script>
+          </camunda:executionListener>
+          <camunda:taskListener event="validate">
+            <camunda:script scriptFormat="JavaScript">console.log(item.input);
+item.vars.approval=item.input.approval;
+console.log('vars',item.vars);
+item.input={};</camunda:script>
+          </camunda:taskListener>
+          <camunda:formData>
+            <camunda:formField id="approval" label="Approval ?" type="enum">
+              <camunda:value id="Approved" name="Approved" />
+              <camunda:value id="Rejected" name="Rejected" />
+            </camunda:formField>
+          </camunda:formData>
+        </bpmn2:extensionElements>
+        <bpmn2:incoming>Flow_18ijwdi</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_03s2m2y</bpmn2:outgoing>
+        <bpmn2:multiInstanceLoopCharacteristics camunda:collection="$appServices.getApprovers(&#34;E&#34;)" />
+      </bpmn2:userTask>
+    </bpmn2:subProcess>
+    <bpmn2:boundaryEvent id="Event_1mqnq9x" attachedToRef="StageD">
+      <bpmn2:outgoing>Flow_0z6nr7o</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_1y5qyd1" escalationRef="Escalation_19cxc7m" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_01u3xp2" attachedToRef="StageD">
+      <bpmn2:outgoing>Flow_11hqlh6</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_1mzrily" escalationRef="Escalation_0ha9j0g" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_1nv1v3s" attachedToRef="StageC">
+      <bpmn2:outgoing>Flow_1lgzu4e</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_058rzdc" escalationRef="Escalation_19cxc7m" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_13izcwg" attachedToRef="StageC">
+      <bpmn2:outgoing>Flow_16liirv</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_1gs0olq" escalationRef="Escalation_0ha9j0g" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_0t3gu9p" attachedToRef="StageB">
+      <bpmn2:outgoing>Flow_0xycc2i</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_0nhli6k" escalationRef="Escalation_0ha9j0g" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_1qhfiix" name="Proceed" attachedToRef="StageB">
+      <bpmn2:outgoing>Flow_0xxuwmo</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_0vouepj" escalationRef="Escalation_19cxc7m" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_0oqa9en" name="Proceed" attachedToRef="StageA">
+      <bpmn2:outgoing>Flow_19qi4yz</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_1muhzmu" escalationRef="Escalation_19cxc7m" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:boundaryEvent id="Event_08pzkwp" name="Reject" attachedToRef="StageA">
+      <bpmn2:outgoing>Flow_1a714ut</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_1gk23p7" escalationRef="Escalation_0ha9j0g" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:sequenceFlow id="Flow_04bibtd" sourceRef="StageA" targetRef="StageB" />
+    <bpmn2:sequenceFlow id="Flow_19qi4yz" sourceRef="Event_0oqa9en" targetRef="StageB" />
+    <bpmn2:sequenceFlow id="Flow_1bk30bk" sourceRef="StageB" targetRef="StageC" />
+    <bpmn2:sequenceFlow id="Flow_0xxuwmo" sourceRef="Event_1qhfiix" targetRef="StageC" />
+    <bpmn2:sequenceFlow id="Flow_1627yke" sourceRef="StageC" targetRef="StageD" />
+    <bpmn2:sequenceFlow id="Flow_1lgzu4e" sourceRef="Event_1nv1v3s" targetRef="StageD" />
+    <bpmn2:sequenceFlow id="Flow_0dkuth7" sourceRef="StageD" targetRef="StageE" />
+    <bpmn2:sequenceFlow id="Flow_0z6nr7o" sourceRef="Event_1mqnq9x" targetRef="StageE" />
+    <bpmn2:sequenceFlow id="Flow_0sih85q" sourceRef="Activity_rejected" targetRef="Event_Rejected_end" />
+    <bpmn2:sequenceFlow id="Flow_16liirv" sourceRef="Event_13izcwg" targetRef="Activity_rejected" />
+    <bpmn2:sequenceFlow id="Flow_1a714ut" sourceRef="Event_08pzkwp" targetRef="Activity_rejected" />
+    <bpmn2:sequenceFlow id="Flow_0xycc2i" sourceRef="Event_0t3gu9p" targetRef="Activity_rejected" />
+    <bpmn2:sequenceFlow id="Flow_11hqlh6" sourceRef="Event_01u3xp2" targetRef="Activity_rejected" />
+    <bpmn2:sequenceFlow id="Flow_1h2m850" sourceRef="Event_1merurp" targetRef="Activity_rejected" />
+    <bpmn2:sequenceFlow id="Flow_191e1wt" sourceRef="Activity_prepare" targetRef="StageA" />
+    <bpmn2:sequenceFlow id="Flow_0bporab" sourceRef="StageE" targetRef="Activity_Process" />
+    <bpmn2:sequenceFlow id="Flow_0zyxxjp" sourceRef="Event_1guadyy" targetRef="Activity_Process" />
+    <bpmn2:sequenceFlow id="Flow_0p9fhcv" sourceRef="Activity_Process" targetRef="Event_End" />
+    <bpmn2:boundaryEvent id="Event_1guadyy" attachedToRef="StageE">
+      <bpmn2:outgoing>Flow_0zyxxjp</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_18qqy71" escalationRef="Escalation_19cxc7m" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:task id="Activity_rejected" name="Rejected">
+      <bpmn2:incoming>Flow_0xycc2i</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1a714ut</bpmn2:incoming>
+      <bpmn2:incoming>Flow_16liirv</bpmn2:incoming>
+      <bpmn2:incoming>Flow_11hqlh6</bpmn2:incoming>
+      <bpmn2:incoming>Flow_1h2m850</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0sih85q</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:endEvent id="Event_Rejected_end">
+      <bpmn2:incoming>Flow_0sih85q</bpmn2:incoming>
+      <bpmn2:terminateEventDefinition id="TerminateEventDefinition_1chler8" />
+    </bpmn2:endEvent>
+    <bpmn2:boundaryEvent id="Event_1merurp" attachedToRef="StageE">
+      <bpmn2:outgoing>Flow_1h2m850</bpmn2:outgoing>
+      <bpmn2:escalationEventDefinition id="EscalationEventDefinition_011x882" escalationRef="Escalation_0ha9j0g" />
+    </bpmn2:boundaryEvent>
+    <bpmn2:userTask id="Activity_prepare" name="Prepare">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="caseTitle" type="string" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1xmgln3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_191e1wt</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="Activity_Process" name="Process">
+      <bpmn2:incoming>Flow_0bporab</bpmn2:incoming>
+      <bpmn2:incoming>Flow_0zyxxjp</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0p9fhcv</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:endEvent id="Event_End">
+      <bpmn2:incoming>Flow_0p9fhcv</bpmn2:incoming>
+    </bpmn2:endEvent>
+  </bpmn2:process>
+  <bpmn2:escalation id="Escalation_0ha9j0g" name="Reject" escalationCode="Rejected" />
+  <bpmn2:escalation id="Escalation_19cxc7m" name="Approved" escalationCode="Approved" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_02tu39u">
+      <bpmndi:BPMNShape id="Participant_0eo8l7b_di" bpmnElement="Participant_0eo8l7b" isHorizontal="true">
+        <dc:Bounds x="230" y="140" width="1820" height="480" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0p9fhcv_di" bpmnElement="Flow_0p9fhcv">
+        <di:waypoint x="1900" y="330" />
+        <di:waypoint x="1962" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zyxxjp_di" bpmnElement="Flow_0zyxxjp">
+        <di:waypoint x="1756" y="349" />
+        <di:waypoint x="1778" y="349" />
+        <di:waypoint x="1778" y="360" />
+        <di:waypoint x="1800" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bporab_di" bpmnElement="Flow_0bporab">
+        <di:waypoint x="1738" y="330" />
+        <di:waypoint x="1800" y="330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_191e1wt_di" bpmnElement="Flow_191e1wt">
+        <di:waypoint x="440" y="310" />
+        <di:waypoint x="492" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1h2m850_di" bpmnElement="Flow_1h2m850">
+        <di:waypoint x="1600" y="468" />
+        <di:waypoint x="1600" y="529" />
+        <di:waypoint x="1670" y="529" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11hqlh6_di" bpmnElement="Flow_11hqlh6">
+        <di:waypoint x="1352" y="468" />
+        <di:waypoint x="1352" y="559" />
+        <di:waypoint x="1670" y="559" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xycc2i_di" bpmnElement="Flow_0xycc2i">
+        <di:waypoint x="802" y="452" />
+        <di:waypoint x="802" y="549" />
+        <di:waypoint x="1670" y="549" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a714ut_di" bpmnElement="Flow_1a714ut">
+        <di:waypoint x="552" y="452" />
+        <di:waypoint x="552" y="549" />
+        <di:waypoint x="1670" y="549" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16liirv_di" bpmnElement="Flow_16liirv">
+        <di:waypoint x="1072" y="468" />
+        <di:waypoint x="1072" y="549" />
+        <di:waypoint x="1670" y="549" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0sih85q_di" bpmnElement="Flow_0sih85q">
+        <di:waypoint x="1770" y="529" />
+        <di:waypoint x="1832" y="529" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z6nr7o_di" bpmnElement="Flow_0z6nr7o">
+        <di:waypoint x="1470" y="359" />
+        <di:waypoint x="1526" y="359" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dkuth7_di" bpmnElement="Flow_0dkuth7">
+        <di:waypoint x="1452" y="306" />
+        <di:waypoint x="1526" y="306" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lgzu4e_di" bpmnElement="Flow_1lgzu4e">
+        <di:waypoint x="1190" y="383" />
+        <di:waypoint x="1242" y="383" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1627yke_di" bpmnElement="Flow_1627yke">
+        <di:waypoint x="1172" y="326" />
+        <di:waypoint x="1242" y="326" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xxuwmo_di" bpmnElement="Flow_0xxuwmo">
+        <di:waypoint x="925" y="378" />
+        <di:waypoint x="972" y="378" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bk30bk_di" bpmnElement="Flow_1bk30bk">
+        <di:waypoint x="912" y="322" />
+        <di:waypoint x="972" y="322" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19qi4yz_di" bpmnElement="Flow_19qi4yz">
+        <di:waypoint x="670" y="376" />
+        <di:waypoint x="722" y="376" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04bibtd_di" bpmnElement="Flow_04bibtd">
+        <di:waypoint x="652" y="316" />
+        <di:waypoint x="722" y="316" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xmgln3_di" bpmnElement="Flow_1xmgln3">
+        <di:waypoint x="308" y="310" />
+        <di:waypoint x="340" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="272" y="292" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wn3wnl_di" bpmnElement="Activity_Process">
+        <dc:Bounds x="1800" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0li3n89_di" bpmnElement="Event_End">
+        <dc:Bounds x="1962" y="312" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0q0g0c9_di" bpmnElement="StageA" isExpanded="true">
+        <dc:Bounds x="492" y="178" width="160" height="256" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0sueik1_di" bpmnElement="Flow_0sueik1">
+        <di:waypoint x="572" y="346" />
+        <di:waypoint x="572" y="368" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bt452n_di" bpmnElement="Flow_0bt452n">
+        <di:waypoint x="572" y="234" />
+        <di:waypoint x="572" y="266" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0ou7f7y_di" bpmnElement="Event_0ou7f7y">
+        <dc:Bounds x="554" y="198" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1rup15x_di" bpmnElement="Event_1rup15x">
+        <dc:Bounds x="554" y="368" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_03s15d8_di" bpmnElement="Activity_Approve_A">
+        <dc:Bounds x="522" y="266" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_09az8nv_di" bpmnElement="StageB" isExpanded="true">
+        <dc:Bounds x="722" y="178" width="190" height="256" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1f1srdp_di" bpmnElement="Flow_1f1srdp">
+        <di:waypoint x="812" y="336" />
+        <di:waypoint x="812" y="368" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p87sg4_di" bpmnElement="Flow_0p87sg4">
+        <di:waypoint x="812" y="234" />
+        <di:waypoint x="812" y="256" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1beauxh_di" bpmnElement="Event_1beauxh">
+        <dc:Bounds x="794" y="198" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nvacu3_di" bpmnElement="Activity_Approve_B">
+        <dc:Bounds x="762" y="256" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0nyz5ye_di" bpmnElement="Event_0nyz5ye">
+        <dc:Bounds x="794" y="368" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0rx31h1_di" bpmnElement="StageC" isExpanded="true">
+        <dc:Bounds x="972" y="188" width="200" height="262" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1tp96y1_di" bpmnElement="Flow_1tp96y1">
+        <di:waypoint x="1072" y="356" />
+        <di:waypoint x="1072" y="378" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ym5j63_di" bpmnElement="Flow_0ym5j63">
+        <di:waypoint x="1072" y="250" />
+        <di:waypoint x="1072" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1ctwwlf_di" bpmnElement="Event_1ctwwlf">
+        <dc:Bounds x="1054" y="214" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1vfdb5d_di" bpmnElement="Event_1vfdb5d">
+        <dc:Bounds x="1054" y="378" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u17zhz_di" bpmnElement="Activity_Approve_C">
+        <dc:Bounds x="1022" y="276" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0b1im5d_di" bpmnElement="StageD" isExpanded="true">
+        <dc:Bounds x="1242" y="188" width="210" height="262" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_09po4pg_di" bpmnElement="Flow_09po4pg">
+        <di:waypoint x="1342" y="366" />
+        <di:waypoint x="1342" y="388" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0prf8y9_di" bpmnElement="Flow_0prf8y9">
+        <di:waypoint x="1342" y="254" />
+        <di:waypoint x="1342" y="286" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1xjkpx4_di" bpmnElement="Event_1xjkpx4">
+        <dc:Bounds x="1324" y="218" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_042n7hh_di" bpmnElement="Event_042n7hh">
+        <dc:Bounds x="1324" y="388" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ujmoxv_di" bpmnElement="Activity_Approve_D">
+        <dc:Bounds x="1292" y="286" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nkgl3l_di" bpmnElement="StageE" isExpanded="true">
+        <dc:Bounds x="1526" y="188" width="212" height="262" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_03s2m2y_di" bpmnElement="Flow_03s2m2y">
+        <di:waypoint x="1636" y="356" />
+        <di:waypoint x="1636" y="388" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18ijwdi_di" bpmnElement="Flow_18ijwdi">
+        <di:waypoint x="1636" y="254" />
+        <di:waypoint x="1636" y="276" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0dl3f65_di" bpmnElement="Event_0dl3f65">
+        <dc:Bounds x="1618" y="218" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1c9o7zk_di" bpmnElement="Event_1c9o7zk">
+        <dc:Bounds x="1618" y="388" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13pcoe1_di" bpmnElement="Activity_Approve_E">
+        <dc:Bounds x="1586" y="276" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ca7ghn_di" bpmnElement="Activity_rejected">
+        <dc:Bounds x="1670" y="489" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fwzksa_di" bpmnElement="Event_Rejected_end">
+        <dc:Bounds x="1832" y="511" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0v55jcl_di" bpmnElement="Activity_prepare">
+        <dc:Bounds x="340" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pp803k_di" bpmnElement="Event_1merurp">
+        <dc:Bounds x="1582" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0cse9b5_di" bpmnElement="Event_1guadyy">
+        <dc:Bounds x="1720" y="331" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pspf2b_di" bpmnElement="Event_08pzkwp">
+        <dc:Bounds x="534" y="416" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="506" y="449" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qkq8er_di" bpmnElement="Event_0oqa9en">
+        <dc:Bounds x="634" y="358" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="671" y="389" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1wpm4na_di" bpmnElement="Event_1qhfiix">
+        <dc:Bounds x="894" y="348" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="921" y="379" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1t5dfkw_di" bpmnElement="Event_0t3gu9p">
+        <dc:Bounds x="784" y="416" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13e29gh_di" bpmnElement="Event_13izcwg">
+        <dc:Bounds x="1054" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05xz2vx_di" bpmnElement="Event_1nv1v3s">
+        <dc:Bounds x="1154" y="365" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1s22qrn_di" bpmnElement="Event_01u3xp2">
+        <dc:Bounds x="1334" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1x9vfam_di" bpmnElement="Event_1mqnq9x">
+        <dc:Bounds x="1434" y="341" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

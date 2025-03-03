@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0m6x1vr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.27.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:collaboration id="Collaboration_0z7y99r">
+    <bpmn:participant id="Participant_0l1clre" processRef="AUTH_MATRIX" />
+  </bpmn:collaboration>
   <bpmn:process id="AUTH_MATRIX" name="Auth Matrix" isExecutable="true">
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:extensionElements>
@@ -14,7 +17,6 @@
       </bpmn:extensionElements>
       <bpmn:outgoing>Flow_1gitqib</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1gitqib" sourceRef="StartEvent_1" targetRef="MAKER" />
     <bpmn:userTask id="MAKER" name="Maker">
       <bpmn:incoming>Flow_1gitqib</bpmn:incoming>
       <bpmn:outgoing>Flow_1wlwap0</bpmn:outgoing>
@@ -26,20 +28,11 @@
       <bpmn:outgoing>Flow_1ozz28v</bpmn:outgoing>
       <bpmn:outgoing>Flow_093i56z</bpmn:outgoing>
     </bpmn:inclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0c9hbj8" sourceRef="Gateway_06a2rjh" targetRef="APPROVER01_01">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 1</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:userTask id="APPROVER01_01" name="Approver 1">
       <bpmn:incoming>Flow_0c9hbj8</bpmn:incoming>
       <bpmn:outgoing>Flow_1j25lq5</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="$appServices.getCollection(this)" />
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_0bi61lr" sourceRef="Gateway_06a2rjh" targetRef="APPROVER01_02">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 2</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1ozz28v" sourceRef="Gateway_06a2rjh" targetRef="APPOVER01_03">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 3</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:userTask id="APPROVER01_02" name="Approver 1">
       <bpmn:incoming>Flow_0bi61lr</bpmn:incoming>
       <bpmn:outgoing>Flow_0uy4c4y</bpmn:outgoing>
@@ -60,7 +53,6 @@
     <bpmn:endEvent id="Event_0qzi5cx">
       <bpmn:incoming>Flow_1ijoz0s</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1ijoz0s" sourceRef="APPROVER02_01" targetRef="Event_0qzi5cx" />
     <bpmn:serviceTask id="Decider01_02" name="Decider" camunda:delegateExpression="dummyTest">
       <bpmn:incoming>Flow_0uy4c4y</bpmn:incoming>
       <bpmn:outgoing>Flow_1yu4eb7</bpmn:outgoing>
@@ -76,10 +68,6 @@
     <bpmn:endEvent id="Event_121x54b">
       <bpmn:incoming>Flow_02xb4zm</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1yu4eb7" sourceRef="Decider01_02" targetRef="Event_1ailkz8" />
-    <bpmn:sequenceFlow id="Flow_0ofbr7c" sourceRef="Decider01_02" targetRef="APPROVER02_02" />
-    <bpmn:sequenceFlow id="Flow_02xb4zm" sourceRef="APPROVER02_02" targetRef="Event_121x54b" />
-    <bpmn:sequenceFlow id="Flow_0uy4c4y" sourceRef="APPROVER01_02" targetRef="Decider01_02" />
     <bpmn:serviceTask id="Decider01_03" name="Decider" camunda:delegateExpression="dummyTest">
       <bpmn:incoming>Flow_051jx3l</bpmn:incoming>
       <bpmn:outgoing>Flow_1guxug3</bpmn:outgoing>
@@ -95,13 +83,6 @@
     <bpmn:endEvent id="Event_14u7zuc">
       <bpmn:incoming>Flow_0wgxc5e</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1guxug3" sourceRef="Decider01_03" targetRef="Event_08tkkw3" />
-    <bpmn:sequenceFlow id="Flow_1lm25ue" sourceRef="Decider01_03" targetRef="APPROVER02_03" />
-    <bpmn:sequenceFlow id="Flow_0wgxc5e" sourceRef="APPROVER02_03" targetRef="Event_14u7zuc" />
-    <bpmn:sequenceFlow id="Flow_051jx3l" sourceRef="APPOVER01_03" targetRef="Decider01_03" />
-    <bpmn:sequenceFlow id="Flow_093i56z" sourceRef="Gateway_06a2rjh" targetRef="APPOVER01_04">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 4</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:userTask id="APPOVER01_04" name="Approver 1">
       <bpmn:incoming>Flow_093i56z</bpmn:incoming>
       <bpmn:outgoing>Flow_13nndg2</bpmn:outgoing>
@@ -119,23 +100,14 @@
     <bpmn:endEvent id="Event_12hgeb7">
       <bpmn:incoming>Flow_0vfjcxk</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1be3enm" sourceRef="Decider01_04" targetRef="APPROVER02_04" />
-    <bpmn:sequenceFlow id="Flow_0vfjcxk" sourceRef="APPROVER02_04" targetRef="Event_12hgeb7" />
-    <bpmn:sequenceFlow id="Flow_13nndg2" sourceRef="APPOVER01_04" targetRef="Decider01_04" />
     <bpmn:endEvent id="Event_1ie6prd">
       <bpmn:incoming>Flow_1h0ajxb</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_1h0ajxb" sourceRef="Decider01_04" targetRef="Event_1ie6prd" />
     <bpmn:serviceTask id="Decider01_01" name="Decider" camunda:delegateExpression="dummyTest">
       <bpmn:incoming>Flow_1j25lq5</bpmn:incoming>
       <bpmn:outgoing>Flow_008q0s3</bpmn:outgoing>
       <bpmn:outgoing>Flow_1iylyo8</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_008q0s3" sourceRef="Decider01_01" targetRef="APPROVER02_01" />
-    <bpmn:sequenceFlow id="Flow_1iylyo8" sourceRef="Decider01_01" targetRef="Event_0hktqvd" />
-    <bpmn:sequenceFlow id="Flow_1j25lq5" sourceRef="APPROVER01_01" targetRef="Decider01_01" />
-    <bpmn:sequenceFlow id="Flow_1wlwap0" sourceRef="MAKER" targetRef="Activity_017s47i" />
-    <bpmn:sequenceFlow id="Flow_1stwf4b" sourceRef="Activity_017s47i" targetRef="Gateway_06a2rjh" />
     <bpmn:serviceTask id="Activity_017s47i" name="Shashank" camunda:delegateExpression="service1">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -148,9 +120,43 @@
       <bpmn:incoming>Flow_1wlwap0</bpmn:incoming>
       <bpmn:outgoing>Flow_1stwf4b</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1stwf4b" sourceRef="Activity_017s47i" targetRef="Gateway_06a2rjh" />
+    <bpmn:sequenceFlow id="Flow_1wlwap0" sourceRef="MAKER" targetRef="Activity_017s47i" />
+    <bpmn:sequenceFlow id="Flow_1j25lq5" sourceRef="APPROVER01_01" targetRef="Decider01_01" />
+    <bpmn:sequenceFlow id="Flow_1iylyo8" sourceRef="Decider01_01" targetRef="Event_0hktqvd" />
+    <bpmn:sequenceFlow id="Flow_008q0s3" sourceRef="Decider01_01" targetRef="APPROVER02_01" />
+    <bpmn:sequenceFlow id="Flow_1h0ajxb" sourceRef="Decider01_04" targetRef="Event_1ie6prd" />
+    <bpmn:sequenceFlow id="Flow_13nndg2" sourceRef="APPOVER01_04" targetRef="Decider01_04" />
+    <bpmn:sequenceFlow id="Flow_0vfjcxk" sourceRef="APPROVER02_04" targetRef="Event_12hgeb7" />
+    <bpmn:sequenceFlow id="Flow_1be3enm" sourceRef="Decider01_04" targetRef="APPROVER02_04" />
+    <bpmn:sequenceFlow id="Flow_093i56z" sourceRef="Gateway_06a2rjh" targetRef="APPOVER01_04">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 4</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_051jx3l" sourceRef="APPOVER01_03" targetRef="Decider01_03" />
+    <bpmn:sequenceFlow id="Flow_0wgxc5e" sourceRef="APPROVER02_03" targetRef="Event_14u7zuc" />
+    <bpmn:sequenceFlow id="Flow_1lm25ue" sourceRef="Decider01_03" targetRef="APPROVER02_03" />
+    <bpmn:sequenceFlow id="Flow_1guxug3" sourceRef="Decider01_03" targetRef="Event_08tkkw3" />
+    <bpmn:sequenceFlow id="Flow_0uy4c4y" sourceRef="APPROVER01_02" targetRef="Decider01_02" />
+    <bpmn:sequenceFlow id="Flow_02xb4zm" sourceRef="APPROVER02_02" targetRef="Event_121x54b" />
+    <bpmn:sequenceFlow id="Flow_0ofbr7c" sourceRef="Decider01_02" targetRef="APPROVER02_02" />
+    <bpmn:sequenceFlow id="Flow_1yu4eb7" sourceRef="Decider01_02" targetRef="Event_1ailkz8" />
+    <bpmn:sequenceFlow id="Flow_1ijoz0s" sourceRef="APPROVER02_01" targetRef="Event_0qzi5cx" />
+    <bpmn:sequenceFlow id="Flow_1ozz28v" sourceRef="Gateway_06a2rjh" targetRef="APPOVER01_03">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 3</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0bi61lr" sourceRef="Gateway_06a2rjh" targetRef="APPROVER01_02">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0c9hbj8" sourceRef="Gateway_06a2rjh" targetRef="APPROVER01_01">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression" language="JavaScript">data.rules.length &gt;= 1</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1gitqib" sourceRef="StartEvent_1" targetRef="MAKER" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AUTH_MATRIX">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0z7y99r">
+      <bpmndi:BPMNShape id="Participant_0l1clre_di" bpmnElement="Participant_0l1clre" isHorizontal="true">
+        <dc:Bounds x="100" y="61" width="1170" height="730" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1stwf4b_di" bpmnElement="Flow_1stwf4b">
         <di:waypoint x="500" y="280" />
         <di:waypoint x="565" y="280" />

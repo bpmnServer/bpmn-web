@@ -1,0 +1,17 @@
+{
+  "diff": true,
+  "extension": [ "js" ],
+  "package": "package.json",
+  "reporter": "spec",
+  "xslow": 1500,
+  "timeout": 50000,
+  "recursive": true,
+  "file": [ "./src/test/helpers/setup.js" ],
+  "ui": "mocha-cakes-2",
+  "watch-files": [ "./src/test/feature/*.js" ],
+  "parallel": false,
+  "xreporter": "allure-mocha",
+  "xreporterOptions": {
+    "resultsDir": "allure-results"
+  }
+}

@@ -12,6 +12,10 @@ and here
 
 ### Changed
 -->
+## Release 2.2.19
+- Release to match bpmn-server Release 2.2.19
+- Fixed bug #244 
+- Fixed bugs in ending flow #242
 ## Release 2.2.18
 - Release to match bpmn-server Release 2.2.18
 - Show itemKey in display

@@ -7,7 +7,7 @@ const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 let user = new SecureUser({userName:'user1',userGroups:['admin']});
 
-
+api.engine.throwSignal('signal1','',user)
 //testSubProcess();
 
 let process;

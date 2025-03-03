@@ -76,7 +76,7 @@ class AppServices {
     
         let completed={};
         allItems.forEach(item=>{
-          if (item.itemKey && item.status==='end' && item.endedAt!==null && item.type=='bpmn:UserTask' && item.itemKey.startsWith(stage+'.'))
+          if (item.status==='end' && item.endedAt!==null && item.type=='bpmn:UserTask' && item.itemKey.startsWith(stage+'.'))
           { 
             let team=item.itemKey.split('.')[1];
             let count=0;
