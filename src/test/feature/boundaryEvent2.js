@@ -85,7 +85,7 @@ Feature('Boundary Event', () => {
 
 function log(msg) {
     logger.log(msg);
-    console.log(msg);
+    //console.log(msg);
 }
 function displayItems() {
     log('instance data:'+ response.instance.data);

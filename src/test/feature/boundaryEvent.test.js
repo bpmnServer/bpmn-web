@@ -99,7 +99,7 @@ Feature('Boundary Event', () => {
 
                     await delay(25000);
                     response = await server.engine.get({id: instanceId});
-                    displayItems();
+                    //displayItems();
                 });
 
                     Then('      user task : end', () => {

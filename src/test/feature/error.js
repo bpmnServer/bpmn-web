@@ -50,8 +50,6 @@ async function testAll(seq) {
     ['UserTask2','Event_error4','Event_catchEsclation','Event_1e95dbp','Event_catch_all'],
     ['StartEvent_14s2cpf','BoundaryEvent_catchErrors']);  
 
-    return;
-  
     
    await logger.save('trans.log');
 }

@@ -39,12 +39,12 @@ Feature('CallTask', () => {
             });
             Then('events should fire and wait',async () => {
 
-                listItems();
+                //listItems();
                 let instances=await server.dataStore.findInstances({"data.caseId":1005})
-                console.log(instances.length);
+                //console.log(instances.length);
                 response=await server.engine.invoke({"data.caseId":1005,"items.elementId":'task_Buy'});
                 response=await server.engine.invoke({"data.caseId":1005,"items.elementId":'task_Drive'});
-                listItems();
+                //listItems();
 
             });
             Then('called process is done',async () => {
