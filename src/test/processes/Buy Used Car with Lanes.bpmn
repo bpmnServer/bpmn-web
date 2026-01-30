@@ -43,7 +43,7 @@ Gateways</bpmn:documentation>
       <bpmn:outgoing>flow_gw1_clean</bpmn:outgoing>
       <bpmn:outgoing>flow_gw1_gw2</bpmn:outgoing>
     </bpmn:inclusiveGateway>
-    <bpmn:endEvent id="Event_19ebav7">
+    <bpmn:endEvent id="Event_19ebav7" name="Bye">
       <bpmn:incoming>flow_drive_end</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="flow_gw1_clean" sourceRef="gateway_1" targetRef="task_clean">
@@ -194,7 +194,7 @@ this.dueDate=date.toISOString();</camunda:script>
       <bpmndi:BPMNShape id="Event_19ebav7_di" bpmnElement="Event_19ebav7">
         <dc:Bounds x="882" y="238" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="771" y="184" width="90" height="20" />
+          <dc:Bounds x="891" y="281" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_158yep3">

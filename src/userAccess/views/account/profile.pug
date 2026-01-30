@@ -5,7 +5,7 @@ block content
  -var loggedUser=user
  -var user=editUser
   .pb-2.mt-2.mb-4.border-bottom
-    h3 Profile Information for #{editUser.userName} by #{loggedUser.userName} - user #{user.userName} profile.pug
+    h3 Profile Information for `#{editUser.userName}` by #{loggedUser.userName} - by user `#{user.userName}`
  table(width="80%")
   form(action='/account/profile', method='POST')
     input(type='hidden', name='_csrf', value=_csrf)

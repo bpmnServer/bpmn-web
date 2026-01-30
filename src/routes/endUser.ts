@@ -150,8 +150,10 @@ export class EndUser extends Common {
             const instances = await bpmnAPI.data.findInstances({ "items.id": id }, getSecureUser(request), 'full');
             const instance = instances[0];
 
+            let definition=await bpmnServer.definitions.loadFromInstance(instance);
 
-            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
+            let { node, fields } =definition.getNodeInfo(elementId);
+            
             let vars = ViewHelper.formatData(instance.data);
 console.log('fields',fields);
             if (fields && fields.length > 0) {
@@ -199,7 +201,6 @@ console.log('fields',fields);
             let processName = request.query.processName;
             let elementId = request.query.elementId;
             let itemId = request.query.itemId;
-            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let item = await bpmnAPI.data.findItem({"items.id": id},getSecureUser(request));
             //console.log('item:', item);
             if (!item) {
@@ -211,6 +212,10 @@ console.log('fields',fields);
             const instances = await bpmnAPI.data.findInstances({ "id": item.instanceId }, getSecureUser(request),'full');
             const instance = instances[0];
             const lastItem = instance.items[instance.items.length - 1];
+
+            let definition=await bpmnServer.definitions.loadFromInstance(instance);
+            let { node, fields } =definition.getNodeInfo(elementId);
+            console.log('fieldsDef:',fields);
 
             let vars = ViewHelper.formatData(instance.data);
             response.render('assign', {

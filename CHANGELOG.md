@@ -12,6 +12,8 @@ and here
 
 ### Changed
 -->
+## Release 2.3.6
+-	Fix issue with svg not reflecting instance svg
 ## Release 2.3.1
 - Release to match bpmn-server Release 2.3.1
 - added Workflow animation in InstanceDetails page

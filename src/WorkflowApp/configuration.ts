@@ -40,9 +40,9 @@ var configuration = new Configuration(
 		},
 		dataStore: function (server) {
 			let ds=new DataStore(server);
-			ds.enableSavePoints=process.env.SAVE_POINTS=='true';
-			ds.saveLogs=process.env.SAVE_LOGS=='true';
-			ds.saveSource=process.env.SAVE_SOURCE=='true';	// for in-flight changes
+			ds.enableSavePoints=isTrue('SAVE_POINTS');
+			ds.saveLogs=isTrue('SAVE_LOGS');
+			ds.saveSource=isTrue('SAVE_SOURCE');
 			return ds;
 		},
 		scriptHandler: function(server) {
@@ -53,6 +53,10 @@ var configuration = new Configuration(
 		},
 
 	});
+	function isTrue(param){
+		const val=process.env[param];
+		return val && val.toLowerCase().startsWith('true');
+	}
 
 
 export { configuration}

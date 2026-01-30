@@ -169,8 +169,11 @@ export class Workflow extends Common {
             const instances = await bpmnAPI.data.findInstances({ "items.id": id }, getSecureUser(request), 'full');
             const instance = instances[0];
 
+            let definition=await bpmnServer.definitions.loadFromInstance(instance);
 
-            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
+            let { node, fields } =definition.getNodeInfo(elementId);
+
+            
             let vars = ViewHelper.formatData(instance.data);
 
             if (fields && fields.length > 0) {
@@ -219,7 +222,6 @@ export class Workflow extends Common {
             let processName = request.query.processName;
             let elementId = request.query.elementId;
             let itemId = request.query.itemId;
-            let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
             let item = await bpmnAPI.data.findItem({"items.id": id},getSecureUser(request));
             //console.log('item:', item);
             if (!item) {
@@ -231,6 +233,9 @@ export class Workflow extends Common {
             const instances = await bpmnAPI.data.findInstances({ "id": item.instanceId }, getSecureUser(request),'full');
             const instance = instances[0];
             const lastItem = instance.items[instance.items.length - 1];
+            let definition=await bpmnServer.definitions.loadFromInstance(instance);
+
+            let { node, fields } =definition.getNodeInfo(elementId);
 
             let vars = ViewHelper.formatData(instance.data);
             response.render('assign', {
@@ -516,7 +521,9 @@ async function instanceDetails(request,response,instanceId,version) {
     
     let svg = null;
     try {
-        svg = await definitions.getSVG(instance.name);
+        svg= instance.svg;
+        if (!svg)
+            svg = await definitions.getSVG(instance.name);
 
     }
     catch (ex) {
@@ -533,7 +540,7 @@ async function instanceDetails(request,response,instanceId,version) {
     }
     let lastItem = items[items.length - 1];
 
-    const def = await bpmnServer.definitions.load(instance.name);
+    const def = await bpmnServer.definitions.loadFromInstance(instance);
     await def.load();
     const defJson = def.getJson();
     let output = ['View Process Log'];

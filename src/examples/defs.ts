@@ -184,7 +184,7 @@ async function defScripts1() {
     console.log("start");
     const server = new BPMNServer(configuration, logger, { cron: false });
 
-    definition = await server.definitions.load('Leave Application');
+    definition = await server.definitions.load('Leave Application') as Definition;
 
     definition.nodes.forEach(node => {
         node.init();

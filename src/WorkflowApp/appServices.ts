@@ -32,8 +32,42 @@ class AppServices {
         context.item.data['echo']=input;
         return input;
     }
-    
-    async webService(input,context) {
+
+  async webService(
+    method: 'GET' | 'POST',
+    url: string,
+    data?: any,
+    headers?: Record<string, string>
+      ): Promise<any> {
+        try {
+        const defaultHeaders: Record<string, string> = {
+            'Content-Type': 'application/json',
+            ...headers, // merge user-provided headers
+        };
+
+        const options: RequestInit = {
+            method,
+            headers: defaultHeaders,
+        };
+
+        if (method === 'POST' && data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return await response.json();
+        } catch (error) {
+        console.error('❌ Service call failed:', error);
+        throw error;
+        }
+    }
+
+    async webService2(input,context) {
         const axios = require('axios');
 
         let url='http://localhost:5000/run';
@@ -69,6 +103,19 @@ class AppServices {
         console.log('flow condition',input);
         return false;
 
+    }
+    getTimerDelay(item) {
+        // item passed is that of the boundary event
+        // need to find parent item
+        const parentItem = item.token.parentToken.currentItem;
+        const priority= parentItem.priority;
+        if (priority === 'high') {  
+            return 'PT5S'; // 5 Seconds ISO 8601 duration format
+        } else if (priority === 'medium') {
+            return 'PT10S'; // 10 Seconds ISO 8601 duration format
+        } else if (priority === 'low') {
+            return 'PT15S'; // 15 Seconds ISO 8601 duration format
+        }
     }
     async add({v1,v2},context)
     {

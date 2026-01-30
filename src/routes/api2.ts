@@ -152,9 +152,10 @@ export class API2 extends Common {
                 const instances = await api.data.findInstances({ "items.id": id }, self.getUser(request), 'full');
                 const instance = instances[0];
     
-    
-                let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
+                let definition=await this.bpmnServer.definitions.loadFromInstance(instance);
 
+                let { node, fields } =definition.getNodeInfo(elementId);
+                
                 let cache=[];
                 let node2=
                 JSON.stringify(node, (key, value) => {

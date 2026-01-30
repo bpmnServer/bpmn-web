@@ -1,7 +1,7 @@
 import  { configuration }   from './';
 import { BPMNServer, Logger ,Cron  } from './';
 import { EventEmitter } from 'events';
-import { ModelsDatastore } from  "bpmn-server";
+import { IModelsDatastore, ModelsDatastore } from  "bpmn-server";
 
 const logger = new Logger({ toConsole: true});
 
@@ -73,12 +73,12 @@ async function test() {
 
     const server = new BPMNServer(configuration, logger);
 
-    const defs: ModelsDatastore = server.definitions;
+    const defs:IModelsDatastore = server.definitions;
 
       
     var caseId = Math.floor(Math.random() * 10000);
 
-    const def= await defs.load("cron");
+    const def= await defs.load("cron",null);
     //    await defs.rebuild("cron");
 
    // await server.cron.startTimers();

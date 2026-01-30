@@ -168,8 +168,9 @@ export class API extends Common {
                 const instances = await this.bpmnServer.dataStore.findInstances({ "items.id": id }, 'full');
                 const instance = instances[0];
     
-    
-                let { node, fields } = await ViewHelper.getNodeInfo(bpmnServer,processName, elementId);
+                let definition=await this.bpmnServer.definitions.loadFromInstance(instance);
+
+                let { node, fields } =definition.getNodeInfo(elementId);
 
                 let cache=[];
                 let node2=
