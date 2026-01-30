@@ -121,20 +121,29 @@ block content
       table#dataTable
         each inf in (info || [])
           tr
-            - let o=JSON.parse(inf.message.replaceAll(`'`,`"`))
-            if (o.type==='execution')
+            - 
+              let o = null;
+              try {
+                const cleanMessage = inf.message.replaceAll(`'`, `"`);
+                if (cleanMessage.startsWith('{') || cleanMessage.startsWith('[')) {
+                  o = JSON.parse(cleanMessage);
+                }
+              } catch (e) {
+                console.log('JSON parse error for message:', inf.message);
+              }
+            if (o && o.type==='execution')
               td(style="white-space:nowrap",colspan="2") Execution
               td #{o.label}
               td #{JSON.stringify(o.inputData)}
               td #{JSON.stringify(o.options)}
-              td #{o.userName}
-              td #{o.id||''+'-'+o.itemId||''}
-
-            else 
+            else if (o)
               td 
               td(style="white-space:nowrap") # #{o.seq+1} #{o.id} 
               td #{o.action}
-              td 
+              td #{o.userName}
+              td #{o.id||''+'-'+o.itemId||''}
+            else
+              td(style="white-space:nowrap",colspan="5") #{inf.message} 
             
 
     h4 Instance Items
