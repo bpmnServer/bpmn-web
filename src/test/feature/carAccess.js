@@ -1,6 +1,10 @@
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 console.log('----', __filename);
-const { BPMNServer , DefaultAppDelegate , Logger } = require('./');
-const { configuration } = require('./');
+import { BPMNServer , DefaultAppDelegate , Logger } from './index.js';
+import { configuration } from './index.js';
 
 console.log('-------- carAccess.js -----------');
 
@@ -13,8 +17,9 @@ let name = 'Buy Used Car';
 let process;
 let response;
 let instanceId;
-return;
-Feature('CarAccess.js - Checking for Access Rules', () => {
+// Disabled in the original suite (was an early top-level `return;`, illegal under ESM).
+// Preserved as a skipped Feature so the spec still loads but does not run.
+Feature.skip('CarAccess.js - Checking for Access Rules', () => {
         Scenario('Buy Used Car -complete', () => {
             Given('Start Buy Used Car Process',async () => {
                 response = await server.engine.start(name, {caseId: caseId});

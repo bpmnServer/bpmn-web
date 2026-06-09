@@ -1,8 +1,5 @@
-div(id="navbarCollapse",class="collapse navbar-collapse")
-	ul(class="nav navbar-nav")
-	ul(class="nav navbar-nav navbar-right")
-		if user && user.isAdmin
-			li
-				a(href='/admin') Admin
-		li 
-			a(href='https://bpmnserver.github.io/docs/' target="docs") About	
+ul.nav.navbar-nav
+ul.nav.navbar-nav.navbar-right
+  if user && user.isAdmin
+    li: a(href="/admin") Admin
+  li: a(href="https://bpmnserver.github.io/docs/" target="docs") About

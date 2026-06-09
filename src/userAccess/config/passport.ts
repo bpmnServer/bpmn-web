@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const passport = require('passport');
 //const refresh = require('passport-oauth2-refresh');
 const axios = require('axios');
@@ -18,7 +20,7 @@ const { OAuth2Strategy } = require('passport-oauth');
 //const _ = require('lodash');
 //const moment = require('moment');
 
-const UserModel = require('../models/User');
+import UserModel from '../models/User.js';
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -45,7 +47,7 @@ passport.use(new LocalStrategy({ usernameField: 'userName' }, async function (us
     if (!user.password) {
       return done(null, false, { msg: 'Your account was registered using a sign-in provider. To enable password login, sign in using a provider, and then set a password under your user profile.' });
     }
-    user.comparePassword(password, (err, isMatch) => {
+    (user as any).comparePassword(password, (err, isMatch) => {
       if (err) { return done(err); }
       if (isMatch) {
         return done(null, user);

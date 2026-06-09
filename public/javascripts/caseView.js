@@ -1,3 +1,18 @@
+/*
+ * STATUS: legacy / inactive in this Express app.
+ *
+ * This dhtmlx-based "case view" originated in the Omni-Workflow (WordPress) product: getCaseJson()
+ * POSTs to an `omni_ajax_call` / `command:'case.getJson'` endpoint that does NOT exist here. In this
+ * app the instance page (views/InstanceViewer.ts -> /instanceDetails) instead embeds `jsonData`
+ * inline and renders the diagram + run decorations via SVGHelper.js (scanSVG()).
+ *
+ * BuildCasePage() and displayCaseData() are intentionally short-circuited with an early `return;`
+ * (matching the disabled jQuery.ready() in InstanceViewer.ts). The dhtmlx tabular case view is also
+ * INCOMPLETE: displayCaseItemDetails() and the BuildCaseItems detail pane are empty stubs.
+ *
+ * Decision (2026-06): document rather than revive — reviving needs the missing backend command and
+ * completion of the stub renderers, which is out of scope for the ESM modernization.
+ */
         var jsonData;
 //	--- Layout ---
 	var main_layout;

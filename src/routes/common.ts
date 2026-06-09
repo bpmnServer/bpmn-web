@@ -1,3 +1,9 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 
 const express = require('express');
 
@@ -6,7 +12,7 @@ const path = require('path');
 const multer = require('multer');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
-import { BPMNAPI , SystemUser } from '../';
+import { BPMNAPI , SystemUser } from '../index.js';
 
 export class Common {
 	webApp;
@@ -29,7 +35,7 @@ export class Common {
 
 	isAuthenticated(req, res, next) {
 	console.log(' calling isAuthenticated',process.env.REQUIRE_AUTHENTICATION);
-		if ((process.env.REQUIRE_AUTHENTICATION === 'true')
+		if ((process.env.REQUIRE_AUTHENTICATION !== 'false')
 			&&
 			(typeof req.isAuthenticated === "function")) {
 			let check=req.isAuthenticated();

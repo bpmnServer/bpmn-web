@@ -1,64 +1,9 @@
-doctype html
-html
-head
-	title= title
-	link(rel='stylesheet', href='/stylesheets/main.css')
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+extends base
 
-	<script type='text/javascript' src='/javascripts/jquery.min.js'></script>
-	<script type='text/javascript' src='/javascripts/bootstrap.min.js'></script>
-	<script type='text/javascript' src='/javascripts/jquery-ui.min.js'></script>
-	<script type='text/javascript' src='/javascripts/jquery.isloading.min.js'></script>
-	<script type='text/javascript' src='/javascripts/workflow.js'></script>
-	<script type='text/javascript' src='/javascripts/processEditor.js'></script>	
-	<script type='text/javascript' src='/javascripts/jsonHelper.js'></script>
-	<script type='text/javascript' src='/javascripts/descriptions.js'></script>
-	<!-- GSAP Library from CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script>
+block head
+  script(src="/javascripts/descriptions.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js")
 
-	<script type='text/javascript' src='/javascripts/SVGHelper.js'></script>
-	<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' type='text/css'>
-	<link rel='stylesheet' href='/stylesheets/bootstrap-theme.min.css' type='text/css'>
-	<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' type='text/css'>
-	<link rel='stylesheet' href='/stylesheets/diagram-js.css' type='text/css'>
-	<link rel='stylesheet' href='/vendor/bpmn-font/css/bpmn-embedded.css' type='text/css'>
-	<link rel='stylesheet' href='/stylesheets/app.css' type='text/css'>
-	<link rel='stylesheet' href='/stylesheets/jquery-ui.css' type='text/css'>
-	<link rel='stylesheet' href='/stylesheets/jquery-ui.theme.css' type='text/css'>
-
-	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-body
-	Header 
-		<nav role="navigation" class="navbar navbar-default">
-			<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-				<a href="/" class="navbar-brand">
-					<img src="/images/omniworkflow_icon.png" /></a>
-			</div>
-			<!-- Collection of nav links, forms, and other content for toggling -->
-			<div id="navbarCollapse" class="collapse navbar-collapse">
-				include includes/nav.pug
-			</div>
-		</nav>
-		<div class='clearfix' height=0;></div>
-			<!-- end of omni_header -->
-		div.col-10.ml-sm-auto.px-4
-			if info
-				for msg in info
-					div.alert.alert-success #{ msg.msg }
-			if successes
-				for success in successes
-					div.alert.alert-success #{ success.msg }
-			if errors
-				for error, i in errors
-					div.alert.alert-danger #{ error.msg }
-
-	block content
-
-
-	block footer
-
-
-
+block nav
+  include includes/nav.pug

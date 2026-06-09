@@ -1,11 +1,17 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import express from 'express';
 
 const FS = require('fs');
 
-import { BPMNServer, dateDiff, Behaviour_names   } from '../';
-import { BPMNAPI , SecureUser } from '../';
-import { Common } from './common';
-import { ViewHelper } from './ViewHelper';
+import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
+import { BPMNAPI , SecureUser } from '../index.js';
+import { Common } from './common.js';
+import { ViewHelper } from './ViewHelper.js';
 
 
 var caseId = Math.floor(Math.random() * 10000);
@@ -38,7 +44,7 @@ export class Workflow extends Common {
         bpmnAPI = new BPMNAPI(bpmnServer);
         definitions = bpmnServer.definitions;
 
-        router.get('/home', home);
+        router.get('/home', awaitAppDelegateFactory(home));
 
         router.get('/', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
             let output = [];
@@ -407,7 +413,7 @@ function getSecureUser(req) {
 //console.log('process.env.REQUIRE_AUTHENTICATION',process.env.REQUIRE_AUTHENTICATION);
 
     let user;
-    if (process.env.REQUIRE_AUTHENTICATION === 'true')
+    if (process.env.REQUIRE_AUTHENTICATION !== 'false')
     {
         const usr = getUser(req);
         if (usr)
@@ -485,7 +491,7 @@ function show(output) {
 function isAdmin(request) {
     console.log(process.env.REQUIRE_AUTHENTICATION,request.isAuthenticated(),request.user);
 
-    if (process.env.REQUIRE_AUTHENTICATION !== 'true')
+    if (process.env.REQUIRE_AUTHENTICATION === 'false')
        return true;
     else
         return request.isAdmin;

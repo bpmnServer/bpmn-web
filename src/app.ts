@@ -1,11 +1,17 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 console.log('app.ts from ',__filename);
 
 
-import debug = require('debug');
+import debug from 'debug';
 const flash = require('connect-flash');
 const cors = require('cors');
 
-import {UserManager } from './userAccess/UserManager'
+import {UserManager } from './userAccess/UserManager.js'
 /**
  * Module dependencies.
  */
@@ -22,10 +28,17 @@ const multer = require('multer');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
-import { BPMNServer, Logger } from './';
+import { BPMNServer, Logger } from './index.js';
 
 
-import { configuration as config } from './WorkflowApp/configuration';
+import { configuration as config } from './WorkflowApp/configuration.js';
+import { Workflow } from './routes/workflow.js';
+import { EndUser } from './routes/endUser.js';
+import { Docs } from './routes/docs.js';
+import { Model } from './routes/model.js';
+import { API } from './routes/api.js';
+import { API2 } from './routes/api2.js';
+
 
 
 var busboy = require('connect-busboy'); //middleware for form/file upload
@@ -37,6 +50,7 @@ export class WebApp {
 	userManager;
 	bpmnServer;
 	packageJson;
+	server;
 
 	constructor() {
 
@@ -79,18 +93,27 @@ export class WebApp {
 		app.set('views', path.join(__dirname, '../src/views'));
 		app.set('view engine', 'pug');
 		app.use(compression());
-		/*app.use(sass({
-		  src: path.join(__dirname, 'public'),
-		  dest: path.join(__dirname, 'public')
-		}));*/
+		// Security headers. CSP is disabled because the modeler/UI loads inline scripts
+		// and a CDN; HSTS only takes effect over HTTPS (harmless over HTTP).
+		const helmet = require('helmet');
+		app.use(helmet({ contentSecurityPolicy: false }));
+		// Trust the TLS-terminating proxy (or our own HTTPS listener) so `secure`
+		// cookies and req.ip work. Enabled only when serving over TLS.
+		if (process.env.HTTPS === 'true' || process.env.SECURE_COOKIES === 'true') {
+			app.set('trust proxy', 1);
+		}
         app.use(cors({
             origin: process.env.ITSM_HOST,
         }));
-		app.use(logger('dev'));
-		app.use(bodyParser.json({ limit: '200mb' }));
-		app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
+		app.use(logger(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+		const bodyLimit = process.env.BODY_LIMIT || '50mb';
+		app.use(bodyParser.json({ limit: bodyLimit }));
+		app.use(bodyParser.urlencoded({ limit: bodyLimit, extended: true }));
 
 		app.use(busboy());
+
+		// Unauthenticated health/readiness probe for load balancers (before auth).
+		app.get('/healthz', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
 
 		this.app = app;
 	}
@@ -115,14 +138,60 @@ export class WebApp {
 		}
 
 		/**
-		 * Start Express server.
+		 * Start the server. Serve over HTTPS when HTTPS=true and SSL_KEY_PATH/SSL_CERT_PATH
+		 * are provided; otherwise plain HTTP (suitable for internal use or behind a
+		 * TLS-terminating proxy).
 		 */
-		app.listen(app.get('port'), () => {
-			console.log('App is running at http://localhost:%s in %s mode', app.get('port'), app.get('env'));
+		const port = app.get('port');
+		const fs = require('fs');
+		const useHttps =
+			process.env.HTTPS === 'true' && !!process.env.SSL_KEY_PATH && !!process.env.SSL_CERT_PATH;
+
+		let server;
+		if (useHttps) {
+			const https = require('https');
+			server = https.createServer(
+				{ key: fs.readFileSync(process.env.SSL_KEY_PATH), cert: fs.readFileSync(process.env.SSL_CERT_PATH) },
+				app,
+			);
+		} else {
+			const http = require('http');
+			server = http.createServer(app);
+		}
+
+		server.listen(port, () => {
+			const proto = useHttps ? 'https' : 'http';
+			console.log('App is running at %s://localhost:%s in %s mode', proto, port, app.get('env'));
 			console.log('  Press CTRL-C to stop\n');
 		});
 
+		this.server = server;
+		this.installShutdownHandlers(server);
+
 		return app;
+	}
+
+	/**
+	 * Process-level resilience: log unhandled errors, and on SIGTERM/SIGINT stop
+	 * accepting connections, let in-flight requests finish, close Mongo, then exit
+	 * (force-exit after a timeout so a stuck connection can't block restart).
+	 */
+	installShutdownHandlers(server) {
+		const shutdown = (signal) => {
+			console.log(`${signal} received — shutting down gracefully...`);
+			server.close(() => {
+				const mongoose = require('mongoose');
+				Promise.resolve(mongoose.connection.close(false)).finally(() => process.exit(0));
+			});
+			setTimeout(() => process.exit(1), 10000).unref();
+		};
+		process.on('SIGTERM', () => shutdown('SIGTERM'));
+		process.on('SIGINT', () => shutdown('SIGINT'));
+		process.on('unhandledRejection', (reason) => console.error('Unhandled Rejection:', reason));
+		process.on('uncaughtException', (err) => {
+			console.error('Uncaught Exception:', err);
+			process.exit(1);
+		});
 	}
 
 	setupRoutes() {
@@ -137,15 +206,15 @@ export class WebApp {
 		router.use('/webfonts', express.static(path.join(root, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
 		this.app.use('/', router);
 
-		var Common = require("./routes/common");
 
 
-		var Workflow = require("./routes/workflow").Workflow;
-		var EndUser = require('./routes/endUser').EndUser;
-		var Docs = require("./routes/docs").Docs;
-		var Model = require("./routes/model").Model;
-		var API = require("./routes/api").API;
-		var API2 = require("./routes/api2").API2;
+
+
+
+
+
+
+
 
 		this.app.use('/', (new Workflow(this)).config());
 		this.app.use('/user', (new EndUser(this)).config());
@@ -180,5 +249,5 @@ setupEnvVars();
 
 const webApp = new WebApp();
 
-module.exports = webApp.app;
+export default webApp.app;
 

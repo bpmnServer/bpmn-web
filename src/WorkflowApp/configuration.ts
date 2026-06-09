@@ -1,10 +1,16 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 
 import { Configuration, ModelsDatastore, ModelsDatastoreDB, DataStore , Logger 
 	, NoCacheManager,CacheManager,
 	ScriptHandler
-} from './';
-import { MyAppDelegate } from './appDelegate';
-import { UserService } from '../userAccess/UserService';
+} from './index.js';
+import { MyAppDelegate } from './appDelegate.js';
+import { UserService } from '../userAccess/UserService.js';
 
 const dotenv = require('dotenv');
 const res = dotenv.config();

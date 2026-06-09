@@ -1,7 +1,7 @@
-const { BPMNServer, Behaviour_names, Execution, DefaultAppDelegate, Logger } = require('./');
+import { BPMNServer, Behaviour_names, Execution, DefaultAppDelegate, Logger } from './index.js';
 
 
-const config = require("../testConfiguration.js").configuration;
+import { configuration as config } from '../testConfiguration.js';
 
 const logger = new Logger({ toConsole: false });
 

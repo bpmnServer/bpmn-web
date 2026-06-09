@@ -1,7 +1,11 @@
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 console.log('----', __filename);
-const { BPMNServer, Execution, DefaultHandler, Logger } = require('./');
+import { BPMNServer, Execution, DefaultHandler, Logger } from './index.js';
 
-const config = require("../testConfiguration.js").configuration;
+import { configuration as config } from '../testConfiguration.js';
 
 const logger = new Logger({ toConsole: false });
 

@@ -1,6 +1,8 @@
-import { IUserService } from '../';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { IUserService } from '../index.js';
 const mongoose = require('mongoose');
-const User = require('./models/User');
+import User from './models/User.js';
 
 export class UserService implements IUserService {
 	static initialized = false;	

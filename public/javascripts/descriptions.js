@@ -14,7 +14,7 @@
 	const  KW_acl = "User Access is controlled";
 	const  KW_timer = "Timer to delay completion to specific time or duration";
 	const  KW_message = "Message to delay completion until a specific message arrives";
-	const  KW_signal = "Signal to delay completion until a specifi signal arrives";
+	const  KW_signal = "Signal to delay completion until a specific signal arrives";
 
 const bpmn_descriptions = {
 	// ----------------------	task   ---------------------- 
@@ -89,7 +89,7 @@ const bpmn_descriptions = {
 	StartEvent:
 	{
 		name: "startEvent",
-		desc: "Start Event is the where the Process can start. <br />",
+		desc: "Start Event is where the Process can start. <br />",
 		start: KW_manualStart,
 		completion: KW_autoComplete,
 		designOptions: [KW_logic, KW_acl],
@@ -100,7 +100,7 @@ const bpmn_descriptions = {
 	EndEvent:
 	{
 		name: "endEvent",
-		desc: "End Event is the where the Process Ends.",
+		desc: "End Event is where the Process ends.",
 		start: KW_autoStart,
 		completion: KW_autoComplete,
 		designOptions: [KW_logic],
@@ -110,7 +110,7 @@ const bpmn_descriptions = {
 	// ----------------------	intermediateCatchEvent   ---------------------- 
 	{
 		name: "intermediateCatchEvent",
-		desc: "End Event is the where the Process Ends.",
+		desc: "Intermediate Catch Event waits for a trigger (timer, message, or signal).",
 		start: KW_autoStart,
 		completion: KW_autoComplete,
 		designOptions: [],
@@ -121,10 +121,7 @@ const bpmn_descriptions = {
 	IntermediateThrowEvent:
 	{
 		name: "intermediateThrowEvent",
-
-
-
-		desc: "End Event is the where the Process Ends.",
+		desc: "Intermediate Throw Event throws a trigger (message or signal).",
 		start: KW_autoStart,
 		completion: KW_autoComplete,
 		designOptions: [],
@@ -135,7 +132,7 @@ const bpmn_descriptions = {
 	// ----------------------	messageEvent   ---------------------- 
 	BoundaryEvent:
 	{
-		name: "boundayEvent",
+		name: "boundaryEvent",
 		desc: "An Event attached to another node.",
 		start: KW_autoStart,
 		completion: KW_autoComplete,
@@ -144,7 +141,7 @@ const bpmn_descriptions = {
 	MessageEvent:
 	{
 		name: "messageEvent",
-		desc: "End Event is the where the Process Ends.",
+		desc: "An event that sends or receives a message.",
 		start: KW_autoStart,
 		completion: KW_autoComplete,
 		designOptions: []

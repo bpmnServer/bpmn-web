@@ -6,6 +6,7 @@
   "xslow": 1500,
   "timeout": 50000,
   "recursive": true,
+  "exit": true,
   "file": [ "./src/test/helpers/setup.js" ],
   "ui": "mocha-cakes-2",
   "watch-files": [ "./src/test/feature/*.js" ],

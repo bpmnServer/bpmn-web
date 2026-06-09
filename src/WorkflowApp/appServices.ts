@@ -1,7 +1,8 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 import * as readline from 'readline';
-import { log } from '../test/helpers/BPMNTester';
 import axios from 'axios';
-import { ApprovalManager } from './ApprovalManager';
+import { ApprovalManager } from './ApprovalManager.js';
 
 const cl = readline.createInterface(process.stdin, process.stdout);
 const question = function (q) {

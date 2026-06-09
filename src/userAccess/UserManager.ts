@@ -1,5 +1,7 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-import debug = require('debug');
+import debug from 'debug';
 
 /**
  * Module dependencies.
@@ -11,7 +13,7 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const errorHandler = require('errorhandler');
 const lusca = require('lusca');
-const MongoStore = require('connect-mongo')(session);
+import MongoStore from 'connect-mongo';
 const flash = require('express-flash');
 const path = require('path');
 const passport = require('passport');
@@ -19,7 +21,9 @@ const mongoose = require('mongoose');//const sass = require('node-sass-middlewar
 const multer = require('multer');
 
 
-const User = require('./models/User');
+import User from './models/User.js';
+import * as passportConfig from './config/passport.js';
+import { Account } from './routes/account.js';
 
 
 export class UserManager {
@@ -31,7 +35,7 @@ export class UserManager {
 
 		this.app = app;
 		this.passport = passport;
-		this.passportConfig = require('./config/passport');
+		this.passportConfig = passportConfig;
 
 	}
 	/**
@@ -42,15 +46,21 @@ export class UserManager {
 		const app = this.app;
 
 		app.use(session({
-			resave: true,
-			saveUninitialized: true,
+			resave: false,
+			saveUninitialized: false,
 			secret: process.env.SESSION_SECRET,
-			cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
-			store: new MongoStore({
-				url: process.env.MONGO_DB_URL,
-				autoReconnect: true,
+			cookie: {
+				maxAge: 1209600000, // two weeks in milliseconds
+				httpOnly: true,
+				sameSite: 'lax',
+				// Only mark cookies Secure when actually served over TLS (direct or via proxy),
+				// otherwise the browser drops them on a plain-HTTP internal deployment.
+				secure: process.env.HTTPS === 'true' || process.env.SECURE_COOKIES === 'true',
+			},
+			store: MongoStore.create({
+				mongoUrl: process.env.MONGO_DB_URL,
 			})
-		})); 
+		}));
 		app.use(flash());
 		app.use((req, res, next) => {
 			res.locals.errors = req.flash("errors");
@@ -88,7 +98,7 @@ export class UserManager {
 				lusca.csrf({
 					cookie: { name: '_csrf' },
 					allowlist: '/',
-					secret: 'qwerty'
+					secret: process.env.SESSION_SECRET
 				})(req, res, next);
 			}
 		}); 
@@ -115,6 +125,18 @@ export class UserManager {
 		app.use(lusca.xframe('SAMEORIGIN'));
 		app.use(lusca.xssProtection(true));
 		app.disable('x-powered-by');
+
+		// Brute-force protection on auth endpoints.
+		const rateLimit = require('express-rate-limit');
+		const authLimiter = rateLimit({
+			windowMs: 15 * 60 * 1000,
+			limit: Number(process.env.AUTH_RATE_LIMIT) || 50,
+			standardHeaders: true,
+			legacyHeaders: false,
+			message: { error: 'Too many attempts, please try again later.' },
+		});
+		app.use(['/login', '/signup', '/forgot', '/reset'], authLimiter);
+
 		app.use((req, res, next) => {
 			res.locals.user = req.user;
 			next();
@@ -143,7 +165,7 @@ export class UserManager {
 
 	setupRoutes() {
 
-		var Account = require("./routes/account").Account;
+		
 		this.app.use('/', (new Account(this)).config());
 
 	}

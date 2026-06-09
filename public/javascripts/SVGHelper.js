@@ -492,7 +492,7 @@ function getItemDescription(desc,element) {
     var pre = '';
     var post = '</td></tr>';
 
-    html += getDescAttribute(desc, 'title', "<tr><td><b>", "</b>",post);
+    html += getDescAttribute(desc, 'title', "<tr><td><b>", "</b></td></tr>");
     html += getDescAttribute(desc, 'desc', "<tr><td colspan='2'>", post);
 //    html += getDescAttribute(desc, 'userDoc', "<tr><td>", post);
     html += getDescAttribute(element, 'id', "<tr><td>id:</td><td>", post);
@@ -517,8 +517,7 @@ function getItemDescription(desc,element) {
 
 }
 function getDescAttribute(desc, attr, pre, post) {
-    txt = '';
-    txt = desc[attr];
+    let txt = desc[attr];
     if ((typeof txt === 'undefined') || (txt === null))
         return '';
 

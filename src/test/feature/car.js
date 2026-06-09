@@ -1,6 +1,10 @@
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 console.log('----', __filename);
-const { BPMNServer , DefaultAppDelegate , Logger } = require('./');
-const { configuration } = require('./');
+import { BPMNServer , DefaultAppDelegate , Logger } from './index.js';
+import { configuration } from './index.js';
 
 console.log('-------- car.js -----------');
 
