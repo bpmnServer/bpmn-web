@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', function save(next) {
+userSchema.pre('save', function save(this: any, next: any) {
     const user = this;
     if (!user.isModified('password')) {
         return next();
@@ -87,5 +87,5 @@ userSchema.methods.gravatar = function gravatar(size) {
     return `https://gravatar.com/avatar/${md5}?s=${size}&d=retro`;
 };
 const User = mongoose.model('User', userSchema);
-module.exports = User;
+export default User;
 //# sourceMappingURL=User.js.map

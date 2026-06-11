@@ -1,4 +1,10 @@
-import { Common} from "../../routes/common";
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import { Common} from "../../routes/common.js";
 
 const express = require('express');
 
@@ -10,7 +16,7 @@ const upload = multer({ dest: path.join(__dirname, 'uploads') });
 /**
  * Controllers (route handlers).
  */
-const userController = require('../controllers/user').UserController;
+import { UserController as userController } from '../controllers/user.js';
 
 export class Account extends Common{
 	passport;

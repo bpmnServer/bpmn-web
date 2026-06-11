@@ -1,4 +1,6 @@
-const { BPMNAPI,BPMNServer, DefaultAppDelegate, Logger,SecureUser } = require("../");
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { BPMNAPI, BPMNServer, DefaultAppDelegate, Logger, SecureUser } from '../index.js';
 
 /**
 	is called by a script 

@@ -1,2 +1,2 @@
 export * from 'bpmn-server';
-export {configuration} from './WorkflowApp/configuration';
+export {configuration} from './WorkflowApp/configuration.js';

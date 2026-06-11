@@ -1,6 +1,9 @@
-const { BPMNServer, Execution, DefaultAppDelegate, Logger, ServerContext } = require('./');
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __dirname = __dn(__f2p(import.meta.url));
+import { BPMNServer, Execution, DefaultAppDelegate, Logger, ServerContext } from './index.js';
 
-const { configuration } = require('./');
+import { configuration } from './index.js';
 
 const logger = new Logger({ toConsole: false });
 

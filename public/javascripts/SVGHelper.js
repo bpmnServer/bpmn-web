@@ -116,10 +116,12 @@ function endAnimation(elementId,seq,action) {
         });
     }
 }
-let tl = gsap.timeline(); // Start paused
-
-
-gsap.registerPlugin(MotionPathPlugin);
+// GSAP powers the optional "Show Animation" feature only. Guard its module-load use so a
+// missing/blocked gsap never throws here — otherwise the whole script aborts and the core
+// diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
+const gsapLoaded = typeof gsap !== 'undefined';
+let tl = gsapLoaded ? gsap.timeline() : null; // Start paused
+if (gsapLoaded && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
 function pauseAnimation() {
 
     tl.addPause(() => {
@@ -492,7 +494,7 @@ function getItemDescription(desc,element) {
     var pre = '';
     var post = '</td></tr>';
 
-    html += getDescAttribute(desc, 'title', "<tr><td><b>", "</b>",post);
+    html += getDescAttribute(desc, 'title', "<tr><td><b>", "</b></td></tr>");
     html += getDescAttribute(desc, 'desc', "<tr><td colspan='2'>", post);
 //    html += getDescAttribute(desc, 'userDoc', "<tr><td>", post);
     html += getDescAttribute(element, 'id', "<tr><td>id:</td><td>", post);
@@ -517,8 +519,7 @@ function getItemDescription(desc,element) {
 
 }
 function getDescAttribute(desc, attr, pre, post) {
-    txt = '';
-    txt = desc[attr];
+    let txt = desc[attr];
     if ((typeof txt === 'undefined') || (txt === null))
         return '';
 

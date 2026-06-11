@@ -1,9 +1,15 @@
-import {  Item, FLOW_ACTION , NODE_ACTION, IExecution , dateDiff } from './';
-import { DefaultAppDelegate } from './';
-import { AppServices } from './appServices';
-import { AppUtils } from './appUtils';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import {  Item, FLOW_ACTION , NODE_ACTION, IExecution , dateDiff } from './index.js';
+import { DefaultAppDelegate } from './index.js';
+import { AppServices } from './appServices.js';
+import { AppUtils } from './appUtils.js';
 
-const Mailer = require('../userAccess/config/mail');
+import * as Mailer from '../userAccess/config/mail.js';
 
 const fs = require('fs');
 

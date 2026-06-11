@@ -15,7 +15,7 @@ jQuery(document).ready(function () {
 function dateDiff(dateStr) {
 
     var endDate = new Date(dateStr);
-    var seconds = Math.abs(endDate.getTime() - startDate) / 1000;
+    var seconds = Math.abs(endDate.getTime() - Date.now()) / 1000;
 
 
     // get total seconds between the times
@@ -51,7 +51,7 @@ jQuery(document).ready(function () {
         {
             jQuery('#processItems').on('change',(function(evt){
 
-                    itemId=jQuery(this).val();
+                    var itemId=jQuery(this).val();
 
                 processItemClicked(evt,itemId);
             })); 
@@ -121,7 +121,6 @@ function processItemClicked(evt,id)
 
     jQuery("#ItemsList").val(id);
  	
-/* 	jQuery( "#tabs" ).tabs( "option", "active", 1); */
     
     counter++;
  	
@@ -131,8 +130,8 @@ function processItemClicked(evt,id)
  	file=getParameterByName('file');
  	
  	var baseUrl=window.location.href.split('?')[0];
- 	url= baseUrl+"?action=itemDetails&file="+file+"&item="+id;
- 	if (File==null || file=="")
+    var url= baseUrl+"?action=itemDetails&file="+file+"&item="+id;
+ 	if (file==null || file=="")
  		{
  		caseId=getParameterByName('caseId');
  		url=baseUrl+"?action=itemDetails&caseId="+caseId+"&item="+id;
@@ -160,16 +159,7 @@ function processItemClicked(evt,id)
 	 	el.html(response);
 		}); 	 	
  	
-/* 	jQuery.post({
- 		url: ajaxurl ,  $data,
- 	  beforeSend: function( xhr ) {
- 	    xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
- 	  }
- 	})
- 	 .done(function( data ) {
-		 	el.html(data);
- 	    }
- 	  ); */
+
 	
 
  	 }

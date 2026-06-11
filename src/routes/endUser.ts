@@ -1,11 +1,17 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import express from 'express';
 
 const FS = require('fs');
 
-import { BPMNServer, dateDiff, Behaviour_names, SystemUser   } from '../';
-import { BPMNAPI , SecureUser } from '../';
-import { Common } from './common';
-import { ViewHelper } from './ViewHelper';
+import { BPMNServer, dateDiff, Behaviour_names, SystemUser   } from '../index.js';
+import { BPMNAPI , SecureUser } from '../index.js';
+import { Common } from './common.js';
+import { ViewHelper } from './ViewHelper.js';
 
 
 var caseId = Math.floor(Math.random() * 10000);

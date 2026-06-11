@@ -1,10 +1,12 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import express from 'express';
 
 const FS = require('fs');
 
-import { BPMNServer, dateDiff, Behaviour_names   } from '../';
-import { BPMNAPI , SecureUser , SystemUser} from '../';
-import { Common } from './common';
+import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
+import { BPMNAPI , SecureUser , SystemUser} from '../index.js';
+import { Common } from './common.js';
 
 
 export class ViewHelper {

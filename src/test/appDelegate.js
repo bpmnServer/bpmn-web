@@ -1,9 +1,7 @@
-"use strict";
-console.log('----', __filename);
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TestAppDelegate = void 0;
-const appDelegate_1 = require("../WorkflowApp/appDelegate");
-class TestAppDelegate extends appDelegate_1.MyAppDelegate {
+// ESM: test app delegate — thin subclass of the WorkflowApp delegate.
+import { MyAppDelegate } from '../WorkflowApp/appDelegate.js';
+
+console.log('----', import.meta.url);
+
+export class TestAppDelegate extends MyAppDelegate {
 }
-exports.TestAppDelegate = TestAppDelegate;
-//# sourceMappingURL=appDelegate.js.map

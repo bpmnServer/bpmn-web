@@ -1,20 +1,16 @@
 import { IDataStore } from 'bpmn-server';
-import {UserService } from '../userAccess/UserService'
-console.log(UserService);
-
-
-const pack = require("./feature");
+import { UserService } from '../userAccess/UserService.js';
+import { BPMNServer } from '../index.js';
+import { configuration } from './testConfiguration.js';
 
 console.log('Installing a new Database');
-
 console.log('current directory is ' + process.cwd());
 console.log('Installing a new Database based on configuration in current directory');
-console.log('current directory is ' + process.cwd());
-console.log('database configuration:',pack.configuration.database);
+console.log('database configuration:', configuration.database);
 
-const server = new pack.BPMNServer(pack.configuration, null, { cron: false });
+const server = new BPMNServer(configuration, null, { cron: false });
 
-const dataStore:IDataStore = server.dataStore;
+const dataStore: IDataStore = server.dataStore;
 
 const modelsDataStore = server.definitions;
 
@@ -24,13 +20,13 @@ run();
 async function run() {
     await install();
     await deleteAll();
-    
+
     process.exit();
 }
 async function deleteAll() {
     console.log('deleting instances');
-    let ret=await dataStore.deleteInstances({});
-    console.log(ret['deletedCount'],'deleted');
+    let ret = await dataStore.deleteInstances({});
+    console.log(ret['deletedCount'], 'deleted');
 }
 async function install() {
 
@@ -40,7 +36,7 @@ async function install() {
 
         await modelsDataStore.install();
 
-        let userService=new UserService();
+        let userService = new UserService();
 
         await userService.install();
     }

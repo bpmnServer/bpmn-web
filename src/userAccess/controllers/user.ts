@@ -1,12 +1,14 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const { promisify } = require('util');
 const crypto = require('crypto');
 const passport = require('passport');
 const _ = require('lodash');
 const validator = require('validator');
 const mailChecker = require('mailchecker');
-const User = require('../models/User');
+import User from '../models/User.js';
 
-const Mailer = require('../config/mail');
+import * as Mailer from '../config/mail.js';
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 const viewPath = '../userAccess/views/account/';
@@ -359,10 +361,8 @@ export class UserController {
         User
             .findOne({ passwordResetToken: req.params.token })
             .where('passwordResetExpires').gt(Date.now())
-            .exec((err, user) => {
-                if (err) {
-                    return next(err);
-                }
+            .exec()
+            .then((user) => {
                 if (!user) {
                     req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
                     return res.redirect('/forgot');
@@ -370,7 +370,8 @@ export class UserController {
                 res.render(viewPath + 'reset', {
                     title: 'Password Reset'
                 });
-            });
+            })
+            .catch((err) => next(err));
     }
     /**
      * GET /account/verify/:token
@@ -394,11 +395,11 @@ export class UserController {
                 .then((user) => {
                     if (!user) {
                         req.flash('errors', { msg: 'There was an error in loading your profile.' });
-                        return res.redirect('back');
+                        return res.redirect(req.get('Referrer') || '/');
                     }
                     user.emailVerificationToken = '';
                     user.emailVerified = true;
-                    user = user.save();
+                    void user.save();
                     req.flash('info', { msg: 'Thank you for verifying your email address.' });
                     return res.redirect('/account');
                 })
@@ -433,7 +434,7 @@ export class UserController {
                 .findOne({ email: req.user.email })
                 .then((user) => {
                     user.emailVerificationToken = token;
-                    user = user.save();
+                    void user.save();
                 });
             return token;
         };
@@ -479,7 +480,7 @@ export class UserController {
             validationErrors.push({ msg: 'Invalid Token.  Please retry.' });
         if (validationErrors.length) {
             req.flash('errors', validationErrors);
-            return res.redirect('back');
+            return res.redirect(req.get('Referrer') || '/');
         }
         const resetPassword = () => User
             .findOne({ passwordResetToken: req.params.token })
@@ -487,7 +488,7 @@ export class UserController {
             .then((user) => {
                 if (!user) {
                     req.flash('errors', { msg: 'Password reset token is invalid or has expired.' });
-                    return res.redirect('back');
+                    return res.redirect(req.get('Referrer') || '/');
                 }
                 user.password = req.body.password;
                 user.passwordResetToken = undefined;
@@ -565,8 +566,8 @@ export class UserController {
                 }
                 else {
                     user.passwordResetToken = token;
-                    user.passwordResetExpires = Date.now() + 3600000; // 1 hour
-                    user = user.save();
+                    user.passwordResetExpires = new Date(Date.now() + 3600000) as any; // 1 hour
+                    void user.save();
                 }
                 return user;
             });

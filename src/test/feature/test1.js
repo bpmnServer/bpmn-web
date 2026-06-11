@@ -18,8 +18,8 @@ function getRepeat(input) {
 
 /*
 
-const { BPMNServer, DefaultAppDelegate, Logger } = require('./');
-const { configuration } = require('./');
+import { BPMNServer, DefaultAppDelegate, Logger } from './index.js';
+import { configuration } from './index.js';
 
 const logger = new Logger({ toConsole: false });
 

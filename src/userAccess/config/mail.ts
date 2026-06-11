@@ -1,3 +1,5 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const nodemailer = require('nodemailer');
 
 
@@ -6,7 +8,7 @@ const nodemailer = require('nodemailer');
 /**
  * Helper Function to Send Mail.
  */
-async  function sendMail({from,to,subject,text,html }) {
+async  function sendMail({from,to,subject,text,html}: {from?:any;to?:any;subject?:any;text?:any;html?:any}) {
     // send mail with defined transport object
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -35,4 +37,4 @@ async  function sendMail({from,to,subject,text,html }) {
     //       <https://github.com/forwardemail/preview-email>
     //
 }
-module.exports = { sendMail };
+export { sendMail };

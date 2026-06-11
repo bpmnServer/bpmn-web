@@ -171,29 +171,16 @@ function markModified()
 }
 function getItemValue(path,itemId,field)
 {
-        return getJsonValue(path+'.['+itemId+'].'+field);
-	var value=null;
-	data=procJson[path];
- 	jQuery.each(data, function(indx, object){  
-
-       		   	var id=object.id
-       		   	if (id==itemId)
-       		   	{
-           		   	var val=object[field];
-           		   	value=val;
-           		   	return false;
-       		   	}
-       	   });
-   	   return value;
+    return getJsonValue(path+'.['+itemId+'].'+field);
 }
 
 function populateField(path,itemId,field)
 {
 	var val=getItemValue(path,itemId,field);
-        fieldName='form_input_'+field;
-    
-    	var fld = jQuery('[name='+fieldName+']');
-	fld.val(fieldVal);
+	var fieldName='form_input_'+field;
+
+	var fld = jQuery('[name='+fieldName+']');
+	fld.val(val);
 
 }
 function processItemOver(evt,itemId)

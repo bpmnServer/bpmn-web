@@ -1,17 +1,23 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
 /*
  * GET users listing.
  */
-import express = require('express');
-import { ModelerNoProp } from '../views/Modeler-noProp';
-import { ModelerWProp } from '../views/Modeler-wProp';
-import { ViewHelper } from './ViewHelper';
+import express from 'express';
+import { ModelerNoProp } from '../views/Modeler-noProp.js';
+import { ModelerWProp } from '../views/Modeler-wProp.js';
+import { ViewHelper } from './ViewHelper.js';
 
 var bodyParser = require('body-parser')
 
 const FS = require('fs');
 
-import { BPMNServer,BPMNAPI} from '../';
-import { Common } from './common';
+import { BPMNServer,BPMNAPI} from '../index.js';
+import { Common } from './common.js';
 
 
 const awaitHandlerFactory = (middleware) => {
@@ -102,7 +108,7 @@ export class Model extends Common {
 
         }));
 
-        var fsx = require('fs-extra');       //File System - for file manipulation
+        var fsx = FS;       //File System - for file manipulation (built-in fs; methods used are native)
 
         router.post('/import', awaitHandlerFactory(async (req, res) => {
 
@@ -119,13 +125,15 @@ export class Model extends Common {
             req.busboy.on('file', function (fileUploaded, file, filename) {
                 console.log("Uploading: ",filename);
 
-                //Path where image will be uploaded
-                const filepath = __dirname + '/../tmp/' + filename.filename;
+                // Strip any path components from the client-supplied filename to prevent
+                // path traversal (e.g. "../../app.ts") writing outside the tmp folder.
+                const safeName = require('path').basename(filename.filename);
+                const filepath = __dirname + '/../tmp/' + safeName;
                 fstream = fsx.createWriteStream(filepath);
                 file.pipe(fstream);
                 fstream.on('close', async function () {
-                    console.log("Upload Finished of " + filename.filename);
-                    const name = filename.filename;
+                    console.log("Upload Finished of " + safeName);
+                    const name = safeName;
                     const source = fsx.readFileSync(filepath,
                         { encoding: 'utf8', flag: 'r' });
 
@@ -222,7 +230,7 @@ export class Model extends Common {
             view.display(processName,xml, request, response);
 
         }));
-        router.post('/addNoProp/:process?', awaitHandlerFactory(async (request, response) => {
+        router.post('/addNoProp{/:process}', awaitHandlerFactory(async (request, response) => {
 
             let body = request.body;
 
@@ -236,7 +244,7 @@ export class Model extends Common {
             //        console.log(request);
             response.status(200).send("");
         }));
-        router.post('/add/:process?', awaitHandlerFactory(async (request, response) => {
+        router.post('/add{/:process}', awaitHandlerFactory(async (request, response) => {
 
             let body = request.body;
 

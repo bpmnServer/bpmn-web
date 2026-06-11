@@ -1,11 +1,17 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import express from 'express';
 const router = express.Router();
 var bodyParser = require('body-parser')
 
 const FS = require('fs');
 
-import { BPMNServer   } from '..';
-import { Common } from './common';
+import { BPMNServer   } from '../index.js';
+import { Common } from './common.js';
 
 /* GET users listing. */
 
@@ -72,11 +78,12 @@ export class Docs extends Common {
             return processFile(fileName, response);
 
         });
-        router.get('/api/*/:fileName', awaitAppDelegateFactory(async (request, response) => {
+        router.get('/api/*splat/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
             let folder = '';
-            if (request.params[0])
-                folder = request.params[0] + '/';
+            const splat = (request.params as any).splat;
+            if (splat && splat.length)
+                folder = (Array.isArray(splat) ? splat.join('/') : splat) + '/';
             let fileName = 'api/' + folder + request.params.fileName;
 
             return processFile(fileName, response);

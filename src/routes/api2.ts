@@ -1,10 +1,16 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import express from 'express';
 const router = express.Router();
 var bodyParser = require('body-parser')
 
 const FS = require('fs');
 
-import { BPMNServer,BPMNAPI, dateDiff, Behaviour_names, SecureUser } from '..';
+import { BPMNServer,BPMNAPI, dateDiff, Behaviour_names, SecureUser } from '../index.js';
 
 
 var caseId = Math.floor(Math.random() * 10000);
@@ -33,8 +39,8 @@ function loggedIn(req, res, next) {
         res.json({ errors: 'missing or invalid "x-api-key"'});
     }
 }
-import { Common } from './common';
-import { ViewHelper } from './ViewHelper';
+import { Common } from './common.js';
+import { ViewHelper } from './ViewHelper.js';
 import { json } from 'body-parser';
 //////////////////////////////////////////////////////////////////////
 
@@ -199,10 +205,10 @@ export class API2 extends Common {
         }));
         // ---------------- engine ----------------------------------
 
-        router.post('/engine/start/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.post('/engine/start{/:name}', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             try {
-                let name = request.params.name;
+                let name = (request.params as any).name;
                 if (!name)
                     name = request.body.name;
   
@@ -395,15 +401,13 @@ export class API2 extends Common {
 
         //// ---------------------  Model -----------------------
 
-        var fsx = require('fs-extra');       //File System - for file manipulation
-
 //        save(name, source, svg, user?: ISecureUser);
 //        getSource(name, user?: ISecureUser);
 //        export(query, folder, user?: ISecureUser) ;
        
-        router.post('/model/import/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.post('/model/import{/:name}', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
-            let name = request.params.name;
+            let name = (request.params as any).name;
             if (!name)
                 name = request.body.name;
             //console.log(' importing: ' + name);
@@ -519,10 +523,10 @@ export class API2 extends Common {
             let list = await api.model.findStartEvents(query,self.getUser(req));
             response.json(list);
         });
-        router.get('/model/load/:name?', loggedIn, async function (request, response) {
+        router.get('/model/load{/:name}', loggedIn, async function (request, response) {
 
             //console.log(request.params);
-            let name = request.params.name;
+            let name = (request.params as any).name;
 
             let definition = await bpmnServer.definitions.load(name);
             response.json(JSON.parse(definition.getJson()));

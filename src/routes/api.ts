@@ -1,11 +1,17 @@
-import express = require('express');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+import { fileURLToPath as __f2p } from 'url';
+import { dirname as __dn } from 'path';
+const __filename = __f2p(import.meta.url);
+const __dirname = __dn(__filename);
+import express from 'express';
 const router = express.Router();
 var bodyParser = require('body-parser')
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 
 const FS = require('fs');
 
-import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '..';
+import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '../index.js';
 
 //const bpmnServer = new BPMNServer(config);
 
@@ -40,8 +46,8 @@ function loggedIn(req, res, next) {
         res.json({ errors: 'missing or invalid "x-api-key"'});
     }
 }
-import { Common } from './common';
-import { ViewHelper } from './ViewHelper';
+import { Common } from './common.js';
+import { ViewHelper } from './ViewHelper.js';
 
 export class API extends Common {
     get bpmnServer() { return this.webApp.bpmnServer; }
@@ -209,10 +215,10 @@ export class API extends Common {
             }
         }));
 
-        router.post('/engine/start/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.post('/engine/start{/:name}', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             try {
-                let name = request.params.name;
+                let name = (request.params as any).name;
                 if (!name)
                     name = request.body.name;
                 //console.log(' starting ' + name);
@@ -509,11 +515,11 @@ export class API extends Common {
 
 
         ////
-        var fsx = require('fs-extra');       //File System - for file manipulation
+        var fsx = FS;       //File System - for file manipulation (built-in fs; methods used are native)
 
-            router.post('/definitions/import/:name?', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            router.post('/definitions/import{/:name}', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
-                let name = request.params.name;
+                let name = (request.params as any).name;
                 if (!name)
                     name = request.body.name;
                 //console.log(' importing: ' + name);
@@ -615,10 +621,10 @@ export class API extends Common {
                 //console.log(list);
                 response.json(list);
             });
-            router.get('/definitions/load/:name?', loggedIn, async function (request, response) {
+            router.get('/definitions/load{/:name}', loggedIn, async function (request, response) {
 
                 //console.log(request.params);
-                let name = request.params.name;
+                let name = (request.params as any).name;
 
                 try {
                     let definition = await bpmnServer.definitions.getSource(name);

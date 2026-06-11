@@ -1,8 +1,9 @@
-'use strict';
+// ESM mocha root setup: expose chai's expect/assert as globals for the feature specs.
+import { expect, assert } from 'chai';
+
 console.log('test/helpers/setup.js');
 
 process.env.NODE_ENV = 'test';
 Error.stackTraceLimit = 20;
-global.expect = require('chai').expect;
-global.assert = require('chai').assert;
-
+global.expect = expect;
+global.assert = assert;

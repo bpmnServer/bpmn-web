@@ -229,11 +229,6 @@ function buildJsonForSave() {
 	saveData["pools"] = procJson['pools'];
 
 	return saveData;
-	var jsonStr = JSON.stringify(objMap);
-	alert(jsonStr);
-
-	return jsonStr;
-
 }
 function saveJson() {
 	waiting("Saving..");
@@ -590,10 +585,9 @@ function displayItemDescription(itemId) {
 
 function getItemDescription(itemId) {
 
-	desc = getObject('itemsDescription', itemId);
 	let type;
 	jsonData.elements.forEach(el => {
-		if (el.id == item.id) {
+		if (el.id == itemId) {
 			type = el.type.replace('bpmn:','');
         }
 	});
@@ -624,8 +618,7 @@ function getItemDescription(itemId) {
 
 }
 function getDescAttribute(desc, attr, pre, post) {
-	txt = '';
-	txt = desc[attr];
+	let txt = desc[attr];
 	if ((typeof txt === 'undefined') || (txt === null))
 		return '';
 

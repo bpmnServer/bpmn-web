@@ -1,2 +1,2 @@
 export * from 'bpmn-server';
-export {configuration} from './configuration';
+export {configuration} from './configuration.js';
