@@ -116,10 +116,12 @@ function endAnimation(elementId,seq,action) {
         });
     }
 }
-let tl = gsap.timeline(); // Start paused
-
-
-gsap.registerPlugin(MotionPathPlugin);
+// GSAP powers the optional "Show Animation" feature only. Guard its module-load use so a
+// missing/blocked gsap never throws here — otherwise the whole script aborts and the core
+// diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
+const gsapLoaded = typeof gsap !== 'undefined';
+let tl = gsapLoaded ? gsap.timeline() : null; // Start paused
+if (gsapLoaded && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
 function pauseAnimation() {
 
     tl.addPause(() => {
