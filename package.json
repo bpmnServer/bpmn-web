@@ -17,7 +17,7 @@
     "axios": "^1.17.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
-    "bpmn-server": "github:MaheshkumarSundaram/bpmn-server#esm-migration",
+    "bpmn-server": "^3.0.0",
     "compression": "^1.8.1",
     "connect-busboy": "^1.0.0",
     "connect-flash": "^0.1.1",
@@ -39,7 +39,7 @@
     "mongoose": "^9.6.3",
     "morgan": "^1.11.0",
     "multer": "^2.1.1",
-    "nodemailer": "^8.0.10",
+    "nodemailer": "^9.0.3",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pug": "^3.0.4",
@@ -61,6 +61,10 @@
     "playwright": "^1.60.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.0"
+  },
+  "overrides": {
+    "diff": "^8.0.3",
+    "serialize-javascript": "^7.0.5"
   },
   "engines": {
     "node": ">=20.0.0"
