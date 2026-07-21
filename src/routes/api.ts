@@ -1,15 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 import express from 'express';
-const router = express.Router();
-var bodyParser = require('body-parser')
+import FS from 'node:fs';
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
-
-const FS = require('fs');
 
 import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '../index.js';
 
@@ -17,7 +8,6 @@ import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '../index.
 
 //const definitions = bpmnServer.definitions;
 
-var caseId = Math.floor(Math.random() * 10000);
 
 /* GET users listing. */
 
@@ -32,20 +22,7 @@ var caseId = Math.floor(Math.random() * 10000);
     }
 }
 
-function loggedIn(req, res, next) {
-
-    let apiKey = req.header('x-api-key');
-
-    if (!apiKey) {
-        apiKey= req.query.apiKey;
-    }
-
-    if (apiKey == process.env.API_KEY) {  
-        next();
-    } else {
-        res.json({ errors: 'missing or invalid "x-api-key"'});
-    }
-}
+import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 
@@ -94,20 +71,17 @@ export class API extends Common {
         }));
         //option: 'summary' | 'full' | any = 'summary'
 
-        router.post('/query', async (req, res) => {
+        router.post('/query', loggedIn, async (req, res) => {
             try {
                 const query = req.body.query;
-                console.log(query);
-                //const collection = db.collection(collectionName);
                 var results = await this.bpmnServer.dataStore.findInstances(query,{
                     projections:    {name:1,status:1,data:1,
                         items:{elementId:1,seq:1,type:1,status:1} },
                         sort:{saved:-1}}).toArray();
-                        console.log(results.length);
                         res.json(results);
-                        console.log(results.length);
             } catch (error) {
-                res.status(500).send(error);
+                console.error('POST /api/query failed:', error);
+                res.status(500).json({ errors: 'query failed' });
             }
         });
         router.get('/datastore/findInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
@@ -701,9 +675,6 @@ export class API extends Common {
                     response.json({ errors: JSON.stringify(exc, null, 2) });
                 }
             }));
-
-            return router;
+        return router;
     }
 }
-
-export default router;

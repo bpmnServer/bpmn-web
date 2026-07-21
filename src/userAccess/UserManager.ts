@@ -1,25 +1,10 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
-import debug from 'debug';
-
-/**
- * Module dependencies.
- */
-const express = require('express');
-const compression = require('compression');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const logger = require('morgan');
-const errorHandler = require('errorhandler');
-const lusca = require('lusca');
+import session from 'express-session';
+import flash from 'express-flash';
+import lusca from 'lusca';
+import mongoose from 'mongoose';
+import passport from 'passport';
+import { rateLimit } from 'express-rate-limit';
 import MongoStore from 'connect-mongo';
-const flash = require('express-flash');
-const path = require('path');
-const passport = require('passport');
-const mongoose = require('mongoose');//const sass = require('node-sass-middleware');
-const multer = require('multer');
-
 
 import User from './models/User.js';
 import * as passportConfig from './config/passport.js';
@@ -127,7 +112,6 @@ export class UserManager {
 		app.disable('x-powered-by');
 
 		// Brute-force protection on auth endpoints.
-		const rateLimit = require('express-rate-limit');
 		const authLimiter = rateLimit({
 			windowMs: 15 * 60 * 1000,
 			limit: Number(process.env.AUTH_RATE_LIMIT) || 50,

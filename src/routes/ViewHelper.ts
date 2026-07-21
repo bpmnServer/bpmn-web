@@ -1,8 +1,6 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 import express from 'express';
 
-const FS = require('fs');
+import FS from 'node:fs';
 
 import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
 import { BPMNAPI , SecureUser , SystemUser} from '../index.js';

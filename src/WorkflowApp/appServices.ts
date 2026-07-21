@@ -1,6 +1,4 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import * as readline from 'readline';
+import * as readline from 'node:readline';
 import axios from 'axios';
 import { ApprovalManager } from './ApprovalManager.js';
 
@@ -69,7 +67,6 @@ class AppServices {
     }
 
     async webService2(input,context) {
-        const axios = require('axios');
 
         let url='http://localhost:5000/run';
         let data={ a: 2, b: 3 };

@@ -1,36 +1,24 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
-console.log('app.ts from ',__filename);
+import fs from 'node:fs';
+import http from 'node:http';
+import https from 'node:https';
+import path from 'node:path';
 
+import bodyParser from 'body-parser';
+import compression from 'compression';
+import flash from 'connect-flash';
+import busboy from 'connect-busboy'; // middleware for form/file upload
+import cors from 'cors';
+import dotenv from 'dotenv';
+import errorHandler from 'errorhandler';
+import express from 'express';
+import session from 'express-session';
+import helmet from 'helmet';
+import mongoose from 'mongoose';
+import morgan from 'morgan';
+import multer from 'multer';
 
-import debug from 'debug';
-const flash = require('connect-flash');
-const cors = require('cors');
-
-import {UserManager } from './userAccess/UserManager.js'
-/**
- * Module dependencies.
- */
-const dotenv = require('dotenv');
-
-const express = require('express');
-const compression = require('compression');
-const session = require('express-session');
-const bodyParser = require('body-parser');
-const logger = require('morgan');
-const errorHandler = require('errorhandler');
-const path = require('path');
-const multer = require('multer');
-
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
-
+import { UserManager } from './userAccess/UserManager.js';
 import { BPMNServer, Logger } from './index.js';
-
-
 import { configuration as config } from './WorkflowApp/configuration.js';
 import { Workflow } from './routes/workflow.js';
 import { EndUser } from './routes/endUser.js';
@@ -39,9 +27,10 @@ import { Model } from './routes/model.js';
 import { API } from './routes/api.js';
 import { API2 } from './routes/api2.js';
 
+const __dirname = import.meta.dirname;
+console.log('app.ts from ', import.meta.filename);
 
-
-var busboy = require('connect-busboy'); //middleware for form/file upload
+const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
 
 
@@ -54,8 +43,6 @@ export class WebApp {
 
 	constructor() {
 
-		const fs = require('fs');
-	
 		const configPath = __dirname + '/../package.json';
 		if (fs.existsSync(configPath)) {
 	
@@ -95,7 +82,6 @@ export class WebApp {
 		app.use(compression());
 		// Security headers. CSP is disabled because the modeler/UI loads inline scripts
 		// and a CDN; HSTS only takes effect over HTTPS (harmless over HTTP).
-		const helmet = require('helmet');
 		app.use(helmet({ contentSecurityPolicy: false }));
 		// Trust the TLS-terminating proxy (or our own HTTPS listener) so `secure`
 		// cookies and req.ip work. Enabled only when serving over TLS.
@@ -105,7 +91,7 @@ export class WebApp {
         app.use(cors({
             origin: process.env.ITSM_HOST,
         }));
-		app.use(logger(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+		app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 		const bodyLimit = process.env.BODY_LIMIT || '50mb';
 		app.use(bodyParser.json({ limit: bodyLimit }));
 		app.use(bodyParser.urlencoded({ limit: bodyLimit, extended: true }));
@@ -113,7 +99,16 @@ export class WebApp {
 		app.use(busboy());
 
 		// Unauthenticated health/readiness probe for load balancers (before auth).
-		app.get('/healthz', (req, res) => res.json({ status: 'ok', uptime: process.uptime() }));
+		app.get('/healthz', (req, res) => {
+			// mongo readyState: 0=disconnected 1=connected 2=connecting 3=disconnecting
+			const mongoState = mongoose.connection?.readyState ?? 0;
+			const ok = mongoState === 1;
+			res.status(ok ? 200 : 503).json({
+				status: ok ? 'ok' : 'degraded',
+				uptime: process.uptime(),
+				mongo: mongoState,
+			});
+		});
 
 		this.app = app;
 	}
@@ -143,19 +138,16 @@ export class WebApp {
 		 * TLS-terminating proxy).
 		 */
 		const port = app.get('port');
-		const fs = require('fs');
 		const useHttps =
 			process.env.HTTPS === 'true' && !!process.env.SSL_KEY_PATH && !!process.env.SSL_CERT_PATH;
 
 		let server;
 		if (useHttps) {
-			const https = require('https');
 			server = https.createServer(
 				{ key: fs.readFileSync(process.env.SSL_KEY_PATH), cert: fs.readFileSync(process.env.SSL_CERT_PATH) },
 				app,
 			);
 		} else {
-			const http = require('http');
 			server = http.createServer(app);
 		}
 
@@ -180,7 +172,6 @@ export class WebApp {
 		const shutdown = (signal) => {
 			console.log(`${signal} received — shutting down gracefully...`);
 			server.close(() => {
-				const mongoose = require('mongoose');
 				Promise.resolve(mongoose.connection.close(false)).finally(() => process.exit(0));
 			});
 			setTimeout(() => process.exit(1), 10000).unref();
@@ -246,6 +237,23 @@ function setupEnvVars() {
 
 
 setupEnvVars();
+
+/**
+ * Warn (don't hard-fail — this is a demo) about unsafe/incomplete config:
+ *  - an empty API_KEY previously authenticated EVERY /api request
+ *    (`undefined == undefined`); the middleware now fails closed, but a
+ *    misconfigured server should still be flagged;
+ *  - REQUIRE_AUTHENTICATION=false disables all UI auth.
+ */
+function warnBootConfig() {
+    const warnings: string[] = [];
+    if (!process.env.API_KEY) warnings.push('API_KEY is not set — /api and /api2 will reject all requests (fail closed).');
+    if (!process.env.SESSION_SECRET) warnings.push('SESSION_SECRET is not set — sessions/CSRF cannot be secured.');
+    if (process.env.REQUIRE_AUTHENTICATION === 'false') warnings.push('REQUIRE_AUTHENTICATION=false — UI authentication is DISABLED (dev only).');
+    if (warnings.length) console.warn('[config] ' + warnings.join('\n[config] '));
+}
+
+warnBootConfig();
 
 const webApp = new WebApp();
 

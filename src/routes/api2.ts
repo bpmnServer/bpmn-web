@@ -1,19 +1,9 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 import express from 'express';
-const router = express.Router();
-var bodyParser = require('body-parser')
-
-const FS = require('fs');
+import FS from 'node:fs';
 
 import { BPMNServer,BPMNAPI, dateDiff, Behaviour_names, SecureUser } from '../index.js';
 
 
-var caseId = Math.floor(Math.random() * 10000);
 
 const awaitAppDelegateFactory = (middleware) => {
     return async (req, res, next) => {
@@ -25,20 +15,7 @@ const awaitAppDelegateFactory = (middleware) => {
     }
 }
 
-function loggedIn(req, res, next) {
-
-    let apiKey = req.header('x-api-key');
-
-    if (!apiKey) {
-        apiKey= req.query.apiKey;
-    }
-
-    if (apiKey == process.env.API_KEY) {  
-        next();
-    } else {
-        res.json({ errors: 'missing or invalid "x-api-key"'});
-    }
-}
+import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { json } from 'body-parser';
@@ -547,9 +524,6 @@ export class API2 extends Common {
                 response.json({ errors: JSON.stringify(exc, null, 2) });
             }
         }));
-
         return router;
     }
 }
-
-export default router;

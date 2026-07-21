@@ -1,7 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 import { IUserService } from '../index.js';
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 import User from './models/User.js';
 
 export class UserService implements IUserService {

@@ -1,29 +1,10 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const passport = require('passport');
-//const refresh = require('passport-oauth2-refresh');
-const axios = require('axios');
-const { Strategy: LocalStrategy } = require('passport-local');
-
-/*
-const { Strategy: FacebookStrategy } = require('passport-facebook');
-const { Strategy: SnapchatStrategy } = require('passport-snapchat');
-const { Strategy: TwitterStrategy } = require('passport-twitter');
-const { Strategy: TwitchStrategy } = require('passport-twitch-new');
-const { Strategy: GitHubStrategy } = require('passport-github2');
-const { OAuth2Strategy: GoogleStrategy } = require('passport-google-oauth');
-const { Strategy: LinkedInStrategy } = require('passport-linkedin-oauth2');
-const { Strategy: OpenIDStrategy } = require('passport-openid');
-const { OAuthStrategy } = require('passport-oauth');
-const { OAuth2Strategy } = require('passport-oauth');
-*/
-//const _ = require('lodash');
-//const moment = require('moment');
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
 
 import UserModel from '../models/User.js';
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, (user as any).id);
 });
 
 passport.deserializeUser((id, done) => {
@@ -38,7 +19,7 @@ passport.deserializeUser((id, done) => {
 /**
  * Sign in using Email and Password.
  */
-passport.use(new LocalStrategy({ usernameField: 'userName' }, async function (userName, password, done)  {
+passport.use(new LocalStrategy({ usernameField: 'userName' }, async function (userName, password, done: (err: any, user?: any, options?: any) => void)  {
     let user = await UserModel.findOne({ userName: userName.toLowerCase() });
 
     if (!user) {

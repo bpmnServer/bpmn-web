@@ -1,12 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 import express from 'express';
-
-const FS = require('fs');
+import FS from 'node:fs';
 
 import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
 import { BPMNAPI , SecureUser } from '../index.js';
@@ -17,7 +10,7 @@ import { ViewHelper } from './ViewHelper.js';
 var caseId = Math.floor(Math.random() * 10000);
 
 
-const docsFolder = __dirname + '/../bpmnServer/docs/';
+const docsFolder = import.meta.dirname + '/../bpmnServer/docs/';
 
 // main functions
 
@@ -43,6 +36,11 @@ export class Workflow extends Common {
         bpmnServer = this.webApp.bpmnServer;
         bpmnAPI = new BPMNAPI(bpmnServer);
         definitions = bpmnServer.definitions;
+
+        // Deny-by-default: every workflow UI route requires a session
+        // (unless REQUIRE_AUTHENTICATION=false — the demo dev bypass).
+        // Public paths (/login, /signup, ...) are served by earlier routers.
+        router.use(this.isAuthenticated);
 
         router.get('/home', awaitAppDelegateFactory(home));
 
@@ -107,7 +105,7 @@ export class Workflow extends Common {
 
             let execution = context.execution;
 
-            afterOperation(request,response,context);
+            return await afterOperation(request,response,context);
         }));
 
 
@@ -131,7 +129,7 @@ export class Workflow extends Common {
             }
             let instance = context.execution;
 
-            afterOperation(request,response,context);
+            return await afterOperation(request,response,context);
 
 
         }));
@@ -191,7 +189,7 @@ export class Workflow extends Common {
             try {
                 let result = await bpmnAPI.engine.invoke({ "items.id": id }, {}, getSecureUser(request));
 
-                afterOperation(request,response,result);
+                return await afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -213,7 +211,7 @@ export class Workflow extends Common {
 
                 let result = await bpmnAPI.engine.invoke({ "items.id": id }, data, getSecureUser(request));
 
-                afterOperation(request,response,result);
+                return await afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -282,7 +280,7 @@ export class Workflow extends Common {
                 //console.log('data', data, 'assignment', assignment);
                 let result = await bpmnAPI.engine.assign({ "items.id": id }, data, assignment, getSecureUser(request));
 
-                afterOperation(request,response,result);
+                return await afterOperation(request,response,result);
             }
             catch (exc) {
                 response.send(exc.toString());
@@ -312,19 +310,14 @@ export class Workflow extends Common {
         router.post('/query', async (req, res) => {
             try {
                 const query = req.body.query;
-                console.log('query',query);
-                //const collection = db.collection(collectionName);
-                let user = getSecureUser(req);
                 var results = await bpmnServer.dataStore.findInstances(query,{
                     projection:    {name:1,status:1,data:1,
                         items:{elementId:1,seq:1,type:1,status:1} },
                     sort:{saved:-1}});
-                console.log(results.length);
                 res.json(results);
-                console.log(results.length);
             } catch (error) {
-                console.log(error);
-                res.status(500).send(error);
+                console.error('POST /query failed:', error);
+                res.status(500).json({ errors: 'query failed' });
             }
         });
 
@@ -489,8 +482,6 @@ function show(output) {
     return output;
 }
 function isAdmin(request) {
-    console.log(process.env.REQUIRE_AUTHENTICATION,request.isAuthenticated(),request.user);
-
     if (process.env.REQUIRE_AUTHENTICATION === 'false')
        return true;
     else
@@ -501,7 +492,7 @@ async function afterOperation(request,response,result) {
 
     //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
     // let user = getSecureUser(request);
-    let returnTo=request.body.returnTo;
+    let returnTo = (request.body && request.body.returnTo) || (request.query && request.query.returnTo);
     if (returnTo=='home')
         return display(request,response,'Show',[]);
     else if (isAdmin(request))
