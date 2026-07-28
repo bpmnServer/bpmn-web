@@ -1,13 +1,12 @@
-import { configuration} from '../WorkflowApp/configuration';
+import fs from 'node:fs';
+import path from 'node:path';
+import { argv } from 'node:process';
+import pug from 'pug';
+import { configuration} from '../WorkflowApp/configuration.js';
 import { BPMNServer,BPMNAPI, Logger ,Definition} from "bpmn-server";
 const logger = new Logger({ toConsole: false});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
-const fs = require('fs');
-
-////////////////////
-// Import the required modules
-const { argv } = require('process');
 
 // Function to parse command-line arguments
 function parseArguments(args) {
@@ -72,8 +71,6 @@ async function describe(model,format) {
         return;
     }
 
-   const pug = require('pug');
-   const path = require('path');
 
    let svg = null;
    try {

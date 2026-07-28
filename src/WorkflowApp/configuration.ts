@@ -1,10 +1,4 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
-
+import dotenv from 'dotenv';
 import { Configuration, ModelsDatastore, ModelsDatastoreDB, DataStore , Logger 
 	, NoCacheManager,CacheManager,
 	ScriptHandler
@@ -12,10 +6,9 @@ import { Configuration, ModelsDatastore, ModelsDatastoreDB, DataStore , Logger
 import { MyAppDelegate } from './appDelegate.js';
 import { UserService } from '../userAccess/UserService.js';
 
-const dotenv = require('dotenv');
 const res = dotenv.config();
 
-const templatesPath = __dirname + '/emailTemplates/';
+const templatesPath = import.meta.dirname + '/emailTemplates/';
 var configuration = new Configuration(
 	{
 		definitionsPath: process.env.DEFINITIONS_PATH,

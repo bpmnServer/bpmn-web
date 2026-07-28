@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as readline from "readline";
+import * as fs from 'node:fs';
+import * as readline from 'node:readline';
 import {UserService } from '../userAccess/UserService'
 
 const cl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
@@ -63,7 +63,7 @@ function copyFile(from, to) {
 async function install() {
 
     
-    const pack = require("../");
+    const pack = await import('../index.js');
 
     console.log('Installing a new Database');
 

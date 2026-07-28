@@ -1,5 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+import dayjs from 'dayjs';
+import pug from 'pug';
 import { BPMNAPI, BPMNServer, DefaultAppDelegate, Logger, SecureUser } from '../index.js';
 
 /**
@@ -49,8 +49,6 @@ class AppUtils {
 
 	dateAdd(date1, amount, units) {
 
-		const dayjs = require('dayjs');
-
 		var dayjs1 = dayjs(date1);
 		var dayjs2 = dayjs1.add(amount, units);
 
@@ -86,7 +84,6 @@ class AppUtils {
 
 		const users=await this.getUsers(to);
 
-        const pug = require('pug');
 		if (!template)
 			template = 'default';
 

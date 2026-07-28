@@ -1,9 +1,9 @@
-import { exec } from 'child_process';
+import { exec } from 'node:child_process';
 
 import { SystemUser, USER_ROLE } from "bpmn-server";
-import { configuration} from '../WorkflowApp/configuration';
+import { configuration} from '../WorkflowApp/configuration.js';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from "bpmn-server";
-import { inherits } from 'util';
+import { inherits } from 'node:util';
 const logger = new Logger({ toConsole: false});
 const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
@@ -12,7 +12,7 @@ let user = new SecureUser({userName:'user1',userGroups:[USER_ROLE.ADMIN]});
 
 ////////////////////
 // Import the required modules
-const { argv } = require('process');
+import { argv } from 'node:process';
 
 // Function to parse command-line arguments
 function parseArguments(args) {

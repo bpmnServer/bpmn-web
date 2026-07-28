@@ -1,9 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
+import fs from 'node:fs';
+import nodemailer from 'nodemailer';
 import {  Item, FLOW_ACTION , NODE_ACTION, IExecution , dateDiff } from './index.js';
 import { DefaultAppDelegate } from './index.js';
 import { AppServices } from './appServices.js';
@@ -11,15 +7,11 @@ import { AppUtils } from './appUtils.js';
 
 import * as Mailer from '../userAccess/config/mail.js';
 
-const fs = require('fs');
-
 var seq = 1;
 
 const MULTI_APP_SERVICES =false;
 
-const nodemailer = require("nodemailer");
-
-console.log('appDelegate from ',__filename);
+console.log('appDelegate from ', import.meta.filename);
 
 
 class MyAppDelegate extends DefaultAppDelegate{

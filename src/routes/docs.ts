@@ -1,14 +1,7 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 import express from 'express';
-const router = express.Router();
-var bodyParser = require('body-parser')
-
-const FS = require('fs');
+import FS from 'node:fs';
+import https from 'node:https';
+import path from 'node:path';
 
 import { BPMNServer   } from '../index.js';
 import { Common } from './common.js';
@@ -16,8 +9,6 @@ import { Common } from './common.js';
 /* GET users listing. */
 
 const url = 'https://raw.githubusercontent.com/ralphhanna/bpmn-server/master/';
-
-const https = require('https');
 
 function getRemoteFile(file) {
     return new Promise(resolve => {
@@ -58,7 +49,7 @@ const awaitAppDelegateFactory = (middleware) => {
         }
     }
 }
-var docsFolder=__dirname + '\\..\\..\\..\\bpmn-server/docs/';
+var docsFolder=import.meta.dirname + '\\..\\..\\..\\bpmn-server/docs/';
 export class Docs extends Common {
 
     constructor(app) {
@@ -72,6 +63,9 @@ export class Docs extends Common {
     config() {
 
         var router = express.Router();
+
+        // Deny-by-default: docs viewer requires a session.
+        router.use(this.isAuthenticated);
 
         router.get('/', function (request, response) {
             let fileName =  '../README.md';
@@ -119,7 +113,7 @@ export class Docs extends Common {
         router.get('/readme_md', awaitAppDelegateFactory(async (request, response) => {
 
             let processName = request.params.process;
-            let fileName = __dirname + '/../node_modules/bpmn-server/README.md';
+            let fileName = import.meta.dirname + '/../node_modules/bpmn-server/README.md';
 
             let file = FS.readFileSync(fileName,
                 { encoding: 'utf8', flag: 'r' });
@@ -134,8 +128,16 @@ function processFile(fileName,response) {
 
     if (!fileName.includes('.'))
         fileName=fileName+'.md';
-    
-    fileName = docsFolder + fileName;
+
+    // Containment check: resolve and refuse anything that escapes docsFolder
+    // (fileName can include splat-derived path segments).
+    const resolvedBase = path.resolve(docsFolder) + path.sep;
+    const resolved = path.resolve(docsFolder, fileName);
+    if (!resolved.startsWith(resolvedBase)) {
+        response.status(400).send('invalid path');
+        return;
+    }
+    fileName = resolved;
 
     let file = FS.readFileSync(fileName);
 
@@ -164,4 +166,3 @@ function processFile(fileName,response) {
 function show(output) {
     return output;
 }
-export default router;

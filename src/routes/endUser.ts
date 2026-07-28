@@ -1,12 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 import express from 'express';
-
-const FS = require('fs');
+import FS from 'node:fs';
 
 import { BPMNServer, dateDiff, Behaviour_names, SystemUser   } from '../index.js';
 import { BPMNAPI , SecureUser } from '../index.js';
@@ -17,7 +10,7 @@ import { ViewHelper } from './ViewHelper.js';
 var caseId = Math.floor(Math.random() * 10000);
 
 
-const docsFolder = __dirname + '/../bpmnServer/docs/';
+const docsFolder = import.meta.dirname + '/../bpmnServer/docs/';
 
 // main functions
 
@@ -49,6 +42,9 @@ export class EndUser extends Common {
         bpmnServer = this.webApp.bpmnServer;
         bpmnAPI = new BPMNAPI(bpmnServer);
         definitions = bpmnServer.definitions;
+
+        // Deny-by-default: end-user task routes require a session.
+        router.use(this.isAuthenticated);
 
         router.get('/home', home);
 

@@ -1,9 +1,3 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-import { fileURLToPath as __f2p } from 'url';
-import { dirname as __dn } from 'path';
-const __filename = __f2p(import.meta.url);
-const __dirname = __dn(__filename);
 /*
  * GET users listing.
  */
@@ -12,9 +6,8 @@ import { ModelerNoProp } from '../views/Modeler-noProp.js';
 import { ModelerWProp } from '../views/Modeler-wProp.js';
 import { ViewHelper } from './ViewHelper.js';
 
-var bodyParser = require('body-parser')
-
-const FS = require('fs');
+import FS from 'node:fs';
+import path from 'node:path';
 
 import { BPMNServer,BPMNAPI} from '../index.js';
 import { Common } from './common.js';
@@ -41,6 +34,9 @@ export class Model extends Common {
 
 
         var router = express.Router();
+
+        // Deny-by-default: model designer routes require a session.
+        router.use(this.isAuthenticated);
 
         router.get('/list', awaitHandlerFactory(async (request, response) => {
 
@@ -93,10 +89,9 @@ export class Model extends Common {
 
         }));
         router.get('/download/:file', awaitHandlerFactory(async (request, response) => {
-            console.log(request.params.file);
-
-            const filePath = bpmnServer.configuration.definitionsPath + request.params.file;
-            console.log('filePath:' + filePath);
+            // basename() defeats traversal via encoded separators in the param
+            const safeFile = path.basename(request.params.file);
+            const filePath = bpmnServer.configuration.definitionsPath + safeFile;
 
             response.download(filePath); // Set disposition and send it.
 
@@ -127,8 +122,8 @@ export class Model extends Common {
 
                 // Strip any path components from the client-supplied filename to prevent
                 // path traversal (e.g. "../../app.ts") writing outside the tmp folder.
-                const safeName = require('path').basename(filename.filename);
-                const filepath = __dirname + '/../tmp/' + safeName;
+                const safeName = path.basename(filename.filename);
+                const filepath = import.meta.dirname + '/../tmp/' + safeName;
                 fstream = fsx.createWriteStream(filepath);
                 file.pipe(fstream);
                 fstream.on('close', async function () {
@@ -310,7 +305,7 @@ export class Model extends Common {
         router.get('/getSvg/:process', awaitHandlerFactory(async (request, response) => {
 
             let processName = request.params.process;
-            let fileName = __dirname + '/../processes/' + processName + '.svg';
+            let fileName = import.meta.dirname + '/../processes/' + processName + '.svg';
 
             let svg = await definitions.getSVG(processName);
 

@@ -1,14 +1,13 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const { promisify } = require('util');
-const crypto = require('crypto');
-const passport = require('passport');
-const _ = require('lodash');
-const validator = require('validator');
-const mailChecker = require('mailchecker');
+import crypto from 'node:crypto';
+import { promisify } from 'node:util';
+import lodash from 'lodash';
+import mailChecker from 'mailchecker';
+import passport from 'passport';
+import validator from 'validator';
 import User from '../models/User.js';
-
 import * as Mailer from '../config/mail.js';
+
+const _ = lodash;
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 const viewPath = '../userAccess/views/account/';
