@@ -1,7 +1,7 @@
 import express from 'express';
 import FS from 'node:fs';
 
-import { BPMNServer,BPMNAPI, dateDiff, Behaviour_names, SecureUser } from '../index.js';
+import { BPMNServer, BPMNAPI, BPMNAdminAPI, dateDiff, Behaviour_names, SecureUser } from '../index.js';
 
 
 
@@ -375,6 +375,16 @@ export class API2 extends Common {
             }
         }));
 
+
+        return router;
+    }
+
+    /** Model administration is mounted separately under /admin/api2. */
+    adminConfig() {
+        const router = express.Router();
+        const bpmnServer = this.bpmnServer;
+        const api = new BPMNAdminAPI(this.bpmnServer);
+        const self = this;
 
         //// ---------------------  Model -----------------------
 

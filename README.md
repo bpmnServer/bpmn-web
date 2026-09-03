@@ -19,6 +19,9 @@ PORT=3000
 #API_KEY is used for remote access
 API_KEY=12345
 
+# Separate credential for definition/model administration
+ADMIN_API_KEY=replace-with-a-different-secret
+
 # MongoDB Settings
 MONGO_DB_URL=mongodb://0.0.0.0:27017/bpmn
 #
@@ -38,3 +41,7 @@ Start the server with the following command:
 ```bash
 npm start
 ```
+
+Runtime operations are exposed under `/api` and `/api2`. Definition and model
+administration are deliberately mounted under `/admin/api` and `/admin/api2`
+and require `ADMIN_API_KEY`; the runtime `API_KEY` is rejected on those routes.
