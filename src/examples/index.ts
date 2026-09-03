@@ -1,4 +1,3 @@
 export * from '../';
-//export { configuration } from '../WorkflowApp/configuration';
-
+//export { configuration } from '../sample-app/configuration';
 
