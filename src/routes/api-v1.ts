@@ -16,6 +16,7 @@ const awaitAppDelegateFactory = (middleware) => {
 }
 
 import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
+import { trustedPrincipal } from './middleware/trustedPrincipal.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { json } from 'body-parser';
@@ -26,9 +27,7 @@ import { json } from 'body-parser';
 /** Canonical versioned HTTP API. */
 export class APIv1 extends Common {
     getUser(request): SecureUser {
-
-        const user=request.body.user;
-        return new SecureUser(user);
+		return request.workflowUser;
     }
     get bpmnServer() { return this.webApp.bpmnServer; }
     config() {
@@ -37,6 +36,7 @@ export class APIv1 extends Common {
         var bpmnServer = this.bpmnServer;
         var api=new BPMNAPI(this.bpmnServer);
         let self = this;
+		router.use(loggedIn, trustedPrincipal(this.webApp.principalResolver));
 
 
         router.get('/status', loggedIn, awaitAppDelegateFactory(async (request, response) => {
@@ -386,6 +386,7 @@ export class APIv1 extends Common {
         const bpmnServer = this.bpmnServer;
         const api = new BPMNAdminAPI(this.bpmnServer);
         const self = this;
+		router.use(loggedIn, trustedPrincipal(this.webApp.principalResolver));
 
         //// ---------------------  Model -----------------------
 
