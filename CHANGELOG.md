@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Separate web host and workflow application (#1)
+
+- Separate reusable web-host integration from the example workflow application.
+- Move application-specific configuration and workflow behavior behind explicit boundaries.
+- Keep the web package focused on adapting HTTP requests to engine operations.
+
 ## Release 2.3.6
 -	Fix issue with svg not reflecting instance svg
 ## Release 2.3.1
@@ -68,5 +74,4 @@ and here
 - UI: instance details , added Model docs
 - UI: invoke item form now supports Date type
 - app.ts: remove security, email to UserService class
-
 

@@ -45,9 +45,9 @@ async function promptForEdit() {
 function copyFiles() {
     const ret=copyFile('INSTALL.env', '.env');
     copyFile('./src/test/INSTALL.env', './src/test/.env');
-    copyFile('./src/WorkflowApp/INSTALL_configuration.ts', './src/WorkflowApp/configuration.ts');
-    copyFile('./src/WorkflowApp/INSTALL_appDelegate.ts', './src/WorkflowApp/appDelegate.ts');
-//    copyFile('./WorkflowApp/INSTALL_appDelegate.js', './WorkflowApp/appDelegate.js');
+    copyFile('./src/sample-app/INSTALL_configuration.ts', './src/sample-app/configuration.ts');
+    copyFile('./src/sample-app/INSTALL_appDelegate.ts', './src/sample-app/appDelegate.ts');
+//    copyFile('./sample-app/INSTALL_appDelegate.js', './sample-app/appDelegate.js');
 
     return ret;
 }
@@ -214,4 +214,3 @@ function report(instance) {
         console.log('--item', item.seq, item.elementId, item.type, item.status, item.userName, item.assignee, item.candidateUsers, item.candidateGroups, item.dueDate);
     });
 }
-

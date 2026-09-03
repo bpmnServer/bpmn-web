@@ -8,7 +8,6 @@ import compression from 'compression';
 import flash from 'connect-flash';
 import busboy from 'connect-busboy'; // middleware for form/file upload
 import cors from 'cors';
-import dotenv from 'dotenv';
 import errorHandler from 'errorhandler';
 import express from 'express';
 import session from 'express-session';
@@ -16,10 +15,10 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import multer from 'multer';
+import { BPMNServer, Logger } from 'bpmn-server';
 
 import { UserManager } from './userAccess/UserManager.js';
-import { BPMNServer, Logger } from './index.js';
-import { configuration as config } from './WorkflowApp/configuration.js';
+import type { WorkflowApplication } from './runtime/WorkflowApplication.js';
 import { Workflow } from './routes/workflow.js';
 import { EndUser } from './routes/endUser.js';
 import { Docs } from './routes/docs.js';
@@ -41,7 +40,10 @@ export class WebApp {
 	packageJson;
 	server;
 
-	constructor() {
+	application: WorkflowApplication;
+
+	constructor(application: WorkflowApplication) {
+		this.application = application;
 
 		const configPath = __dirname + '/../package.json';
 		if (fs.existsSync(configPath)) {
@@ -57,11 +59,13 @@ export class WebApp {
 		this.userManager = new UserManager(this.app);
 
 		this.userManager.init();
-		const wflogger = new Logger({ toConsole: true });
-
-
-		this.bpmnServer = new BPMNServer(config,wflogger);
-		this.bpmnServer.appDelegate.winSocket = null;
+		const wflogger = application.logger ?? new Logger({ toConsole: true });
+		this.bpmnServer = new BPMNServer(
+			application.configuration,
+			wflogger,
+			application.serverOptions ?? {},
+		);
+		application.initialize?.(this.bpmnServer);
 
 		this.setupExpress();
 	
@@ -132,11 +136,15 @@ export class WebApp {
 			});
 		}
 
-		/**
-		 * Start the server. Serve over HTTPS when HTTPS=true and SSL_KEY_PATH/SSL_CERT_PATH
-		 * are provided; otherwise plain HTTP (suitable for internal use or behind a
-		 * TLS-terminating proxy).
-		 */
+	}
+
+	/**
+	 * Start the HTTP listener after the application and routes have been composed.
+	 * Keeping this separate from construction allows applications and tests to use
+	 * the Express app without opening a network port.
+	 */
+	start() {
+		const app = this.app;
 		const port = app.get('port');
 		const useHttps =
 			process.env.HTTPS === 'true' && !!process.env.SSL_KEY_PATH && !!process.env.SSL_CERT_PATH;
@@ -218,44 +226,3 @@ export class WebApp {
 	}
 
 }
-
-/** Main logic
-*/
-/**
- * Load environment variables from .env file, where API keys and passwords are configured.
- */
-function setupEnvVars() {
-	dotenv.config();
-	var argv = process.argv;
-	var args = {};
-	for (let i = 2; i < argv.length; i++) {
-		const key = argv[i];
-		const val = argv[++i];
-		process.env[key] = val;
-	}
-}
-
-
-setupEnvVars();
-
-/**
- * Warn (don't hard-fail — this is a demo) about unsafe/incomplete config:
- *  - an empty API_KEY previously authenticated EVERY /api request
- *    (`undefined == undefined`); the middleware now fails closed, but a
- *    misconfigured server should still be flagged;
- *  - REQUIRE_AUTHENTICATION=false disables all UI auth.
- */
-function warnBootConfig() {
-    const warnings: string[] = [];
-    if (!process.env.API_KEY) warnings.push('API_KEY is not set — /api and /api2 will reject all requests (fail closed).');
-    if (!process.env.SESSION_SECRET) warnings.push('SESSION_SECRET is not set — sessions/CSRF cannot be secured.');
-    if (process.env.REQUIRE_AUTHENTICATION === 'false') warnings.push('REQUIRE_AUTHENTICATION=false — UI authentication is DISABLED (dev only).');
-    if (warnings.length) console.warn('[config] ' + warnings.join('\n[config] '));
-}
-
-warnBootConfig();
-
-const webApp = new WebApp();
-
-export default webApp.app;
-

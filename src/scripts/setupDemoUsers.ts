@@ -1,4 +1,5 @@
-import { SystemUser, configuration } from '../';
+import { SystemUser } from '../';
+import { configuration } from '../sample-app/configuration.js';
 import { BPMNServer, Logger ,SecureUser,BPMNAPI} from '../';
 
 import { UserService } from "../userAccess/UserService";
@@ -42,4 +43,3 @@ async function addRelation(user,manager) {
       }
 
 }
-

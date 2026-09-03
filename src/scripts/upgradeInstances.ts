@@ -1,7 +1,7 @@
 import { exec } from 'node:child_process';
 
 import { SystemUser, USER_ROLE } from "bpmn-server";
-import { configuration} from '../WorkflowApp/configuration.js';
+import { configuration} from '../sample-app/configuration.js';
 import { BPMNServer,BPMNAPI, Logger, Definition ,SecureUser } from "bpmn-server";
 import { inherits } from 'node:util';
 const logger = new Logger({ toConsole: false});
