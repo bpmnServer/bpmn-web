@@ -28,6 +28,7 @@ import { API } from './routes/api.js';
 import { API2 } from './routes/api2.js';
 import { APIv1 } from './routes/api-v1.js';
 import { deprecatedApi } from './routes/middleware/deprecatedApi.js';
+import { EnvironmentPrincipalResolver, type PrincipalResolver } from './security/PrincipalResolver.js';
 
 const __dirname = import.meta.dirname;
 console.log('app.ts from ', import.meta.filename);
@@ -42,8 +43,10 @@ export class WebApp {
 	bpmnServer;
 	packageJson;
 	server;
+	principalResolver: PrincipalResolver;
 
-	constructor() {
+	constructor({ principalResolver = new EnvironmentPrincipalResolver() }: { principalResolver?: PrincipalResolver } = {}) {
+		this.principalResolver = principalResolver;
 
 		const configPath = __dirname + '/../package.json';
 		if (fs.existsSync(configPath)) {
@@ -218,7 +221,8 @@ export class WebApp {
 
 		// Compatibility aliases. Responses identify the canonical successor.
 		this.app.use('/api2', deprecatedApi('/api/v1'), (new API2(this)).config());
-		this.app.use('/api', deprecatedApi('/api/v1'), (new API(this)).config());
+		if (process.env.ENABLE_LEGACY_API === 'true')
+			this.app.use('/api', deprecatedApi('/api/v1'), (new API(this)).config());
 		this.app.use('/admin/api2', deprecatedApi('/admin/api/v1'), (new API2(this)).adminConfig());
 		this.app.use('/admin/api', deprecatedApi('/admin/api/v1'), (new API(this)).adminConfig());
 

@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Resolve trusted workflow principals (#4)
+
+- Resolve workflow identity from authenticated server context through an injectable resolver.
+- Reject caller-supplied `user` objects in request bodies.
+- Disable the insecure legacy API by default and require explicit opt-in.
+
 ## Unreleased — Canonical versioned web API (#3)
 
 - Establish `/api/v1` and `/admin/api/v1` as the canonical contracts.
