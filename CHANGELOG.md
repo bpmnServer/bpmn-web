@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Canonical versioned web API (#3)
+
+- Establish `/api/v1` and `/admin/api/v1` as the canonical contracts.
+- Retain `/api2` as a compatibility adapter over the v1 implementation.
+- Mark legacy aliases as deprecated and advertise their successor routes.
+
 ## Unreleased — Separate runtime and administration routes (#2)
 
 - Separate operational workflow routes from model-administration routes.
@@ -74,4 +80,3 @@ and here
 - UI: instance details , added Model docs
 - UI: invoke item form now supports Date type
 - app.ts: remove security, email to UserService class
-

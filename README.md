@@ -42,6 +42,7 @@ Start the server with the following command:
 npm start
 ```
 
-Runtime operations are exposed under `/api` and `/api2`. Definition and model
-administration are deliberately mounted under `/admin/api` and `/admin/api2`
-and require `ADMIN_API_KEY`; the runtime `API_KEY` is rejected on those routes.
+The canonical runtime API is `/api/v1`; model administration is mounted at
+`/admin/api/v1` and requires `ADMIN_API_KEY`. `/api` and `/api2` remain
+temporary compatibility aliases and return standard `Deprecation` and `Link`
+headers pointing clients to `/api/v1`.
