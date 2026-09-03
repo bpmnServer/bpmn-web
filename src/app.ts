@@ -213,6 +213,8 @@ export class WebApp {
 		this.app.use('/model', (new Model(this)).config());
 		this.app.use('/api', (new API(this)).config());
 		this.app.use('/api2', (new API2(this)).config());
+		this.app.use('/admin/api', (new API(this)).adminConfig());
+		this.app.use('/admin/api2', (new API2(this)).adminConfig());
 
 
 	}
@@ -248,6 +250,7 @@ setupEnvVars();
 function warnBootConfig() {
     const warnings: string[] = [];
     if (!process.env.API_KEY) warnings.push('API_KEY is not set — /api and /api2 will reject all requests (fail closed).');
+    if (!process.env.ADMIN_API_KEY) warnings.push('ADMIN_API_KEY is not set — /admin/api and /admin/api2 will reject all requests (fail closed).');
     if (!process.env.SESSION_SECRET) warnings.push('SESSION_SECRET is not set — sessions/CSRF cannot be secured.');
     if (process.env.REQUIRE_AUTHENTICATION === 'false') warnings.push('REQUIRE_AUTHENTICATION=false — UI authentication is DISABLED (dev only).');
     if (warnings.length) console.warn('[config] ' + warnings.join('\n[config] '));
@@ -258,4 +261,3 @@ warnBootConfig();
 const webApp = new WebApp();
 
 export default webApp.app;
-

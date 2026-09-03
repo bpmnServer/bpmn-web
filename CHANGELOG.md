@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Separate runtime and administration routes (#2)
+
+- Separate operational workflow routes from model-administration routes.
+- Mount administration endpoints under `/admin` with a distinct API key.
+- Prevent runtime credentials from granting workflow-definition management access.
+
 ## Release 2.3.6
 -	Fix issue with svg not reflecting instance svg
 ## Release 2.3.1
@@ -68,5 +74,4 @@ and here
 - UI: instance details , added Model docs
 - UI: invoke item form now supports Date type
 - app.ts: remove security, email to UserService class
-
 

@@ -488,8 +488,14 @@ export class API extends Common {
         }));
 
 
-        ////
-        var fsx = FS;       //File System - for file manipulation (built-in fs; methods used are native)
+        return router;
+    }
+
+    /** Definition administration is mounted separately under /admin/api. */
+    adminConfig() {
+        const router = express.Router();
+        const bpmnServer = this.bpmnServer;
+        const fsx = FS;
 
             router.post('/definitions/import{/:name}', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 

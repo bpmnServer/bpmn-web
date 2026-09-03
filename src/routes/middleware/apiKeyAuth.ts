@@ -26,9 +26,11 @@ export function timingSafeEqualStr(a: string, b: string): boolean {
  * apart from application errors.
  */
 export function apiKeyAuth(req, res, next): void {
-    const configured = process.env.API_KEY;
+    const adminRequest = typeof req.originalUrl === 'string' && req.originalUrl.startsWith('/admin/');
+    const configured = adminRequest ? process.env.ADMIN_API_KEY : process.env.API_KEY;
     if (!configured) {
-        res.status(500).json({ errors: 'server API key is not configured' });
+        const keyName = adminRequest ? 'ADMIN_API_KEY' : 'API_KEY';
+        res.status(500).json({ errors: `server ${keyName} is not configured` });
         return;
     }
 
