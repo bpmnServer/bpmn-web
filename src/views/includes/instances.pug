@@ -2,7 +2,9 @@ h3 Instances
 if user && user.isAdmin()
 	table
 		tr
-			a(href=`/resetData`)  Delete All Instances Data
+			form(action='/resetData', method='post')
+				input(type='hidden', name='_csrf', value=_csrf)
+				button(type='submit') Delete All Instances Data
 table
 	tr
 		td Name
@@ -15,7 +17,6 @@ table
 	each instance in instances
 		- var ref = "/instanceDetails?id="+instance.id;
 		if user && user.isAdmin()
-			- var ref2 = "/deleteInstance?id="+instance.id;
 		tr
 			td #{instance.name}
 			td #{instance.data.caseId}
@@ -25,4 +26,7 @@ table
 				a(href=`${ref}`) Examine
 			if user && user.isAdmin()
 				td 
-					a(href=`${ref2}`) Delete
+					form(action='/deleteInstance', method='post')
+						input(type='hidden', name='_csrf', value=_csrf)
+						input(type='hidden', name='id', value=instance.id)
+						button(type='submit') Delete

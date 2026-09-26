@@ -1,6 +1,6 @@
 form(name='searchTasks',action="/setUser",method="get")
 
-	if (request.user && request.user.isAdmin && process.env.ENFORCE_SECURITY === 'true')
+	if process.env.REQUIRE_AUTHENTICATION === 'false'
 		- var forUserName=request.user.userName;
 		- var forUserGroups=request.user.userGroups;
 		if request.session.forUser
@@ -15,7 +15,6 @@ form(name='searchTasks',action="/setUser",method="get")
 				input(type="text",name="forUserGroups",id="forUserGroups",value=`${forUserGroups}`)
 			td  
 				input(type='submit',value='Apply')
-
 
 
 
