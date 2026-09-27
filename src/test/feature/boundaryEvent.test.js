@@ -12,7 +12,7 @@ const __dirname = __dn(__filename);
 ///```javascript
 console.log('----', __filename);
 
-import { BPMNServer, DefaultHandler, Logger } from './index.js';
+import { BPMNServer, Logger } from './index.js';
 import { configuration } from './index.js';
 
 

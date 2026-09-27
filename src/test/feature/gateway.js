@@ -10,7 +10,7 @@ const __dirname = __dn(__f2p(import.meta.url));
 
 ///```javascript
 
-import { BPMNServer , DefaultHandler , Logger } from './index.js';
+import { BPMNServer  , Logger } from './index.js';
 import { configuration } from './index.js';
 
 
