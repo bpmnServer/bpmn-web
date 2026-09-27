@@ -115,8 +115,8 @@ export class APIv1 extends Common {
 
             try {
 
-                results = await this.bpmnServer.dataStore.find({ filter, projection, after, limit, sort,lastItem,
-                    latestItem,getTotalCount });
+                results = await api.data.find({ filter, projection, after, limit, sort,lastItem,
+                    latestItem,getTotalCount }, self.getUser(request));
 
             }
             catch (exc) {
@@ -172,7 +172,7 @@ export class APIv1 extends Common {
             let errors;
             let result;
             try {
-                result = await self.bpmnServer.dataStore.deleteInstances(query);
+                result = await api.data.deleteInstances(query, self.getUser(request));
             }
             catch (exc) {
                 errors = exc.toString();
@@ -340,6 +340,39 @@ export class APIv1 extends Common {
             response.json({ errors: errors, instance });
 
 
+        }));
+
+        router.put('/engine/restart', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            let instance;
+            let errors;
+            try {
+                const context = await api.engine.restart(
+                    request.body.query,
+                    request.body.data,
+                    self.getUser(request),
+                    request.body.options || {}
+                );
+                instance = context.instance;
+                if (context.errors)
+                    errors = context.errors.toString();
+            }
+            catch (exc) {
+                errors = exc.toString();
+            }
+            response.json({ errors, instance });
+        }));
+
+        router.get('/engine/get', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            let instance;
+            let errors;
+            try {
+                const context = await api.engine.get(request.body.query || request.body, self.getUser(request));
+                instance = context.instance;
+            }
+            catch (exc) {
+                errors = exc.toString();
+            }
+            response.json({ errors, instance });
         }));
 
 

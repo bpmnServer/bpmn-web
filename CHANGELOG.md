@@ -12,6 +12,12 @@ and here
 
 ### Changed
 -->
+## Unreleased — Migrate useful legacy operations (#5)
+
+- Migrate execution lookup, restart, and cursor-based instance search into `/api/v1`.
+- Route each migrated operation through `BPMNAPI` authorization.
+- Leave redundant query aliases, global engine diagnostics, and model upgrade out of the runtime API.
+
 ## Unreleased — Resolve trusted workflow principals (#4)
 
 - Resolve workflow identity from authenticated server context through an injectable resolver.
