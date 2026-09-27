@@ -51,7 +51,7 @@ export class Workflow extends Common {
             display(request,response, 'Show', output);
         }));
 
-        router.get('/setUser', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
+        router.get('/setUser', this.isAdmin, awaitAppDelegateFactory(async (request, response) => {
             let output = [];
             setForUser(request);
             output = show(output);
@@ -141,8 +141,8 @@ export class Workflow extends Common {
 
         });
 
-        router.get('/resetData', awaitAppDelegateFactory(async (request, response) => {
-            await bpmnServer.dataStore.deleteInstances();
+        router.post('/resetData', this.isAdmin, awaitAppDelegateFactory(async (request, response) => {
+            await bpmnServer.dataStore.deleteInstances({});
             let output = ['Data Reset'];
             output = show(output);
             display(request,response, 'Show', output);
@@ -310,10 +310,10 @@ export class Workflow extends Common {
         router.post('/query', async (req, res) => {
             try {
                 const query = req.body.query;
-                var results = await bpmnServer.dataStore.findInstances(query,{
-                    projection:    {name:1,status:1,data:1,
-                        items:{elementId:1,seq:1,type:1,status:1} },
-                    sort:{saved:-1}});
+                var results = await bpmnAPI.data.findInstances(query, getSecureUser(req), {
+                    projection: { name: 1, status: 1, data: 1, items: 1 },
+                    sort: { saved: -1 }
+                });
                 res.json(results);
             } catch (error) {
                 console.error('POST /query failed:', error);
@@ -321,7 +321,7 @@ export class Workflow extends Common {
             }
         });
 
-        router.get('/deleteInstance', deleteInstance);
+        router.post('/deleteInstance', this.isAdmin, awaitAppDelegateFactory(deleteInstance));
         return router;
     }
     async tasks(request, response) {
@@ -369,7 +369,7 @@ async function home(request, response)  {
 
 async function deleteInstance(req, res) {
 
-    let instanceId = req.query.id;
+    let instanceId = req.body.id;
 
     await bpmnServer.dataStore.deleteInstances({ id: instanceId });
 
@@ -410,7 +410,7 @@ function getSecureUser(req) {
     {
         const usr = getUser(req);
         if (usr)
-            user=new SecureUser({ userName: usr.userName, userGroups: usr.userGroups });
+            user=new SecureUser({ userName: usr.userName, userGroups: usr.userGroups, tenantId: usr.tenantId });
     }
     else
          user=SecureUser.SystemUser();
@@ -420,12 +420,16 @@ function getSecureUser(req) {
  }
 
 function getUser(req) {
-    if (req.session.forUser)
+    if (process.env.REQUIRE_AUTHENTICATION === 'false' && req.session.forUser)
         return req.session.forUser;
     else
         return req.user;
 }
 function setForUser(req) {
+    if (process.env.REQUIRE_AUTHENTICATION !== 'false') {
+        delete req.session.forUser;
+        return;
+    }
     let forUserName;
     let forUserGroups;
     if ('forUserName' in req.query) {
@@ -509,6 +513,9 @@ async function afterOperation(request,response,result) {
 async function instanceDetails(request,response,instanceId,version) {
 
     let user = getSecureUser(request);
+
+    const visibleItems = await bpmnAPI.data.findItems({ id: instanceId }, user);
+    if (visibleItems.length === 0) return response.status(403).send('Instance access denied');
 
     let instance = await bpmnServer.dataStore.findInstance({ id: instanceId }, 'Full');
 

@@ -23,6 +23,7 @@ import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '../index.
 }
 
 import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
+import { modelNameGuard } from './middleware/modelName.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 
@@ -32,6 +33,8 @@ export class API extends Common {
 
         var router = express.Router();
         var bpmnServer = this.bpmnServer;
+
+        router.use(['/definitions', '/model'], modelNameGuard);
 
         router.get('/status', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
@@ -75,9 +78,9 @@ export class API extends Common {
             try {
                 const query = req.body.query;
                 var results = await this.bpmnServer.dataStore.findInstances(query,{
-                    projections:    {name:1,status:1,data:1,
+                    projection:    {name:1,status:1,data:1,
                         items:{elementId:1,seq:1,type:1,status:1} },
-                        sort:{saved:-1}}).toArray();
+                        sort:{saved:-1}});
                         res.json(results);
             } catch (error) {
                 console.error('POST /api/query failed:', error);
@@ -614,14 +617,6 @@ export class API extends Common {
                 const name = request.body.name;
                 const bpmn = request.body.xml;
                 const svg = '';
-                let definitionsPath = bpmnServer.configuration.definitionsPath;
-                let fullpath = definitionsPath + '/' + name + '.bpmn';
-
-                console.log(fullpath, bpmn);
-                fsx.writeFile(fullpath, bpmn, function (err) {
-                    if (err) throw err;
-                    console.log(`Saved bpmn to ${fullpath}`);
-                });
                 await bpmnServer.definitions.save(name, bpmn, svg);
                 console.log(" save completed");
 

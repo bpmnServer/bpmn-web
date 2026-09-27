@@ -12,13 +12,17 @@ export class Common {
      * demo can be explored without setting up users.
      */
     isAuthenticated(req, res, next) {
-        if (process.env.REQUIRE_AUTHENTICATION !== 'false' && typeof req.isAuthenticated === 'function') {
-            if (req.isAuthenticated() === true) {
-                req.isAdmin = !(req.user.userGroups && req.user.userGroups.indexOf('ADMIN') === -1);
-                return next();
-            }
+        if (process.env.REQUIRE_AUTHENTICATION === 'false') return next();
+        if (typeof req.isAuthenticated !== 'function' || req.isAuthenticated() !== true || !req.user) {
             return res.redirect('/login');
         }
+        req.isAdmin = Array.isArray(req.user.userGroups) &&
+            (req.user.userGroups.includes('ADMIN') || req.user.userGroups.includes('SYSTEM'));
         return next();
+    }
+
+    isAdmin(req, res, next) {
+        if (process.env.REQUIRE_AUTHENTICATION === 'false' || req.isAdmin === true) return next();
+        return res.status(403).send('Administrator permission required');
     }
 }

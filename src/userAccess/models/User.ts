@@ -65,7 +65,7 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
  * Helper method for getting user's gravatar.
  */
 userSchema.virtual('isAdmin').get(function () {
-    return userSchema.methods.hasGroup('ADMIN');
+    return this.userGroups?.includes('ADMIN') || this.userGroups?.includes('SYSTEM') || false;
 });
 userSchema.methods.hasGroup = function hasGroup(group) {
     if (this.userGroups && this.userGroups.indexOf(group) !== -1)
