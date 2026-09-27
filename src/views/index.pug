@@ -6,30 +6,10 @@ block content
 		h1 bpmn-server Workbench
 		p.workbench-intro Explore models, work on pending tasks, and follow running instances.
 		include includes/dashboardHeader.pug
-		nav.workbench-tabs(aria-label="Workbench sections")
-			a(href="#processes", data-section="processes") Models
-			a(href="#tasks", data-section="tasks") Pending tasks
-			a(href="#instances", data-section="instances") Instances
 		div#workbench-sections
 			div#processes.workbench-section
-			include includes/processes.pug
+				include includes/processes.pug
 			div#tasks.workbench-section
 				include includes/tasks.pug
 			div#instances.workbench-section
 				include includes/instances.pug
-	script.
-		(function () {
-			const sections = ['processes', 'tasks', 'instances'];
-			function showSection() {
-				const active = sections.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'processes';
-				sections.forEach(id => {
-					document.getElementById(id).hidden = id !== active;
-					const link = document.querySelector('.workbench-tabs [data-section="' + id + '"]');
-					link.classList.toggle('active', id === active);
-					if (id === active) link.setAttribute('aria-current', 'page');
-					else link.removeAttribute('aria-current');
-				});
-			}
-			window.addEventListener('hashchange', showSection);
-			showSection();
-		})();
