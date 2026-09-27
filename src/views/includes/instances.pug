@@ -1,4 +1,6 @@
 h3 Instances
+if !instances.length
+	p.empty-state No instances to show yet. Run a process from Models to create one.
 if user && user.isAdmin()
 	table
 		tr
