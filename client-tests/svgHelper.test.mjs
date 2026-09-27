@@ -54,19 +54,19 @@ test('getItemDescription returns empty string when desc is null', () => {
   assert.equal(sb.getItemDescription(null, { id: 'x' }), '');
 });
 
-test('Show animation plays the selected instance events and restarts on a second click', () => {
-  const events = [];
+test('Show Animation plays the selected element and restarts cleanly', () => {
   const timelines = [];
+  const element = { classList: { remove() {} } };
   const gsap = {
     registerPlugin() {},
-    killTweensOf(selector) { events.push(['killTweensOf', selector]); },
+    killTweensOf() {},
     timeline(options) {
       const timeline = {
-        options,
-        to(selector) { events.push(['to', selector]); return this; },
-        call(callback) { events.push(['call', callback]); return this; },
-        play() { events.push(['play']); return this; },
-        kill() { events.push(['kill']); return this; },
+        options, targets: [], plays: 0, killed: false,
+        to(target) { this.targets.push(target); return this; },
+        call() { return this; },
+        play() { this.plays++; },
+        kill() { this.killed = true; },
       };
       timelines.push(timeline);
       return timeline;
@@ -74,24 +74,32 @@ test('Show animation plays the selected instance events and restarts on a second
   };
   const document = {
     addEventListener() {},
-    getElementById(id) {
-      if (id !== 'jsonInfo') return null;
-      return { textContent: JSON.stringify([
-        { message: `{\"seq\":1,\"type\":'bpmn:StartEvent',\"id\":'start',\"action\":'Started'}` },
-        { message: `{\"seq\":2,\"type\":'bpmn:UserTask',\"id\":'task',\"action\":'Waiting'}` },
-      ]) };
-    },
     querySelectorAll() { return []; },
+    querySelector(selector) { return selector === '[data-element-id="StartEvent_1"]' ? element : null; },
+    getElementById(id) {
+      if (id === 'jsonInfo') return { textContent: JSON.stringify([
+        { message: "{'id':'StartEvent_1','seq':1,'action':'Started'}" },
+      ]) };
+      return null;
+    },
   };
-  const animation = loadClientScript('SVGHelper.js', { document, gsap });
-  animation.startAnimation();
-  assert.equal(timelines.length, 1);
-  assert.equal(timelines[0].options.paused, true);
-  assert.deepEqual(events.filter(([name]) => name === 'to'), [['to', '[data-element-id="start"]']]);
-  assert.equal(events.at(-1)[0], 'play');
+  const script = loadClientScript('SVGHelper.js', {
+    gsap, document, CSS: { escape: value => value },
+  });
 
-  animation.startAnimation();
-  assert.equal(timelines.length, 2);
-  assert.equal(events.filter(([name]) => name === 'kill').length, 1);
-  assert.equal(events.filter(([name]) => name === 'play').length, 2);
+  script.startAnimation();
+  assert.equal(timelines[0].options.paused, true);
+  assert.deepEqual(timelines[0].targets, [element]);
+  assert.equal(timelines[0].plays, 1);
+
+  script.startAnimation();
+  assert.equal(timelines[0].killed, true);
+  assert.equal(timelines[1].plays, 1);
+});
+
+test('Show Animation does not throw if an item is absent from the diagram', () => {
+  const script = loadClientScript('SVGHelper.js', {
+    document: { addEventListener() {}, querySelector: () => null },
+  });
+  assert.doesNotThrow(() => script.endAnimation('missing', 1, 'Ended'));
 });

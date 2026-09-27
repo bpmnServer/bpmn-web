@@ -124,11 +124,10 @@ function endAnimation(elementId,seq,action) {
 // GSAP powers the optional "Show Animation" feature only. Guard its module-load use so a
 // missing/blocked gsap never throws here — otherwise the whole script aborts and the core
 // diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
-const gsapLoaded = typeof gsap !== 'undefined';
 let tl = null;
-if (gsapLoaded && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
+if (typeof gsap !== 'undefined' && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
 function pauseAnimation() {
-
+    if (!tl) return;
     tl.addPause(() => {
         console.log("Timeline paused — waiting for user...");
         document.getElementById("continueBtn").style.display = "block";
@@ -136,14 +135,15 @@ function pauseAnimation() {
 
 }
 function continueAnimation() {
+    if (!tl) return;
     tl.play();
     document.getElementById("continueBtn").style.display = "none";
 }
 
 
 function startAnimation() {
-    if (!gsapLoaded) {
-        console.warn('Animation is unavailable because GSAP did not load.');
+    if (typeof gsap === 'undefined') {
+        console.error("Animation is unavailable: GSAP did not load.");
         return;
     }
     if (tl) tl.kill();
@@ -156,6 +156,7 @@ function startAnimation() {
     document.querySelectorAll(`.Cancelled`).forEach(element => { element.classList.remove("Cancelled"); });
 
     let flowInfo = getFlowInfo();
+    if (!flowInfo.length) return;
 
     for(let i=0;i<flowInfo.length;i++)
         {
@@ -171,7 +172,9 @@ function startAnimation() {
         if (i==0)
         {
             $('#seq_'+item.seq).hide();
-            tl.to(`[data-element-id="${item.id}"]`, { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
+            const firstElement = item.id && document.querySelector('[data-element-id="' + CSS.escape(item.id) + '"]');
+            if (firstElement)
+                tl.to(firstElement, { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
         }
         else if (item.type==='bpmn:SequenceFlow')
             tl.call(() => animateFlow(item.id,item.seq+1), null, "+=0.5"); // Activate task and wait
