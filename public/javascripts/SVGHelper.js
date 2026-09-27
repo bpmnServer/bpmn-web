@@ -1,10 +1,4 @@
 
- // Ensure GSAP is loaded
-if (typeof gsap === "undefined") {
-    console.error("GSAP is not loaded. Include GSAP CDN in your HTML.");
-}
-
-
 function animateFlow(flowId,seq) {
     let group = document.querySelector(`[data-element-id="${flowId}"]`);
     if (!group) {
@@ -125,7 +119,59 @@ function endAnimation(elementId,seq,action) {
 // missing/blocked gsap never throws here — otherwise the whole script aborts and the core
 // diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
 let tl = null;
+let animationRun = 0;
 if (typeof gsap !== 'undefined' && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
+function animationStatus(message) {
+    const status = document.getElementById('animationStatus');
+    if (status) status.textContent = message;
+}
+
+async function playWithoutGsap(flowInfo, run) {
+    for (let index = 0; index < flowInfo.length && run === animationRun; index++) {
+        const item = flowInfo[index];
+        const element = item.id && document.querySelector('[data-element-id="' + CSS.escape(item.id) + '"]');
+        if (!element) continue;
+        if (index === 0) {
+            await element.animate([
+                { transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }
+            ], { duration: 650 }).finished;
+        } else if (item.type === 'bpmn:SequenceFlow') {
+            const path = element.querySelector('path');
+            if (path && path.getTotalLength) {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = String(length);
+                path.style.strokeDashoffset = String(length);
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('r', '5');
+                dot.setAttribute('fill', 'red');
+                dot.setAttribute('data-moving-dot', item.id);
+                element.appendChild(dot);
+                const points = Array.from({ length: 21 }, (_, i) => {
+                    const point = path.getPointAtLength(length * i / 20);
+                    return { transform: `translate(${point.x}px, ${point.y}px)` };
+                });
+                try {
+                    await Promise.all([
+                        path.animate([{ strokeDashoffset: String(length) }, { strokeDashoffset: '0' }], { duration: 800 }).finished,
+                        dot.animate(points, { duration: 800 }).finished
+                    ]);
+                } finally {
+                    path.style.strokeDashoffset = '0';
+                    dot.remove();
+                }
+            }
+            element.classList.add('Completed');
+        } else if (item.action === 'Waiting') {
+            element.classList.add('Pending');
+        } else if (item.action === 'Ended' || item.action === 'Cancelled') {
+            element.classList.remove('Pending');
+            element.classList.add(item.action === 'Ended' ? 'Completed' : 'Cancelled');
+        }
+        if (item.seq) $('#seq_' + item.seq).show();
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    if (run === animationRun) animationStatus('Replay complete. Click again to restart.');
+}
 function pauseAnimation() {
     if (!tl) return;
     tl.addPause(() => {
@@ -142,21 +188,28 @@ function continueAnimation() {
 
 
 function startAnimation() {
-    if (typeof gsap === 'undefined') {
-        console.error("Animation is unavailable: GSAP did not load.");
+    const flowInfo = getFlowInfo();
+    if (!flowInfo.length) {
+        animationStatus('No recorded steps are available for this instance.');
         return;
     }
+    animationRun++;
     if (tl) tl.kill();
-    gsap.killTweensOf('.djs-element');
+    if (typeof gsap !== 'undefined') gsap.killTweensOf('.djs-element');
     document.querySelectorAll('[data-moving-dot]').forEach(dot => dot.remove());
-    tl = gsap.timeline({ paused: true });
 
     document.querySelectorAll(`.Pending`).forEach(element => { element.classList.remove("Pending"); });
     document.querySelectorAll(`.Completed`).forEach(element => { element.classList.remove("Completed"); });
     document.querySelectorAll(`.Cancelled`).forEach(element => { element.classList.remove("Cancelled"); });
-
-    let flowInfo = getFlowInfo();
-    if (!flowInfo.length) return;
+    animationStatus('Replaying recorded steps…');
+    if (typeof gsap === 'undefined') {
+        playWithoutGsap(flowInfo, animationRun).catch(error => {
+            console.error('Animation failed:', error);
+            animationStatus('Animation could not be played.');
+        });
+        return;
+    }
+    tl = gsap.timeline({ paused: true, onComplete: () => animationStatus('Replay complete. Click again to restart.') });
 
     for(let i=0;i<flowInfo.length;i++)
         {
@@ -201,8 +254,7 @@ let svg;
 
  function getFlowInfo() {
     let json = document.getElementById('jsonInfo');
-    if (!json) return [];
-    let info = JSON.parse(json.textContent);
+    let info = json ? JSON.parse(json.textContent) : [];
     let flow=[];
     info.forEach(item => {
         try {
@@ -211,6 +263,16 @@ let svg;
         }
         catch(exc) {}
     });
+    if (!flow.length) {
+        const itemJson = document.getElementById('animationItems');
+        if (itemJson) {
+            const items = JSON.parse(itemJson.textContent);
+            flow = items.filter(item => item.id && item.seq).map(item => ({
+                id: item.id, seq: item.seq, type: item.type,
+                action: item.type === 'bpmn:SequenceFlow' ? 'Taken' : item.status === 'wait' ? 'Waiting' : 'Ended'
+            }));
+        }
+    }
     return flow;
  }
  function start()

@@ -85,12 +85,14 @@ block content
           button#startAnimation.btn.btn-default(type="button", onclick="startAnimation()")
             i.fa.fa-play(aria-hidden="true")
             | Show animation
+        span#animationStatus.instance-animation-status(role="status", aria-live="polite")
       .instance-diagram
         if svg
           div!= svg
         else
           p.instance-empty Diagram unavailable for this instance.
       script(type="application/json" id="jsonInfo")!= JSON.stringify(info)
+      script(type="application/json" id="animationItems")!= JSON.stringify((items || []).map(item => ({ id: item.elementId, seq: item.seq, type: item.type, status: item.status }))).replace(/</g, '\\u003c')
 
     section.instance-card(aria-labelledby="items-heading")
       .instance-card-heading

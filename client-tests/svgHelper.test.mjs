@@ -103,3 +103,35 @@ test('Show Animation does not throw if an item is absent from the diagram', () =
   });
   assert.doesNotThrow(() => script.endAnimation('missing', 1, 'Ended'));
 });
+
+test('Show Animation uses saved items and native animation when GSAP is unavailable', async () => {
+  let pulses = 0;
+  const classes = new Set();
+  const element = {
+    classList: {
+      add(name) { classes.add(name); },
+      remove(name) { classes.delete(name); },
+    },
+    animate() { pulses++; return { finished: Promise.resolve() }; },
+  };
+  const status = { textContent: '' };
+  const document = {
+    addEventListener() {},
+    querySelectorAll() { return []; },
+    querySelector(selector) { return selector === '[data-element-id="start"]' ? element : null; },
+    getElementById(id) {
+      if (id === 'jsonInfo') return { textContent: '[]' };
+      if (id === 'animationItems') return { textContent: JSON.stringify([{ id: 'start', seq: 1, type: 'bpmn:StartEvent', status: 'end' }]) };
+      if (id === 'animationStatus') return status;
+      return null;
+    },
+  };
+  const script = loadClientScript('SVGHelper.js', {
+    document, gsap: undefined, CSS: { escape: value => value },
+    setTimeout(callback) { callback(); },
+  });
+  script.startAnimation();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(pulses, 1);
+  assert.match(status.textContent, /Replay complete/);
+});

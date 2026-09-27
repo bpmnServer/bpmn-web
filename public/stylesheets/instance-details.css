@@ -23,6 +23,7 @@
 .instance-toolbar .fa { margin-right: 6px; }
 .instance-diagram { margin-top: 16px; padding: 18px; overflow: auto; background: #f7fafc; border: 1px solid #e5ebf0; border-radius: 5px; }
 .instance-diagram svg { display: block; max-width: 100%; height: auto; }
+.instance-animation-status { color: #526579; font-size: 13px; align-self: center; }
 .instance-empty { color: #637588; }
 .instance-table-scroll { overflow-x: auto; margin-top: 16px; }
 .instance-table { width: 100%; border-collapse: collapse; font-size: 13px; }
