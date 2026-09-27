@@ -21,4 +21,20 @@ test('deprecated aliases advertise their canonical successor', () => {
     assert.equal(continued, true);
 });
 
+test('v1 migrates useful legacy execution operations but not unsafe or redundant routes', () => {
+    const webApp = {
+        bpmnServer: {},
+        principalResolver: { resolve: async () => ({}) }
+    };
+    const router = new APIv1(webApp).config();
+    const paths = router.stack.map(layer => layer.route?.path).filter(Boolean);
+
+    assert.ok(paths.includes('/engine/get'));
+    assert.ok(paths.includes('/engine/restart'));
+    assert.ok(paths.includes('/datastore/find'));
+    assert.equal(paths.includes('/engine/upgrade'), false);
+    assert.equal(paths.includes('/engine/status'), false);
+    assert.equal(paths.includes('/query'), false);
+});
+
 test.after(() => { setImmediate(() => process.exit(0)); });

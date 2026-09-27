@@ -46,3 +46,10 @@ The canonical runtime API is `/api/v1`; model administration is mounted at
 `/admin/api/v1` and requires `ADMIN_API_KEY`. `/api` and `/api2` remain
 temporary compatibility aliases and return standard `Deprecation` and `Link`
 headers pointing clients to `/api/v1`.
+
+The authorized API derives its workflow principal from trusted server-side
+configuration (`API_USER_NAME`, `API_USER_GROUPS`, and optional tenant values),
+not from `request.body.user`. Applications that authenticate individual users
+can inject a `PrincipalResolver` that validates their session or bearer token.
+The original `/api` route bypasses this security model and is therefore disabled
+unless `ENABLE_LEGACY_API=true` is set explicitly.
