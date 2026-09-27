@@ -53,3 +53,45 @@ test('getItemDescription builds an HTML table with id and type rows', () => {
 test('getItemDescription returns empty string when desc is null', () => {
   assert.equal(sb.getItemDescription(null, { id: 'x' }), '');
 });
+
+test('Show animation plays the selected instance events and restarts on a second click', () => {
+  const events = [];
+  const timelines = [];
+  const gsap = {
+    registerPlugin() {},
+    killTweensOf(selector) { events.push(['killTweensOf', selector]); },
+    timeline(options) {
+      const timeline = {
+        options,
+        to(selector) { events.push(['to', selector]); return this; },
+        call(callback) { events.push(['call', callback]); return this; },
+        play() { events.push(['play']); return this; },
+        kill() { events.push(['kill']); return this; },
+      };
+      timelines.push(timeline);
+      return timeline;
+    },
+  };
+  const document = {
+    addEventListener() {},
+    getElementById(id) {
+      if (id !== 'jsonInfo') return null;
+      return { textContent: JSON.stringify([
+        { message: `{\"seq\":1,\"type\":'bpmn:StartEvent',\"id\":'start',\"action\":'Started'}` },
+        { message: `{\"seq\":2,\"type\":'bpmn:UserTask',\"id\":'task',\"action\":'Waiting'}` },
+      ]) };
+    },
+    querySelectorAll() { return []; },
+  };
+  const animation = loadClientScript('SVGHelper.js', { document, gsap });
+  animation.startAnimation();
+  assert.equal(timelines.length, 1);
+  assert.equal(timelines[0].options.paused, true);
+  assert.deepEqual(events.filter(([name]) => name === 'to'), [['to', '[data-element-id="start"]']]);
+  assert.equal(events.at(-1)[0], 'play');
+
+  animation.startAnimation();
+  assert.equal(timelines.length, 2);
+  assert.equal(events.filter(([name]) => name === 'kill').length, 1);
+  assert.equal(events.filter(([name]) => name === 'play').length, 2);
+});

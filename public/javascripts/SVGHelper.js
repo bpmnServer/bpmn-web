@@ -9,14 +9,14 @@ function animateFlow(flowId,seq) {
     let group = document.querySelector(`[data-element-id="${flowId}"]`);
     if (!group) {
         console.warn(`Flow group not found: ${flowId}`);
-        return gsap.to({}, {}); // Prevent breaking animation
+        return;
     }
     group.classList.add("Completed");
 
     let path = group.querySelector("path");
     if (!path) {
         console.warn(`No <path> found inside group: ${flowId}`);
-        return gsap.to({}, {}); // Prevent breaking animation
+        return;
     }
 //    $('#seq_'+seq).show();
 
@@ -28,16 +28,20 @@ function animateFlow(flowId,seq) {
     movingDot.setAttribute("r", "5");  // Radius of the dot
     movingDot.setAttribute("fill", "red");  // Color of the dot
     movingDot.setAttribute("data-moving-dot", flowId);
-    path.appendChild(movingDot);
+    group.appendChild(movingDot);
 
     // **Animate Path and Move the "Head"**
     gsap.to(path, { strokeDashoffset: 0, duration: 1, ease: "power2.out" });
-    gsap.to(movingDot, { 
-        motionPath: { path: path, align: path, alignOrigin: [0.5, 0.5] },
-        duration: 1, 
-        ease: "power2.out",
-        onComplete: () => movingDot.remove() // Remove dot after animation
-    });
+    if (typeof MotionPathPlugin !== 'undefined') {
+        gsap.to(movingDot, {
+            motionPath: { path: path, align: path, alignOrigin: [0.5, 0.5] },
+            duration: 1,
+            ease: "power2.out",
+            onComplete: () => movingDot.remove()
+        });
+    } else {
+        movingDot.remove();
+    }
 }
 
 function animateFlow2(flowId) {
@@ -94,6 +98,7 @@ function activateTask(taskId,seq) {
 
 function endAnimation(elementId,seq,action) {
     let element = document.querySelector(`[data-element-id="${elementId}"]`);
+    if (!element) return;
     element.classList.remove("Pending");
     if (action==='Ended')
         element.classList.add("Completed");
@@ -120,7 +125,7 @@ function endAnimation(elementId,seq,action) {
 // missing/blocked gsap never throws here — otherwise the whole script aborts and the core
 // diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
 const gsapLoaded = typeof gsap !== 'undefined';
-let tl = gsapLoaded ? gsap.timeline() : null; // Start paused
+let tl = null;
 if (gsapLoaded && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
 function pauseAnimation() {
 
@@ -137,6 +142,14 @@ function continueAnimation() {
 
 
 function startAnimation() {
+    if (!gsapLoaded) {
+        console.warn('Animation is unavailable because GSAP did not load.');
+        return;
+    }
+    if (tl) tl.kill();
+    gsap.killTweensOf('.djs-element');
+    document.querySelectorAll('[data-moving-dot]').forEach(dot => dot.remove());
+    tl = gsap.timeline({ paused: true });
 
     document.querySelectorAll(`.Pending`).forEach(element => { element.classList.remove("Pending"); });
     document.querySelectorAll(`.Completed`).forEach(element => { element.classList.remove("Completed"); });
@@ -158,7 +171,7 @@ function startAnimation() {
         if (i==0)
         {
             $('#seq_'+item.seq).hide();
-            tl.to('[data-element-id="${item.id}"]', { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
+            tl.to(`[data-element-id="${item.id}"]`, { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
         }
         else if (item.type==='bpmn:SequenceFlow')
             tl.call(() => animateFlow(item.id,item.seq+1), null, "+=0.5"); // Activate task and wait
@@ -174,22 +187,24 @@ function startAnimation() {
                     tl.call(() => endAnimation(item.id,item.seq+1,item.action), null, "+=0.5"); 
             }
     }
-   // tl.play();
+    tl.play();
 
     return;
 }
 
 // Ensure the SVG is fully loaded before running the animation
 document.addEventListener("DOMContentLoaded", start);
-let svg = $('svg');
+let svg;
 
  function getFlowInfo() {
-    let info = JSON.parse(document.getElementById('jsonInfo').textContent);
+    let json = document.getElementById('jsonInfo');
+    if (!json) return [];
+    let info = JSON.parse(json.textContent);
     let flow=[];
     info.forEach(item => {
         try {
             let fl=JSON.parse(item.message.replaceAll(`'`,`"`));
-            flow.push(fl);
+            if (fl.id && fl.seq && fl.action) flow.push(fl);
         }
         catch(exc) {}
     });
@@ -199,7 +214,7 @@ let svg = $('svg');
     {
     scanSVG()
 
-
+    svg = $('svg');
     if (!svg.get(0))
         return;
 
