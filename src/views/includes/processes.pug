@@ -1,134 +1,109 @@
-h3 Models (BPMN Definitions)
-	script(type="text/javascript").
+section.models-workspace(aria-labelledby="models-heading")
+  .models-heading
+    div
+      h2#models-heading Models
+      p Browse a process, inspect its diagram, then open or run it.
+    if user && user.isAdmin()
+      .models-create
+        a.btn.btn-primary(href="/model/new") New model
+        a.btn.btn-default(href="/model/import") Import
+  .models-layout
+    aside.models-sidebar(aria-label="Model catalog")
+      label(for="model-search") Search models
+      input#model-search.form-control(type="search", placeholder="Search by name", autocomplete="off")
+      p#model-count.models-count(aria-live="polite")
+      select#process.form-control(size=18, aria-label="Select a model", data-current-process=request.session.processName || "")
+        each proc in procs
+          option(value=proc)= proc
+      p#model-empty.models-empty(hidden) No models match your search.
+    section.models-detail(aria-label="Selected model")
+      .models-detail-bar
+        div
+          span.models-eyebrow BPMN model
+          h3#selected-model-name Select a model
+        .models-actions
+          if user && user.isAdmin()
+            a#modelLink.btn.btn-primary(href="#") Open model
+            a#execLink.btn.btn-default(href="#") Run process
+          else
+            a#execLink.btn.btn-primary(href="#") Start process
+          if user && user.isAdmin()
+            .details-menu
+              button.btn.btn-default(type="button", aria-expanded="false", aria-controls="model-more-actions") More ▾
+              #model-more-actions.details-menu-items(hidden)
+                a#execInputLink(href="#") Run with options
+                a#renameLink(href="#") Rename
+                a(href="/model/export") Export
+                a#deleteLink.details-danger(href="#") Delete model
+      .models-preview
+        a#diagram-link(href="#", target="_blank", rel="noopener", aria-label="Open full-size diagram in a new tab")
+          img#svg(alt="Selected BPMN process diagram")
+        p Preview unavailable for this model.
+      p.models-preview-caption Select the diagram to view it at full size.
 
-		var currentProcess="#{request.session.processName}";
-		var selectedProcess,userId;
+script.
+  (function () {
+    const select = document.getElementById('process');
+    const search = document.getElementById('model-search');
+    const allModels = Array.from(select.options).map(option => option.value);
+    const currentProcess = select.dataset.currentProcess;
+    const preview = document.getElementById('svg');
+    const previewLink = document.getElementById('diagram-link');
+    const previewBox = document.querySelector('.models-preview');
+    const menu = document.querySelector('.details-menu');
+    const menuButton = menu && menu.querySelector('button');
+    const menuItems = document.getElementById('model-more-actions');
 
-		$(window).on('pageshow', function(){
+    function updateSelection() {
+      const name = select.value;
+      document.getElementById('selected-model-name').textContent = name || 'Select a model';
+      const urls = {
+        execLink: '/execute/', execInputLink: '/executeInput/',
+        modelLink: '/model/edit/', renameLink: '/model/rename/', deleteLink: '/model/delete/'
+      };
+      Object.keys(urls).forEach(id => {
+        const link = document.getElementById(id);
+        if (link) {
+          link.href = name ? urls[id] + encodeURIComponent(name) + '/' : '#';
+          link.setAttribute('aria-disabled', name ? 'false' : 'true');
+        }
+      });
+      if (name) {
+        const url = '/model/getSVg/' + encodeURIComponent(name);
+        preview.src = url;
+        previewLink.href = url;
+        previewBox.classList.remove('preview-unavailable');
+      } else {
+        preview.removeAttribute('src');
+        previewLink.href = '#';
+        previewBox.classList.add('preview-unavailable');
+      }
+    }
 
-			if (!$("#process").val())
-			{
-				$("#process").val($("#process option:first").val());
-			}
-
-			
-			selectedProcess = $("#process").val();
-			$("#svg").attr("src", "/model/getSVg/"+selectedProcess);
-			setLinks();
-
-		});
-
-		$(document).ready(function(){
-			userId=$("userId").val();
-
-			$("#process").change(function(){
-				selectedProcess = $(this).children("option:selected").val();
-				$("#svg").attr("src", "/model/getSVg/"+selectedProcess);
-				setLinks();
-			});
-			$("#userId").change(function(){
-				var userId=$(this).val();
-				  $.get("userId?userId="+userId, function(data, status){
-						});
-			});
-			$("#userId").keyup(function(){
-				userId=$(this).val();
-				setLinks();
-			});
-			$("#process")[0].value = currentProcess;
-		});
-		function setLinks()
-		{
-			if (selectedProcess)
-				{
-				var ext=selectedProcess+"/?userId="+userId;
-
-				$('#execLink').attr("href","/execute/"+ext);
-				$('#execButton').attr("value","/execute/"+ext);
-				$('#execInputLink').attr("href","/executeInput/"+ext);
-				$('#modelLink').attr("href","/model/edit/"+ext);
-				$('#deleteLink').attr("href","/model/delete/"+ext);
-				$('#renameLink').attr("href","/model/rename/"+ext);
-				}
-		}
-
-div(id="processes")
-	table
-		tr 
-			a(vertical-align="top")
-			form(name='ExecuteForm',action="/execute",method="post")
-				input(type='hidden',name='processName',id='processName')
-				td
-					table
-						tr
-							td
-
-								select(id='process',size=18)
-									each proc in procs
-										option #{proc}
-										a value #{proc}
-
-						tr
-							td
-
-				td
-					div(id="image",style="overflow:auto;")
-						image(id="svg",alt="No image to display",style="max-width: 100%;max-height: 270px;padding: 0;margin: 0;background: lightgray;")
-if user && user.isAdmin()
-	div(id="actions")
-		table
-			tr 
-				a(vertical-align="top")
-				form(name='ExecuteForm',action="/execute",method="post")
-					input(type='hidden',name='processName',id='processName')
-					td
-						table(class="buttonsTable")
-							tr
-								td  
-									a(id='execLink',href="javascript:alert('please select a Process');") 
-										div Execute
-							tr
-								td  
-									a(id='execInputLink',href="javascript:alert('please select a Process');") 
-										div Execute with Options
-							tr
-								td  
-									a(id='modelLink',href="javascript:alert('please select a Process');")
-										div Model
-					td
-						table(class="buttonsTable")
-							tr
-								td  
-										a(id='deleteLink',href="javascript:alert('please select a Process');")
-											div Delete
-							tr
-								td  
-										a(id='renameLink',href="javascript:alert('please select a Process');")
-											div Rename
-					td
-						table(class="buttonsTable")
-							tr
-								td  
-										a(href="/model/new")
-											div New Model
-							tr
-								td  
-										a(href="/model/import") 
-											div Import
-							tr
-								td  
-										a(href="/model/export") 
-											div Export
-else 
-	div(id="actions")
-		table
-			tr 
-				a(vertical-align="top")
-				form(name='ExecuteForm',action="/execute",method="post")
-					input(type='hidden',name='processName',id='processName')
-					td
-						table(class="buttonsTable")
-							tr
-								td  
-									a(id='execLink',href="javascript:alert('please select a Process');") 
-										div Start
+    search.addEventListener('input', function () {
+      const previous = select.value;
+      const matching = allModels.filter(name => name.toLocaleLowerCase().includes(search.value.trim().toLocaleLowerCase()));
+      select.replaceChildren(...matching.map(name => new Option(name, name)));
+      select.value = matching.includes(previous) ? previous : (matching[0] || '');
+      document.getElementById('model-count').textContent = matching.length + ' of ' + allModels.length + ' models';
+      document.getElementById('model-empty').hidden = matching.length !== 0;
+      updateSelection();
+    });
+    select.addEventListener('change', updateSelection);
+    preview.addEventListener('error', () => previewBox.classList.add('preview-unavailable'));
+    if (menuButton) {
+      menuButton.addEventListener('click', () => {
+        menuItems.hidden = !menuItems.hidden;
+        menuButton.setAttribute('aria-expanded', String(!menuItems.hidden));
+      });
+      document.addEventListener('click', event => {
+        if (!menu.contains(event.target)) {
+          menuItems.hidden = true;
+          menuButton.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+    select.value = allModels.includes(currentProcess) ? currentProcess : (allModels[0] || '');
+    document.getElementById('model-count').textContent = allModels.length + ' models';
+    updateSelection();
+  })();
