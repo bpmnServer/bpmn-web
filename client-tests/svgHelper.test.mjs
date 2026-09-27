@@ -102,3 +102,8 @@ test('Show Animation does not throw if an item is absent from the diagram', () =
   });
   assert.doesNotThrow(() => script.endAnimation('missing', 1, 'Ended'));
 });
+
+test('shared SVG helper ignores pages without an instance diagram', () => {
+  const script = loadClientScript('SVGHelper.js');
+  assert.doesNotThrow(() => script.start());
+});

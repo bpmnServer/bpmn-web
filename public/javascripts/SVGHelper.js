@@ -212,12 +212,13 @@ let svg = $('svg');
  }
  function start()
     {
-    scanSVG()
-
-
+    svg = $('svg');
     if (!svg.get(0))
         return;
 
+    if (typeof decorations === 'undefined' || typeof jsonData === 'undefined')
+        return;
+    scanSVG();
 
         $(document).click(function (event) {
             let id = $(event.target).parent().attr('data-element-id')
