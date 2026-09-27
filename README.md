@@ -49,3 +49,16 @@ Start the server with the following command:
 ```bash
 npm start
 ```
+
+## Browser tests
+
+The browser suite renders fixture pages from the real Pug views and serves the
+app's scripts locally. It does not need MongoDB or a running BPMN server.
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
+
+Pull requests run these tests in Chromium through GitHub Actions.
