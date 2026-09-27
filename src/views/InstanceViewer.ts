@@ -74,7 +74,8 @@ function getHeader() {
 	<script type='text/javascript' src='/vendor/dhtmlx/codebase/datastore.js'></script>
 	<script type='text/javascript' src='/javascripts/jsonHelper.js'></script>
 	 <!-- GSAP Library from CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="/vendor/gsap/gsap.min.js"></script>
+<script src="/vendor/gsap/MotionPathPlugin.min.js"></script>
 	<script type='text/javascript' src='/javascripts/SVGHelper.js'></script>
 
 	<link rel='stylesheet' href='/vendor/dhtmlx/codebase/dhtmlx.css' type='text/css'>

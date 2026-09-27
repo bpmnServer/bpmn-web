@@ -189,6 +189,7 @@ export class WebApp {
 		var router = express.Router();
 		var root=path.join(__dirname,'../');
 		
+		router.use('/vendor/gsap', express.static(path.join(root, 'node_modules/gsap/dist'), { maxAge: 31557600000 }));
 		router.use('/', express.static(path.join(root, 'public'), { maxAge: 31557600000 }));
 		router.use('/js/lib', express.static(path.join(root, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
 		router.use('/js/lib', express.static(path.join(root, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
