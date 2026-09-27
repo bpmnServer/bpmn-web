@@ -11,7 +11,7 @@ const __dirname = __dn(__filename);
 
 ///```javascript
 
-import { BPMNServer , DefaultHandler , Logger } from './index.js';
+import { BPMNServer  , Logger } from './index.js';
 import { configuration } from './index.js';
 
 
