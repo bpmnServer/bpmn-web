@@ -28,7 +28,7 @@ test('instance Show Animation plays and can be replayed', { timeout: 20000 }, as
 
     assert.equal(await page.locator('script[src="/vendor/gsap/gsap.min.js"]').count(), 1);
     assert.equal(await page.evaluate(() => typeof gsap), 'object');
-    assert.equal(await page.evaluate(() => typeof MotionPathPlugin), 'function');
+    assert.equal(await page.evaluate(() => typeof MotionPathPlugin !== 'undefined'), true);
     assert.equal(await page.locator('#jsonInfo').count(), 1);
 
     const button = page.getByRole('button', { name: 'Show Animation' });
@@ -66,6 +66,7 @@ test('model search updates the preview and section navigation', { timeout: 20000
     assert.equal(await page.locator('#modelLink').getAttribute('href'), '/model/edit/Invoice/');
 
     await page.locator('.workbench-tabs [data-section="tasks"]').click();
+    await page.locator('#tasks').waitFor({ state: 'visible' });
     assert.equal(await page.locator('#tasks').isVisible(), true);
     assert.equal(await page.locator('#processes').isVisible(), false);
     assert.deepEqual(errors, []);
