@@ -197,6 +197,7 @@ export class WebApp {
 		var router = express.Router();
 		var root=path.join(__dirname,'../');
 		
+		router.use('/vendor/gsap', express.static(path.join(root, 'node_modules/gsap/dist'), { maxAge: 31557600000 }));
 		router.use('/', express.static(path.join(root, 'public'), { maxAge: 31557600000 }));
 		router.use('/js/lib', express.static(path.join(root, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
 		router.use('/js/lib', express.static(path.join(root, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
@@ -226,3 +227,45 @@ export class WebApp {
 	}
 
 }
+
+/** Main logic
+*/
+/**
+ * Load environment variables from .env file, where API keys and passwords are configured.
+ */
+function setupEnvVars() {
+	dotenv.config();
+	var argv = process.argv;
+	var args = {};
+	for (let i = 2; i < argv.length; i++) {
+		const key = argv[i];
+		const val = argv[++i];
+		process.env[key] = val;
+	}
+}
+
+
+setupEnvVars();
+
+/**
+ * Warn (don't hard-fail — this is a demo) about unsafe/incomplete config:
+ *  - an empty API_KEY previously authenticated EVERY /api request
+ *    (`undefined == undefined`); the middleware now fails closed, but a
+ *    misconfigured server should still be flagged;
+ *  - REQUIRE_AUTHENTICATION=false disables all UI auth.
+ */
+function warnBootConfig() {
+    const warnings: string[] = [];
+    if (!process.env.API_KEY) warnings.push('API_KEY is not set — /api and /api2 will reject all requests (fail closed).');
+    if (!process.env.API_SERVICE_USER_NAME || !process.env.API_SERVICE_USER_GROUPS)
+        warnings.push('API_SERVICE_USER_NAME and API_SERVICE_USER_GROUPS are required for /api2.');
+    if (!process.env.SESSION_SECRET) warnings.push('SESSION_SECRET is not set — sessions/CSRF cannot be secured.');
+    if (process.env.REQUIRE_AUTHENTICATION === 'false') warnings.push('REQUIRE_AUTHENTICATION=false — UI authentication is DISABLED (dev only).');
+    if (warnings.length) console.warn('[config] ' + warnings.join('\n[config] '));
+}
+
+warnBootConfig();
+
+const webApp = new WebApp();
+
+export default webApp.app;

@@ -31,8 +31,8 @@ export class Account extends Common{
 		router.post('/reset/:token', userController.postReset);
 		router.get('/signup', userController.getSignup);
 		router.post('/signup', userController.postSignup);
-		router.get('/account/edit/:id', this.isAuthenticated, userController.getEdit);
-		router.post('/account/edit', this.isAuthenticated, userController.postEdit);
+		router.get('/account/edit/:id', this.isAuthenticated, this.isAdmin, userController.getEdit);
+		router.post('/account/edit', this.isAuthenticated, this.isAdmin, userController.postEdit);
 		router.get('/account/verify', this.isAuthenticated, userController.getVerifyEmail);
 		router.get('/account/verify/:token', this.isAuthenticated, userController.getVerifyEmailToken);
 		router.get('/account', this.isAuthenticated, userController.getAccount);

@@ -15,7 +15,8 @@ const awaitAppDelegateFactory = (middleware) => {
     }
 }
 
-import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
+import { apiKeyAuth as loggedIn, apiServiceAuth, configuredApiUser } from './middleware/apiKeyAuth.js';
+import { modelNameGuard } from './middleware/modelName.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { json } from 'body-parser';
@@ -25,14 +26,32 @@ import { json } from 'body-parser';
 
 export class API2 extends Common {
     getUser(request): SecureUser {
-
-        const user=request.body.user;
-        return new SecureUser(user);
+        // The API key authenticates one configured service account. Client-supplied
+        // user/group claims must never become an authorization principal.
+        return configuredApiUser();
     }
+    requireSystem = (req, res, next) => {
+        try {
+            if (this.getUser(req).isSystem()) return next();
+            return res.status(403).json({ errors: 'System permission required' });
+        } catch (error) {
+            return res.status(500).json({ errors: error.message });
+        }
+    };
+    requireAdmin = (req, res, next) => {
+        try {
+            if (this.getUser(req).isAdmin()) return next();
+            return res.status(403).json({ errors: 'Administrator permission required' });
+        } catch (error) {
+            return res.status(500).json({ errors: error.message });
+        }
+    };
     get bpmnServer() { return this.webApp.bpmnServer; }
     config() {
 
         var router = express.Router();
+        router.use(loggedIn, apiServiceAuth);
+        router.use('/model', modelNameGuard);
         var bpmnServer = this.bpmnServer;
         var api=new BPMNAPI(this.bpmnServer);
         let self = this;
@@ -96,7 +115,7 @@ export class API2 extends Common {
             }
             response.json({ errors: errors, instances });
         }));
-        router.get('/datastore/find', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.get('/datastore/find', loggedIn, this.requireSystem, awaitAppDelegateFactory(async (request, response) => {
 
             let error, results = null;
             let {
@@ -125,7 +144,7 @@ export class API2 extends Common {
             }
             response.json(results);
         }));
-        router.get('/data/fieldInfo', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.get('/data/fieldInfo', loggedIn, this.requireSystem, awaitAppDelegateFactory(async (request, response) => {
     
                 let id = request.query.id;
                 let processName = request.query.processName;
@@ -157,7 +176,7 @@ export class API2 extends Common {
     
                 response.json({ errors: [], node: JSON.parse(node2),fields ,data });
             }));
-        router.delete('/data/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+        router.delete('/data/deleteInstances', loggedIn, this.requireAdmin, awaitAppDelegateFactory(async (request, response) => {
 
             let query;
             if (request.body.query) {
@@ -171,7 +190,7 @@ export class API2 extends Common {
             let errors;
             let result;
             try {
-                result = await self.bpmnServer.dataStore.deleteInstances(query);
+                result = await api.data.deleteInstances(query, self.getUser(request));
             }
             catch (exc) {
                 errors = exc.toString();
@@ -422,7 +441,11 @@ export class API2 extends Common {
                             svgFile= files[1];
 
                         try {
-                            await api.model.save(name, bpmnFile,svgFile,self.getUser(request));
+                            const saved = await api.model.save(name, bpmnFile,svgFile,self.getUser(request));
+                            if (saved === false) {
+                                response.status(403).json({ errors: 'Model modification denied' });
+                                return;
+                            }
                             }
                         catch(exc)
                             {
@@ -500,7 +523,7 @@ export class API2 extends Common {
             let list = await api.model.findStartEvents(query,self.getUser(req));
             response.json(list);
         });
-        router.get('/model/load{/:name}', loggedIn, async function (request, response) {
+        router.get('/model/load{/:name}', loggedIn, self.requireSystem, async function (request, response) {
 
             //console.log(request.params);
             let name = (request.params as any).name;

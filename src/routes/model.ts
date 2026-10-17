@@ -11,6 +11,7 @@ import path from 'node:path';
 
 import { BPMNServer,BPMNAPI} from '../index.js';
 import { Common } from './common.js';
+import { modelNameGuard, isSafeModelName } from './middleware/modelName.js';
 
 
 const awaitHandlerFactory = (middleware) => {
@@ -36,7 +37,7 @@ export class Model extends Common {
         var router = express.Router();
 
         // Deny-by-default: model designer routes require a session.
-        router.use(this.isAuthenticated);
+        router.use(this.isAuthenticated, this.isAdmin, modelNameGuard);
 
         router.get('/list', awaitHandlerFactory(async (request, response) => {
 
@@ -123,6 +124,11 @@ export class Model extends Common {
                 // Strip any path components from the client-supplied filename to prevent
                 // path traversal (e.g. "../../app.ts") writing outside the tmp folder.
                 const safeName = path.basename(filename.filename);
+                if (!isSafeModelName(safeName)) {
+                    res.status(400).send('Invalid model name');
+                    file.resume();
+                    return;
+                }
                 const filepath = import.meta.dirname + '/../tmp/' + safeName;
                 fstream = fsx.createWriteStream(filepath);
                 file.pipe(fstream);
@@ -264,13 +270,6 @@ export class Model extends Common {
             let bpmn = body.bpmn;
             let svg = body.svg;
 
-            let definitionsPath = bpmnServer.configuration.definitionsPath;
-            let fullpath = definitionsPath + '/' + name + '.bpmn';
-
-            fsx.writeFile(fullpath, bpmn, function (err) {
-                if (err) throw err;
-                console.log(`Saved bpmn to ${fullpath}`);
-            });
             await definitions.save(name, bpmn, svg);
             console.log(" save completed");
 
@@ -287,13 +286,6 @@ export class Model extends Common {
             let bpmn = body.bpmn;
             let svg = body.svg;
 
-            let definitionsPath = bpmnServer.configuration.definitionsPath;
-            let fullpath = definitionsPath + '/' + name + '.bpmn';
-
-            fsx.writeFile(fullpath, bpmn, function (err) {
-                if (err) throw err;
-                console.log(`Saved bpmn to ${fullpath}`);
-            });
             await definitions.save(name, bpmn, svg);
             console.log(" save completed");
 
@@ -316,4 +308,3 @@ export class Model extends Common {
         return router;
     }
 }
-

@@ -1,22 +1,16 @@
 
- // Ensure GSAP is loaded
-if (typeof gsap === "undefined") {
-    console.error("GSAP is not loaded. Include GSAP CDN in your HTML.");
-}
-
-
 function animateFlow(flowId,seq) {
     let group = document.querySelector(`[data-element-id="${flowId}"]`);
     if (!group) {
         console.warn(`Flow group not found: ${flowId}`);
-        return gsap.to({}, {}); // Prevent breaking animation
+        return;
     }
     group.classList.add("Completed");
 
     let path = group.querySelector("path");
     if (!path) {
         console.warn(`No <path> found inside group: ${flowId}`);
-        return gsap.to({}, {}); // Prevent breaking animation
+        return;
     }
 //    $('#seq_'+seq).show();
 
@@ -28,16 +22,20 @@ function animateFlow(flowId,seq) {
     movingDot.setAttribute("r", "5");  // Radius of the dot
     movingDot.setAttribute("fill", "red");  // Color of the dot
     movingDot.setAttribute("data-moving-dot", flowId);
-    path.appendChild(movingDot);
+    group.appendChild(movingDot);
 
     // **Animate Path and Move the "Head"**
     gsap.to(path, { strokeDashoffset: 0, duration: 1, ease: "power2.out" });
-    gsap.to(movingDot, { 
-        motionPath: { path: path, align: path, alignOrigin: [0.5, 0.5] },
-        duration: 1, 
-        ease: "power2.out",
-        onComplete: () => movingDot.remove() // Remove dot after animation
-    });
+    if (typeof MotionPathPlugin !== 'undefined') {
+        gsap.to(movingDot, {
+            motionPath: { path: path, align: path, alignOrigin: [0.5, 0.5] },
+            duration: 1,
+            ease: "power2.out",
+            onComplete: () => movingDot.remove()
+        });
+    } else {
+        movingDot.remove();
+    }
 }
 
 function animateFlow2(flowId) {
@@ -94,6 +92,7 @@ function activateTask(taskId,seq) {
 
 function endAnimation(elementId,seq,action) {
     let element = document.querySelector(`[data-element-id="${elementId}"]`);
+    if (!element) return;
     element.classList.remove("Pending");
     if (action==='Ended')
         element.classList.add("Completed");
@@ -119,11 +118,62 @@ function endAnimation(elementId,seq,action) {
 // GSAP powers the optional "Show Animation" feature only. Guard its module-load use so a
 // missing/blocked gsap never throws here — otherwise the whole script aborts and the core
 // diagram decorations (scanSVG: sequence numbers + status colors) silently disappear.
-const gsapLoaded = typeof gsap !== 'undefined';
-let tl = gsapLoaded ? gsap.timeline() : null; // Start paused
-if (gsapLoaded && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
-function pauseAnimation() {
+let tl = null;
+let animationRun = 0;
+if (typeof gsap !== 'undefined' && typeof MotionPathPlugin !== 'undefined') gsap.registerPlugin(MotionPathPlugin);
+function animationStatus(message) {
+    const status = document.getElementById('animationStatus');
+    if (status) status.textContent = message;
+}
 
+async function playWithoutGsap(flowInfo, run) {
+    for (let index = 0; index < flowInfo.length && run === animationRun; index++) {
+        const item = flowInfo[index];
+        const element = item.id && document.querySelector('[data-element-id="' + CSS.escape(item.id) + '"]');
+        if (!element) continue;
+        if (index === 0) {
+            await element.animate([
+                { transform: 'scale(1)' }, { transform: 'scale(1.2)' }, { transform: 'scale(1)' }
+            ], { duration: 650 }).finished;
+        } else if (item.type === 'bpmn:SequenceFlow') {
+            const path = element.querySelector('path');
+            if (path && path.getTotalLength) {
+                const length = path.getTotalLength();
+                path.style.strokeDasharray = String(length);
+                path.style.strokeDashoffset = String(length);
+                const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('r', '5');
+                dot.setAttribute('fill', 'red');
+                dot.setAttribute('data-moving-dot', item.id);
+                element.appendChild(dot);
+                const points = Array.from({ length: 21 }, (_, i) => {
+                    const point = path.getPointAtLength(length * i / 20);
+                    return { transform: `translate(${point.x}px, ${point.y}px)` };
+                });
+                try {
+                    await Promise.all([
+                        path.animate([{ strokeDashoffset: String(length) }, { strokeDashoffset: '0' }], { duration: 800 }).finished,
+                        dot.animate(points, { duration: 800 }).finished
+                    ]);
+                } finally {
+                    path.style.strokeDashoffset = '0';
+                    dot.remove();
+                }
+            }
+            element.classList.add('Completed');
+        } else if (item.action === 'Waiting') {
+            element.classList.add('Pending');
+        } else if (item.action === 'Ended' || item.action === 'Cancelled') {
+            element.classList.remove('Pending');
+            element.classList.add(item.action === 'Ended' ? 'Completed' : 'Cancelled');
+        }
+        if (item.seq) $('#seq_' + item.seq).show();
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    if (run === animationRun) animationStatus('Replay complete. Click again to restart.');
+}
+function pauseAnimation() {
+    if (!tl) return;
     tl.addPause(() => {
         console.log("Timeline paused — waiting for user...");
         document.getElementById("continueBtn").style.display = "block";
@@ -131,18 +181,35 @@ function pauseAnimation() {
 
 }
 function continueAnimation() {
+    if (!tl) return;
     tl.play();
     document.getElementById("continueBtn").style.display = "none";
 }
 
 
 function startAnimation() {
+    const flowInfo = getFlowInfo();
+    if (!flowInfo.length) {
+        animationStatus('No recorded steps are available for this instance.');
+        return;
+    }
+    animationRun++;
+    if (tl) tl.kill();
+    if (typeof gsap !== 'undefined') gsap.killTweensOf('.djs-element');
+    document.querySelectorAll('[data-moving-dot]').forEach(dot => dot.remove());
 
     document.querySelectorAll(`.Pending`).forEach(element => { element.classList.remove("Pending"); });
     document.querySelectorAll(`.Completed`).forEach(element => { element.classList.remove("Completed"); });
     document.querySelectorAll(`.Cancelled`).forEach(element => { element.classList.remove("Cancelled"); });
-
-    let flowInfo = getFlowInfo();
+    animationStatus('Replaying recorded steps…');
+    if (typeof gsap === 'undefined') {
+        playWithoutGsap(flowInfo, animationRun).catch(error => {
+            console.error('Animation failed:', error);
+            animationStatus('Animation could not be played.');
+        });
+        return;
+    }
+    tl = gsap.timeline({ paused: true, onComplete: () => animationStatus('Replay complete. Click again to restart.') });
 
     for(let i=0;i<flowInfo.length;i++)
         {
@@ -158,7 +225,9 @@ function startAnimation() {
         if (i==0)
         {
             $('#seq_'+item.seq).hide();
-            tl.to('[data-element-id="${item.id}"]', { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
+            const firstElement = item.id && document.querySelector('[data-element-id="' + CSS.escape(item.id) + '"]');
+            if (firstElement)
+                tl.to(firstElement, { scale: 1.2, duration: 0.5, repeat: 1, yoyo: true });
         }
         else if (item.type==='bpmn:SequenceFlow')
             tl.call(() => animateFlow(item.id,item.seq+1), null, "+=0.5"); // Activate task and wait
@@ -174,32 +243,43 @@ function startAnimation() {
                     tl.call(() => endAnimation(item.id,item.seq+1,item.action), null, "+=0.5"); 
             }
     }
-   // tl.play();
+    tl.play();
 
     return;
 }
 
 // Ensure the SVG is fully loaded before running the animation
 document.addEventListener("DOMContentLoaded", start);
-let svg = $('svg');
+let svg;
 
  function getFlowInfo() {
-    let info = JSON.parse(document.getElementById('jsonInfo').textContent);
+    let json = document.getElementById('jsonInfo');
+    let info = json ? JSON.parse(json.textContent) : [];
     let flow=[];
     info.forEach(item => {
         try {
             let fl=JSON.parse(item.message.replaceAll(`'`,`"`));
-            flow.push(fl);
+            if (fl.id && fl.seq && fl.action) flow.push(fl);
         }
         catch(exc) {}
     });
+    if (!flow.length) {
+        const itemJson = document.getElementById('animationItems');
+        if (itemJson) {
+            const items = JSON.parse(itemJson.textContent);
+            flow = items.filter(item => item.id && item.seq).map(item => ({
+                id: item.id, seq: item.seq, type: item.type,
+                action: item.type === 'bpmn:SequenceFlow' ? 'Taken' : item.status === 'wait' ? 'Waiting' : 'Ended'
+            }));
+        }
+    }
     return flow;
  }
  function start()
     {
     scanSVG()
 
-
+    svg = $('svg');
     if (!svg.get(0))
         return;
 

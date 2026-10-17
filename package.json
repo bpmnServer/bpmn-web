@@ -21,7 +21,7 @@
     "clean": "tsc --build --clean",
     "test": "node --import tsx src/test/setup.ts && node --import tsx ./node_modules/mocha/bin/mocha.js --config=src/test/.mocharc.json src/test/feature",
     "test:engine": "node --test web-engine.test.mjs",
-    "test:unit": "node --test apikey-auth.test.mjs architecture-boundary.test.mjs"
+    "test:unit": "node --test apikey-auth.test.mjs web-security.test.mjs account-security.test.mjs dashboard-header.test.mjs"
   },
   "dependencies": {
     "axios": "^1.18.1",
@@ -40,6 +40,7 @@
     "express-flash": "^0.0.2",
     "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
+    "gsap": "3.12.2",
     "helmet": "^8.3.0",
     "lodash": "^4.18.1",
     "lusca": "^1.7.0",
