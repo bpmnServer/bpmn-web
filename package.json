@@ -13,7 +13,7 @@
     "clean": "tsc --build --clean",
     "test": "node --import tsx src/test/setup.ts && node --import tsx ./node_modules/mocha/bin/mocha.js --config=src/test/.mocharc.json src/test/feature",
     "test:engine": "node --test web-engine.test.mjs",
-    "test:unit": "node --test apikey-auth.test.mjs && node --test api-versioning.test.mjs && node --test admin-route-boundary.test.mjs"
+    "test:unit": "node --test apikey-auth.test.mjs principal-auth.test.mjs && node --test api-versioning.test.mjs && node --test admin-route-boundary.test.mjs"
   },
   "dependencies": {
     "axios": "^1.18.1",

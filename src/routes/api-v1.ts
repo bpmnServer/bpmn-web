@@ -16,6 +16,7 @@ const awaitAppDelegateFactory = (middleware) => {
 }
 
 import { apiKeyAuth as loggedIn } from './middleware/apiKeyAuth.js';
+import { trustedPrincipal } from './middleware/trustedPrincipal.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { json } from 'body-parser';
@@ -26,9 +27,7 @@ import { json } from 'body-parser';
 /** Canonical versioned HTTP API. */
 export class APIv1 extends Common {
     getUser(request): SecureUser {
-
-        const user=request.body.user;
-        return new SecureUser(user);
+		return request.workflowUser;
     }
     get bpmnServer() { return this.webApp.bpmnServer; }
     config() {
@@ -37,6 +36,7 @@ export class APIv1 extends Common {
         var bpmnServer = this.bpmnServer;
         var api=new BPMNAPI(this.bpmnServer);
         let self = this;
+		router.use(loggedIn, trustedPrincipal(this.webApp.principalResolver));
 
 
         router.get('/status', loggedIn, awaitAppDelegateFactory(async (request, response) => {
@@ -115,8 +115,8 @@ export class APIv1 extends Common {
 
             try {
 
-                results = await this.bpmnServer.dataStore.find({ filter, projection, after, limit, sort,lastItem,
-                    latestItem,getTotalCount });
+                results = await api.data.find({ filter, projection, after, limit, sort,lastItem,
+                    latestItem,getTotalCount }, self.getUser(request));
 
             }
             catch (exc) {
@@ -172,7 +172,7 @@ export class APIv1 extends Common {
             let errors;
             let result;
             try {
-                result = await self.bpmnServer.dataStore.deleteInstances(query);
+                result = await api.data.deleteInstances(query, self.getUser(request));
             }
             catch (exc) {
                 errors = exc.toString();
@@ -342,6 +342,39 @@ export class APIv1 extends Common {
 
         }));
 
+        router.put('/engine/restart', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            let instance;
+            let errors;
+            try {
+                const context = await api.engine.restart(
+                    request.body.query,
+                    request.body.data,
+                    self.getUser(request),
+                    request.body.options || {}
+                );
+                instance = context.instance;
+                if (context.errors)
+                    errors = context.errors.toString();
+            }
+            catch (exc) {
+                errors = exc.toString();
+            }
+            response.json({ errors, instance });
+        }));
+
+        router.get('/engine/get', loggedIn, awaitAppDelegateFactory(async (request, response) => {
+            let instance;
+            let errors;
+            try {
+                const context = await api.engine.get(request.body.query || request.body, self.getUser(request));
+                instance = context.instance;
+            }
+            catch (exc) {
+                errors = exc.toString();
+            }
+            response.json({ errors, instance });
+        }));
+
 
 /*
  *  engine.throwSignal     - issue a signal by id
@@ -386,6 +419,7 @@ export class APIv1 extends Common {
         const bpmnServer = this.bpmnServer;
         const api = new BPMNAdminAPI(this.bpmnServer);
         const self = this;
+		router.use(loggedIn, trustedPrincipal(this.webApp.principalResolver));
 
         //// ---------------------  Model -----------------------
 
