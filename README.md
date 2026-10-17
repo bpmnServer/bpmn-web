@@ -31,6 +31,9 @@ API_SERVICE_USER_GROUPS=SYSTEM
 # API_SERVICE_TENANT_ID=tenant-a
 # API_SERVICE_MODELS_OWNER=tenant-a
 
+# Separate credential for definition/model administration
+ADMIN_API_KEY=replace-with-a-different-secret
+
 # MongoDB Settings
 MONGO_DB_URL=mongodb://0.0.0.0:27017/bpmn
 #

@@ -222,6 +222,8 @@ export class WebApp {
 		this.app.use('/model', (new Model(this)).config());
 		this.app.use('/api', (new API(this)).config());
 		this.app.use('/api2', (new API2(this)).config());
+		this.app.use('/admin/api', (new API(this)).adminConfig());
+		this.app.use('/admin/api2', (new API2(this)).adminConfig());
 
 
 	}
