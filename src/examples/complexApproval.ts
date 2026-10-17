@@ -5,7 +5,7 @@ const server = new BPMNServer(configuration, logger, { cron: false });
 const api = new BPMNAPI(server);
 const user = SecureUser.SystemUser();
 
-import { ApprovalManager } from '../WorkflowApp/ApprovalManager';
+import { ApprovalManager } from '../sample-app/ApprovalManager';
 
 
 let process;

@@ -1,4 +1,27 @@
 import crypto from 'node:crypto';
+import { SecureUser } from 'bpmn-server';
+
+export function configuredApiUser(): SecureUser {
+    const userName = process.env.API_SERVICE_USER_NAME;
+    const groups = process.env.API_SERVICE_USER_GROUPS?.split(',').map(g => g.trim()).filter(Boolean);
+    if (!userName || !groups?.length)
+        throw new Error('API service principal is not configured');
+    return new SecureUser({
+        userName,
+        userGroups: groups,
+        tenantId: process.env.API_SERVICE_TENANT_ID,
+        modelsOwner: process.env.API_SERVICE_MODELS_OWNER,
+    });
+}
+
+export function apiServiceAuth(req, res, next): void {
+    try {
+        configuredApiUser();
+        next();
+    } catch (error) {
+        res.status(500).json({ errors: error.message });
+    }
+}
 
 /**
  * Constant-time string comparison. Both sides are hashed first so inputs of

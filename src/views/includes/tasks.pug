@@ -1,5 +1,7 @@
-div(id="tasks")
+div.tasks-content
 	h3 Pending Tasks
+	if !waiting.length
+		p.empty-state There are no pending tasks for this user.
 	table
 		tr
 			th Name -id
@@ -36,5 +38,3 @@ div(id="tasks")
 				td #{item.followFrom}
 				td #{item.priority}
 						
-
-

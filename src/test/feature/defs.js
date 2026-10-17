@@ -3,7 +3,7 @@ import { dirname as __dn } from 'path';
 const __filename = __f2p(import.meta.url);
 const __dirname = __dn(__filename);
 console.log('----', __filename);
-import { BPMNServer, Execution, DefaultHandler, Logger } from './index.js';
+import { BPMNServer, Execution, Logger } from './index.js';
 
 import { configuration as config } from '../testConfiguration.js';
 

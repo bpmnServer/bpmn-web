@@ -12,11 +12,11 @@ and here
 
 ### Changed
 -->
-## Unreleased — Separate runtime and administration routes (#2)
+## Unreleased — Separate web host and workflow application (#1)
 
-- Separate operational workflow routes from model-administration routes.
-- Mount administration endpoints under `/admin` with a distinct API key.
-- Prevent runtime credentials from granting workflow-definition management access.
+- Separate reusable web-host integration from the example workflow application.
+- Move application-specific configuration and workflow behavior behind explicit boundaries.
+- Keep the web package focused on adapting HTTP requests to engine operations.
 
 ## Release 2.3.6
 -	Fix issue with svg not reflecting instance svg

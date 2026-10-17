@@ -1,5 +1,5 @@
 // ESM test helper: shared BPMNServer instance + small assertion utilities.
-import { BPMNServer, DefaultHandler, Logger } from '../../index.js';
+import { BPMNServer, Logger } from '../../index.js';
 import { configuration } from '../testConfiguration.js';
 
 const logger = new Logger({ toConsole: false });
@@ -37,7 +37,7 @@ function getItem(id) {
 }
 
 export {
-    BPMNServer, DefaultHandler, Logger,
+    BPMNServer, Logger,
     configuration,
     logger, server, response,
     caseId,

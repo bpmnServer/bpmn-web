@@ -54,7 +54,7 @@ export class EndUser extends Common {
             display(request,response, 'Show');
         }));
 
-        router.get('/setUser', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
+        router.get('/setUser', this.isAdmin, awaitAppDelegateFactory(async (request, response) => {
             setForUser(request);
             //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
 
@@ -281,7 +281,7 @@ console.log('fields',fields);
 
             let imageId = request.query.id;
             console.log(request.query,request.query.version);
-            await instanceDetails(response, imageId);
+            await instanceDetails(request, response, imageId);
 
         }));
 
@@ -369,11 +369,11 @@ function getSecureUser(req) {
 //console.log('process.env.REQUIRE_AUTHENTICATION',process.env.REQUIRE_AUTHENTICATION);
 
     let user;
-    if (process.env.REQUIRE_AUTHENTICATION === 'true')
+    if (process.env.REQUIRE_AUTHENTICATION !== 'false')
     {
         const usr = getUser(req);
         if (usr)
-            user=new SecureUser({ userName: usr.userName, userGroups: usr.userGroups });
+            user=new SecureUser({ userName: usr.userName, userGroups: usr.userGroups, tenantId: usr.tenantId });
     }
     else
          user=SecureUser.SystemUser();
@@ -384,12 +384,16 @@ function getSecureUser(req) {
 
 function getUser(req) {
     //console.log('getUser', req.user, req.session.forUser);
-    if (req.session.forUser)
+    if (process.env.REQUIRE_AUTHENTICATION === 'false' && req.session.forUser)
         return req.session.forUser;
     else
         return req.user;
 }
 function setForUser(req) {
+    if (process.env.REQUIRE_AUTHENTICATION !== 'false') {
+        delete req.session.forUser;
+        return;
+    }
     let forUserName;
     let forUserGroups;
     if ('forUserName' in req.query) {
@@ -452,7 +456,10 @@ async function display(req,res, title, logs = [], items = []) {
         });
 
 }
-async function instanceDetails(response,instanceId) {
+async function instanceDetails(request,response,instanceId) {
+
+    const visibleItems = await bpmnAPI.data.findItems({ id: instanceId }, getSecureUser(request));
+    if (visibleItems.length === 0) return response.status(403).send('Instance access denied');
 
     let instance = await bpmnServer.dataStore.findInstance({ id: instanceId }, 'Full');
 

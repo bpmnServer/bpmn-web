@@ -1,5 +1,5 @@
 import { BPMNServer,dateDiff, DefaultAppDelegate, Logger, SystemUser ,BPMNAPI} from "bpmn-server";
-import { configuration} from '../WorkflowApp/configuration';
+import { configuration} from '../sample-app/configuration';
 import * as readline from "readline";
 import "dotenv/config";
 import { UserService } from "../userAccess/UserService";
@@ -440,4 +440,3 @@ async function recover() {
 		console.log('nothing to recover');
 
 }
-

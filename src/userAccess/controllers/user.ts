@@ -72,19 +72,19 @@ export class UserController {
         }
         req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
 
-        User.findById(req.body.id).then(
+        return User.findById(req.body.id).then(
             function (user) {
         
                 if (user.email !== req.body.email)
                     user.emailVerified = false;
                 user.email = req.body.email || '';
-                user.userGroups = req.body.userGroups;
+                user.userGroups = String(req.body.userGroups || '').split(',').map(group => group.trim()).filter(Boolean);
                 user.profile.name = req.body.name || '';
                 user.profile.gender = req.body.gender || '';
                 user.profile.location = req.body.location || '';
                 user.profile.website = req.body.website || '';
                 console.log('user obj', user);
-                user.save().then((savedUser) => {
+                return user.save().then((savedUser) => {
                     /*if (!user) {
                         if (err.code === 11000) {
                             req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
@@ -235,35 +235,34 @@ export class UserController {
      * Update profile information.
      */
     static postUpdateProfile(req, res, next) {
-        console.log("post update profile", req.body,req.user);
         const validationErrors = [];
         if (!validator.isEmail(req.body.email))
             validationErrors.push({ msg: 'Please enter a valid email address.' });
         if (validationErrors.length) {
             req.flash('errors', validationErrors);
-            return res.redirect('/account/edit/'+req.body.id);
+            return res.redirect('/account');
         }
         req.body.email = validator.normalizeEmail(req.body.email, { gmail_remove_dots: false });
 
 
-        User.findById(req.body.id).then((user) =>
+        return User.findById(req.user.id).then((user) =>
             {
+            if (!user) return res.status(404).send('User not found');
             if (user.email !== req.body.email)
                 user.emailVerified = false;
-            user.userGroups = req.body.userGroups.split(',');
             user.email = req.body.email || '';
             user.profile.name = req.body.name || '';
             user.profile.gender = req.body.gender || '';
             user.profile.location = req.body.location || '';
             user.profile.website = req.body.website || '';
            
-            user.save().then((savedUser) => {
+            return user.save().then((savedUser) => {
                 if (user!==savedUser) {
                         req.flash('errors', { msg: 'The email address you have entered is already associated with an account.' });
-                        return res.redirect('/account/edit' + req.body.id);
+                        return res.redirect('/account');
                 } 
                 req.flash('success', { msg: 'Profile information has been updated.' });
-                res.redirect('/account/edit/' + req.body.id);
+                res.redirect('/account');
             });
         });
     }
@@ -279,18 +278,18 @@ export class UserController {
             validationErrors.push({ msg: 'Passwords do not match' });
         if (validationErrors.length) {
             req.flash('errors', validationErrors);
-            res.redirect('/account/edit/' + req.body.id);
+            return res.redirect('/account');
         }
-        console.log('changing pw for ' + req.body.id);
 
-        User.findById(req.body.id).then(( user) => {
+        return User.findById(req.user.id).then(( user) => {
+            if (!user) return res.status(404).send('User not found');
             user.password = req.body.password;
-            user.save().then((savedUser) => {
+            return user.save().then((savedUser) => {
                 if (user !== savedUser) {
                     req.flash('error', { msg: 'Password has not been changed for user ' + user.userName + '.' });
                 }
                 req.flash('success', { msg: 'Password has been changed for user '+user.userName+'.' });
-                res.redirect('/account/edit/' + user.id);
+                res.redirect('/account');
             });
         });
     }
@@ -300,18 +299,12 @@ export class UserController {
      */
     static async postDeleteAccount(req, res, next) {
 
-        let ret= await User.deleteOne({ _id: req.body.id });
-            if (req.user.id == req.body.id) {
-                req.logout();
-                req.flash('info', { msg: 'Account has been deleted for user' + req.body.id + '.' });
-                res.redirect('/');
-            }
-            else {
-
-                req.flash('info', { msg: 'Account has been deleted for user' + req.body.id + '.' });
-                res.redirect('/admin');
-
-            }
+        await User.deleteOne({ _id: req.user.id });
+        req.logout(err => {
+            if (err) return next(err);
+            req.flash('info', { msg: 'Your account has been deleted.' });
+            res.redirect('/');
+        });
     }
     /**
      * GET /account/unlink/:provider
