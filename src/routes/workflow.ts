@@ -3,7 +3,7 @@ import FS from 'node:fs';
 import path from 'node:path';
 
 import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
-import { BPMNAPI , BPMNAdminAPI, SecureUser } from '../index.js';
+import { BPMNAPI , SecureUser } from '../index.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { bpmnToSvg } from './bpmnToSvg.js';
@@ -29,7 +29,6 @@ function awaitAppDelegateFactory (middleware) {
 var bpmnServer;
 var definitions;
 var bpmnAPI;
-var bpmnAdminAPI;
 
 export class Workflow extends Common {
     config() {
@@ -37,7 +36,6 @@ export class Workflow extends Common {
 
         bpmnServer = this.webApp.bpmnServer;
         bpmnAPI = new BPMNAPI(bpmnServer);
-        bpmnAdminAPI = new BPMNAdminAPI(bpmnServer);   // model reads; BPMNAPI has no model
         definitions = bpmnServer.definitions;
 
         // Deny-by-default: every workflow UI route requires a session
@@ -338,7 +336,7 @@ export class Workflow extends Common {
             item['dueFrom'] = dateDiff(item.dueDate);
             item['followFrom'] = dateDiff(item.followUpDate);
         });
-        let starts = await bpmnAdminAPI.model.findStartEvents({}, getSecureUser(request));
+        let starts = await bpmnAPI.model.findStartEvents({}, getSecureUser(request));
 
 
         await response.render('tasks',
