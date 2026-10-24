@@ -1,8 +1,9 @@
 import express from 'express';
 import FS from 'node:fs';
+import path from 'node:path';
 
 import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
-import { BPMNAPI , SecureUser } from '../index.js';
+import { BPMNAPI , BPMNAdminAPI, SecureUser } from '../index.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 import { bpmnToSvg } from './bpmnToSvg.js';
@@ -11,7 +12,6 @@ import { bpmnToSvg } from './bpmnToSvg.js';
 var caseId = Math.floor(Math.random() * 10000);
 
 
-const docsFolder = import.meta.dirname + '/../bpmnServer/docs/';
 
 // main functions
 
@@ -29,6 +29,7 @@ function awaitAppDelegateFactory (middleware) {
 var bpmnServer;
 var definitions;
 var bpmnAPI;
+var bpmnAdminAPI;
 
 export class Workflow extends Common {
     config() {
@@ -36,6 +37,7 @@ export class Workflow extends Common {
 
         bpmnServer = this.webApp.bpmnServer;
         bpmnAPI = new BPMNAPI(bpmnServer);
+        bpmnAdminAPI = new BPMNAdminAPI(bpmnServer);   // model reads; BPMNAPI has no model
         definitions = bpmnServer.definitions;
 
         // Deny-by-default: every workflow UI route requires a session
@@ -49,7 +51,7 @@ export class Workflow extends Common {
             let output = [];
             output = show(output);
             
-            display(request,response, 'Show', output);
+            return display(request,response, 'Show', output);
         }));
 
         router.get('/setUser', this.isAdmin, awaitAppDelegateFactory(async (request, response) => {
@@ -57,7 +59,7 @@ export class Workflow extends Common {
             setForUser(request);
             output = show(output);
 
-            display(request, response, 'Show', output);
+            return display(request, response, 'Show', output);
         }));
         router.get('/tasks', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
             return await this.tasks(request, response);
@@ -67,7 +69,7 @@ export class Workflow extends Common {
         router.get('/readme_md', awaitAppDelegateFactory(async (request, response) => {
 
             let processName = request.params.process;
-            let fileName = docsFolder + '../README.md';
+            let fileName = path.resolve(import.meta.dirname, '../../node_modules/bpmn-server/README.md');
 
             let file = FS.readFileSync(fileName,
                 { encoding: 'utf8', flag: 'r' });
@@ -138,7 +140,7 @@ export class Workflow extends Common {
         router.get('/listDefinitions', function (req, res) {
             let output = ['Data Reset'];
             output = show(output);
-            display(req,res, 'Show', output);
+            return display(req,res, 'Show', output);
 
         });
 
@@ -146,20 +148,20 @@ export class Workflow extends Common {
             await bpmnServer.dataStore.deleteInstances({});
             let output = ['Data Reset'];
             output = show(output);
-            display(request,response, 'Show', output);
+            return display(request,response, 'Show', output);
         }));
 
         router.get('/refresh', function (req, res) {
             let output = [];
             output = show(output);
-            display(req,res, 'Show', output);
+            return display(req,res, 'Show', output);
         });
 
         router.get('/clearDebug', function (req, res) {
             //    Logger.clear();
             let output = [];
             output = show(output);
-            display(req,res, 'Show', output);
+            return display(req,res, 'Show', output);
         });
 
         router.get('/invokeItem', awaitAppDelegateFactory(async (request, response) => {
@@ -171,15 +173,17 @@ export class Workflow extends Common {
             
 
 
-            const instances = await bpmnAPI.data.findInstances({ "items.id": id }, getSecureUser(request), 'full');
-            const instance = instances[0];
+            // findItem authorizes the task; findInstances no longer returns data or items to non-admins
+            const item = await bpmnAPI.data.findItem({ "items.id": id }, getSecureUser(request));
+            if (!item) return response.status(403).send('Item not found or not authorized');
+            const instance = await bpmnServer.dataStore.findInstance({ id: item.instanceId }, 'full');
 
             let definition=await bpmnServer.definitions.loadFromInstance(instance);
 
             let { node, fields } =definition.getNodeInfo(elementId);
 
             
-            let vars = ViewHelper.formatData(instance.data);
+            let vars = ViewHelper.formatData(instance.data || {});
 
             if (fields && fields.length > 0) {
                 response.render('invokeItem', { node,
@@ -235,14 +239,13 @@ export class Workflow extends Common {
                 return;
             }
 
-            const instances = await bpmnAPI.data.findInstances({ "id": item.instanceId }, getSecureUser(request),'full');
-            const instance = instances[0];
+            const instance = await bpmnServer.dataStore.findInstance({ id: item.instanceId }, 'full');   // item authorized above
             const lastItem = instance.items[instance.items.length - 1];
             let definition=await bpmnServer.definitions.loadFromInstance(instance);
 
             let { node, fields } =definition.getNodeInfo(elementId);
 
-            let vars = ViewHelper.formatData(instance.data);
+            let vars = ViewHelper.formatData(instance.data || {});
             response.render('assign', {
                     item, instance, vars, lastItem,
                     dueDate: ViewHelper.dateDisplay(item.dueDate),
@@ -299,7 +302,7 @@ export class Workflow extends Common {
 
             let output = ['run ' + process];
             output = show(output);
-            display(request,response, 'Run Prcesses', output, exec.instance.logs, exec.instance.items);
+            return display(request,response, 'Run Prcesses', output, exec.instance.logs, exec.instance.items);
         }));
         router.get('/instanceDetails', awaitAppDelegateFactory(async (request, response) => {
 
@@ -335,7 +338,7 @@ export class Workflow extends Common {
             item['dueFrom'] = dateDiff(item.dueDate);
             item['followFrom'] = dateDiff(item.followUpDate);
         });
-        let starts = await bpmnAPI.model.findStartEvents({}, getSecureUser(request));
+        let starts = await bpmnAdminAPI.model.findStartEvents({}, getSecureUser(request));
 
 
         await response.render('tasks',
@@ -365,7 +368,7 @@ async function home(request, response)  {
 
 
 
-        display(request,response, 'Show', output);
+        return display(request,response, 'Show', output);
 }
 
 async function deleteInstance(req, res) {
@@ -375,7 +378,7 @@ async function deleteInstance(req, res) {
     await bpmnServer.dataStore.deleteInstances({ id: instanceId });
 
     let output = ['Complete ' + instanceId];
-    display(req,res, 'Show', output);
+    return display(req,res, 'Show', output);
 }
 async function getProcs() {
     let list=[];
@@ -505,7 +508,7 @@ async function afterOperation(request,response,result) {
          response.redirect('/instanceDetails?id=' + result.execution.id);
         }
     else
-        display(request,response, 'Show', []);
+        return display(request,response, 'Show', []);
 
 //    response.redirect('/instanceDetails?id=' + result.execution.id);
 //    console.log('items#',result.instance.items.length);
@@ -554,7 +557,7 @@ async function instanceDetails(request,response,instanceId,version) {
     let output = ['View Process Log'];
     output = show(output);
 
-    let vars = ViewHelper.formatData(instance.data);
+    let vars = ViewHelper.formatData(instance.data || {});
 
     let decorations = JSON.stringify(ViewHelper.calculateDecorations(items,instance.tokens));
 
