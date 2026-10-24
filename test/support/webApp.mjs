@@ -152,15 +152,18 @@ export class WebClient {
         const init = { method, redirect: 'manual', headers: { ...headers } };
         if (this.cookies.size) init.headers.cookie = this.cookieHeader;
         const csrf = this.cookies.get('_csrf');
+        // scripts send the CSRF token as a header (public/javascripts/csrf.js); forms also as _csrf
+        if (csrf && !/^(GET|HEAD)$/i.test(method) && !('x-csrf-token' in init.headers) && this.sendCsrf !== false)
+            init.headers['x-csrf-token'] = decodeURIComponent(csrf);
         if (form) {
             const params = new URLSearchParams();
             for (const [k, v] of Object.entries(form)) params.append(k, String(v));
-            if (csrf && !('_csrf' in form)) params.append('_csrf', decodeURIComponent(csrf));
+            if (csrf && !('_csrf' in form) && this.sendCsrf !== false) params.append('_csrf', decodeURIComponent(csrf));
             init.body = params;
         }
         else if (multipart) {
             const data = new FormData();
-            if (csrf) data.append('_csrf', decodeURIComponent(csrf));
+            if (csrf && this.sendCsrf !== false) data.append('_csrf', decodeURIComponent(csrf));
             for (const [k, v] of Object.entries(multipart))
                 if (v && v.content !== undefined) data.append(k, new Blob([v.content], { type: v.type || 'application/octet-stream' }), v.filename);
                 else data.append(k, String(v));

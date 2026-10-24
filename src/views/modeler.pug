@@ -6,6 +6,8 @@ html(lang="en-CA" class="no-js")
       //- allow rendering inside the ITSM host iframe
       meta(http-equiv="Content-Security-Policy" content=`frame-ancestors 'self' ${cspHost}`)
     title Omni-WorkFlow
+    meta(name="csrf-token" content=_csrf)
+    script(type="text/javascript" src="/javascripts/csrf.js")
     script(type="text/javascript" src="/javascripts/jquery.min.js")
     script(type="text/javascript" src="/javascripts/bootstrap.min.js")
     script(type="text/javascript" src="/javascripts/jquery-ui.min.js")

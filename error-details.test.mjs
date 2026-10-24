@@ -62,3 +62,15 @@ test('renders escaped HTML for browser requests', () => {
   assert.ok(res.body.includes('&lt;script&gt;'));
   assert.ok(!res.body.includes('<script>x'));
 });
+
+test('keeps a status the middleware already set on the response', () => {
+  const res = fakeResponse();
+  res.statusCode = 403;
+  const errorLog = console.error; console.error = () => {};
+  try {
+    errorDetailsHandler(new Error('CSRF token mismatch'), { method: 'POST', originalUrl: '/resetData', accepts: () => 'html' }, res, () => {});
+  } finally { console.error = errorLog; }
+  assert.equal(res.statusCode, 403);
+  assert.ok(res.body.includes('CSRF token mismatch'));
+});
+

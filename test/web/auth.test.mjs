@@ -88,4 +88,44 @@ test('signup creates a user who can log in', async () => {
   assert.equal((await login.get('/')).status, 200);
 });
 
-test.todo('state-changing forms are protected against CSRF (lusca allowlist "/" currently exempts every path)');
+test('state-changing requests without the CSRF token are refused', async () => {
+  const admin = await web.login('admin');
+  admin.sendCsrf = false;
+  for (const [url, form] of [['/resetData', {}], ['/model/rename', { processName: 'leave-request', newName: 'x' }], ['/account/profile', { email: 'a@b.c' }]]) {
+    const res = await admin.post(url, form);
+    assert.equal(res.status, 403, `${url}: ${res.status}`);
+  }
+  const names = (await web.bpmnServer.definitions.getList()).map(m => m.name ?? m);
+  assert.ok(names.includes('leave-request'), 'nothing renamed');
+});
+
+test('a token from another session is refused', async () => {
+  const admin = await web.login('admin');
+  const other = await web.login('staff');
+  admin.sendCsrf = false;
+  const res = await admin.post('/resetData', { _csrf: decodeURIComponent(other.cookies.get('_csrf')) });
+  assert.equal(res.status, 403);
+});
+
+test('the login form needs the token too', async () => {
+  const client = web.client();
+  await client.get('/login');
+  client.sendCsrf = false;
+  const res = await client.post('/login', { userName: 'staff', password: PASSWORD });
+  assert.equal(res.status, 403);
+});
+
+test('pages carry the token for forms and scripts', async () => {
+  const admin = await web.login('admin');
+  const home = await admin.get('/');
+  assert.match(home.text, /<meta name="csrf-token" content="[^"]+"/);
+  assert.match(home.text, /\/javascripts\/csrf\.js/);
+  const assign = await admin.get('/model/rename/leave-request');
+  assert.match(assign.text, /name="_csrf" value="[^"]+"/);
+});
+
+test('API-key requests need no CSRF token', async () => {
+  const res = await web.api('POST', '/api2/engine/start', { name: 'leave-request', data: {} });
+  assert.equal(res.status, 200);
+  assert.ok(res.body.id);
+});
