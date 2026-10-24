@@ -77,7 +77,15 @@ test('the runtime API does not expose model administration', async () => {
   assert.ok(!Array.isArray(res.body), 'no model list');
 });
 
-test.todo('unknown API paths answer 404 JSON (today they fall through to the UI router and redirect to /login)');
+test('unknown API paths answer 404 JSON', async () => {
+  for (const [url, key] of [['/api2/no-such-route', undefined], ['/api/no/such', undefined], ['/admin/api2/nope', ADMIN_API_KEY]]) {
+    const res = await web.api('GET', url, undefined, key);
+    assert.equal(res.status, 404, url);
+    assert.match(res.body.errors, /No API route/, url);
+  }
+  // without a key the key check answers first
+  assert.equal((await web.client().get('/api2/no-such-route')).status, 401);
+});
 
 test('signup creates a user who can log in', async () => {
   const client = web.client();

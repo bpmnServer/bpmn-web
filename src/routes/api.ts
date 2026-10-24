@@ -491,6 +491,8 @@ export class API extends Common {
         }));
 
 
+        // an unknown API path is the caller's mistake: answer it here, not with the UI's login redirect
+        router.use((request, response) => response.status(404).json({ errors: `No API route ${request.method} ${request.originalUrl.split('?')[0]}` }));
         return router;
     }
 
@@ -676,6 +678,8 @@ export class API extends Common {
                     response.json({ errors: exc.toString() });
                 }
             }));
+        // an unknown API path is the caller's mistake: answer it here, not with the UI's login redirect
+        router.use((request, response) => response.status(404).json({ errors: `No API route ${request.method} ${request.originalUrl.split('?')[0]}` }));
         return router;
     }
 }
