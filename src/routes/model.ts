@@ -11,7 +11,7 @@ import path from 'node:path';
 import { layoutProcess } from 'bpmn-auto-layout';
 import { bpmnToSvg } from './bpmnToSvg.js';
 
-import { BPMNServer,BPMNAPI} from '../index.js';
+import { BPMNServer, BPMNAdminAPI } from '../index.js';
 import { Common } from './common.js';
 import { modelNameGuard, isSafeModelName } from './middleware/modelName.js';
 
@@ -33,7 +33,7 @@ export class Model extends Common {
         const bpmnServer = this.webApp.bpmnServer;
 
         const definitions = bpmnServer.definitions;
-        bpmnAPI = new BPMNAPI(bpmnServer);
+        bpmnAPI = new BPMNAdminAPI(bpmnServer);   // the designer reads and saves models
 
 
         var router = express.Router();
@@ -106,11 +106,8 @@ export class Model extends Common {
 
         }));
 
-        var fsx = FS;       //File System - for file manipulation (built-in fs; methods used are native)
 
         router.post('/import', awaitHandlerFactory(async (req, res) => {
-
-            var fstream;
 
             try
                 {
@@ -131,14 +128,13 @@ export class Model extends Common {
                     file.resume();
                     return;
                 }
-                const filepath = import.meta.dirname + '/../tmp/' + safeName;
-                fstream = fsx.createWriteStream(filepath);
-                file.pipe(fstream);
-                fstream.on('close', async function () {
+                // read the upload in memory: no temp folder (dist/tmp does not exist in a build)
+                const chunks = [];
+                file.on('data', chunk => chunks.push(chunk));
+                file.on('end', async function () {
                     console.log("Upload Finished of " + safeName);
                     const name = safeName;
-                    let source = fsx.readFileSync(filepath,
-                        { encoding: 'utf8', flag: 'r' });
+                    let source = Buffer.concat(chunks).toString('utf8');
 
                     // files without diagram information (BPMN DI) can't be drawn by the modeler
                     if (!/<(\w+:)?BPMNDiagram[\s>]/.test(source)) {
