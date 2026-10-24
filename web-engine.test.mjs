@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 // Everything pulled through bpmn-web's OWN index barrel -> proves the bpmn-web -> bpmn-server v3 ESM link
 import { BPMNServer, Configuration, ModelsDatastore, DataStore, NoCacheManager, Logger, ScriptHandler } from './dist/index.js';
-import { MyAppDelegate } from './dist/WorkflowApp/appDelegate.js';
+import { MyAppDelegate } from './dist/sample-app/appDelegate.js';
 import { MemoryMongoDB } from './MemoryMongoDB.mjs';
 import { fileURLToPath } from 'node:url';
 

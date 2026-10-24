@@ -1,3 +1,3 @@
 
-import { ApprovalManager } from '../WorkflowApp/ApprovalManager';
+import { ApprovalManager } from '../sample-app/ApprovalManager';
 ApprovalManager.test();
