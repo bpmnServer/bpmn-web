@@ -8,7 +8,6 @@
 *.map
 *.d.ts
 **/*.js
-!src/test/**/*.js
 /bin
 /dist
 .env

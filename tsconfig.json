@@ -7,6 +7,6 @@
     "rootDir": "./src", "outDir": "./dist", "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules","dist","src/examples","src/test","src/scripts","src/tmp",
+  "exclude": ["node_modules","dist","src/examples","src/scripts","src/tmp",
               "src/WorkflowApp/appServices.ts","src/WorkflowApp/INSTALL_appDelegate.ts","src/WorkflowApp/INSTALL_configuration.ts"]
 }
