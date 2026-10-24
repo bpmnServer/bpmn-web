@@ -105,6 +105,10 @@ export async function startWebApp({ env = {} } = {}) {
         /** Calls the API with a key (API_KEY unless given). */
         api: (method, url, body, key = API_KEY) => new WebClient(base).request(method, url, { json: body, headers: { 'x-api-key': key } }),
         async stop() {
+            // close fetch's keep-alive connections first: exiting while they close crashes Node on
+            // Windows ("Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)")
+            await globalThis[Symbol.for('undici.globalDispatcher.1')]?.close?.().catch(() => { });
+            webApp.server.closeAllConnections?.();
             await new Promise(resolve => webApp.server.close(() => resolve()));
             await bpmnServer.shutdown?.();
             try {
