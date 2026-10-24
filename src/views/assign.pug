@@ -1,6 +1,7 @@
 extends layout
 
 block content
+	include includes/dates.pug
 
 
 	h3 Assign Users/Groups to Item  <b>#{elementId}#{name} </b> - #{processName} 
@@ -65,12 +66,12 @@ block content
 			td #{instance.id}
 		tr
 			td started At
-			td(class='startDate') #{instance.startedAt}
+			td(class='startDate') #{prettyDate(instance.startedAt)}
 			td ended At
-			td #{instance.endedAt}
+			td #{prettyDate(instance.endedAt)}
 		tr
 			td lastAt
-			td #{lastAt} 
+			td #{prettyDate(lastAt)} 
 		tr
 			td lastItem
 			td #{lastItem.elementId}
@@ -112,8 +113,8 @@ block content
 						td #{seq}
 						td #{item.elementId}
 						td #{item.name}
-						td(class='date') #{item.startedAt}
-						td(class='date') #{item.endedAt}
+						td(class='date') #{prettyDate(item.startedAt)}
+						td(class='date') #{prettyDate(item.endedAt)}
 						td #{item.status}
 						td #{item.type}
 						td #{item.userId}

@@ -4,12 +4,7 @@ block content
   link(rel="stylesheet", href="/stylesheets/instance-details.css")
   - var docs = JSON.parse(definition || '{}');
   - var info = (logs || []).filter(l => l.type === 'info');
-  - function prettyDate(dateStr) {
-  -   if (!dateStr) return '';
-  -   var date = new Date(dateStr);
-  -   if (isNaN(date.getTime())) return dateStr;
-  -   return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
-  - }
+  include includes/dates.pug
   - var lastAt = lastItem && (lastItem.endedAt || lastItem.startedAt);
 
   script(type="text/javascript").
@@ -131,8 +126,8 @@ block content
                 td #{seq}
                 td.instance-nowrap #{item.elementId}
                 td #{item.name} #{key}
-                td.instance-nowrap #{item.startedAt}
-                td.instance-nowrap #{item.endedAt}
+                td.instance-nowrap #{prettyDate(item.startedAt)}
+                td.instance-nowrap #{prettyDate(item.endedAt)}
                 td: span.status-badge(class=item.status === 'wait' ? 'status-wait' : 'status-end') #{item.status}
                 td.instance-nowrap #{item.type}
                 td #{item.userName}
