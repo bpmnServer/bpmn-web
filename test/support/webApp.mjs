@@ -98,7 +98,7 @@ export async function startWebApp({ env = {} } = {}) {
             await client.get('/login');
             const res = await client.post('/login', { userName, password: PASSWORD });
             if (res.status !== 302 || res.location.endsWith('/login'))
-                throw new Error(`login as ${userName} failed: ${res.status} ${res.location}`);
+                throw new Error(`login as ${userName} failed: ${why(res)}`);
             client.userName = userName;
             return client;
         },
