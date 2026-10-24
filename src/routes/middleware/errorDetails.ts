@@ -73,7 +73,7 @@ export function errorDetailsHandler(err, req, res, next): void {
         return;
     }
     res.status(details.status);
-    const wantsJson = /^\/api2?(\/|$)/.test(details.path) || req.xhr || !req.accepts?.('html');
+    const wantsJson = /^(\/admin)?\/api2?(\/|$)/.test(details.path) || req.xhr || !req.accepts?.('html');
     if (wantsJson) {
         res.json(details);
         return;

@@ -74,7 +74,7 @@ export class API2 extends Common {
         router.post('/data/findItems', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let query;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
@@ -97,11 +97,11 @@ export class API2 extends Common {
 
             //console.log(request.body);
             let query;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
-                query = request.body;
+                query = request.body ?? {};     // a GET usually has no body: all visible instances
             //console.log(query);
             let instances;
             let errors;
@@ -179,7 +179,7 @@ export class API2 extends Common {
         router.delete('/data/deleteInstances', loggedIn, this.requireAdmin, awaitAppDelegateFactory(async (request, response) => {
 
             let query;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
@@ -229,7 +229,7 @@ export class API2 extends Common {
 
             //console.log(request.body);
             let query, data,userName,assignment;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             if (request.body.data) {
@@ -262,7 +262,7 @@ export class API2 extends Common {
 
             //console.log('---------invoke',request.body);
             let query, data,options;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             if (request.body.data) {
@@ -515,7 +515,7 @@ export class API2 extends Common {
 
         router.get('/model/list', loggedIn, async function (req, response) {
 
-            let query=req.body.query;
+            let query=req.body?.query ?? {};   // GET requests may carry no body
             
             let list = await api.model.list(query,self.getUser(req));
             //console.log(list);
@@ -523,13 +523,13 @@ export class API2 extends Common {
         });
         router.get('/model/findEvents', loggedIn, async function (req, response) {
 
-            let query=req.body.query;
+            let query=req.body?.query ?? {};   // GET requests may carry no body
             let list = await api.model.findEvents(query,self.getUser(req));
             response.json(list);
         });
         router.get('/model/findStartEvents', loggedIn, async function (req, response) {
 
-            let query=req.body.query;
+            let query=req.body?.query ?? {};   // GET requests may carry no body
             let list = await api.model.findStartEvents(query,self.getUser(req));
             response.json(list);
         });
