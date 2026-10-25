@@ -24,6 +24,8 @@ test.after(async () => {
 /** A signed-in admin page that records refused (403) requests and page errors. */
 async function signedIn(userName = 'admin') {
   const context = await browser.newContext();
+  // only the app itself: external CDNs would make the tests slow and network-dependent
+  await context.route('**/*', route => route.request().url().startsWith(web.base) ? route.continue() : route.abort());
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   const refused = [], errors = [];
