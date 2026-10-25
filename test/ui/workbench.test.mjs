@@ -162,26 +162,41 @@ test('a long leave: staff submits, the manager approves from their own list', as
   for (const s of [admin, staff, manager]) await s.close();
 });
 
-test('candidates: the Tasks page offers Execute, the workbench list only once assigned', async () => {
-  // Today's behaviour, which differs between the two lists (the engine lets candidates complete it):
-  // tasks.pug offers Execute to every candidate; includes/tasks.pug only to the assignee or an admin.
+test('candidates execute a task from every task list, assigned or not (assignment is optional)', async () => {
   const admin = await signedIn('admin');
   await admin.page.goto(`${web.base}/execute/${MODEL}`);
-  const submit = await waitingItem(instanceIdOf(admin.page), 'Submit');
+  const id = instanceIdOf(admin.page);
+  const submit = await waitingItem(id, 'Submit');
 
   const staff = await signedIn('staff');
-  await staff.page.goto(`${web.base}/tasks`);
-  assert.equal(await staff.page.locator(`a[href*="invokeItem?id=${submit.id}"]`).count(), 1, '/tasks: Execute');
-  await staff.page.goto(`${web.base}/`);
-  assert.equal(await staff.page.locator(`#tasks a[href*="assign?id=${submit.id}"], a[href*="assign?id=${submit.id}"]`).count() >= 1, true, 'workbench: listed, with Assign');
-  assert.equal(await staff.page.locator(`a[href*="invokeItem?id=${submit.id}"]`).count(), 0, 'workbench: no Execute before assignment');
+  for (const url of ['/tasks', '/', '/user']) {
+    await staff.page.goto(web.base + url);
+    assert.equal(await staff.page.locator(`a[href*="invokeItem?id=${submit.id}"]`).count(), 1, `${url}: Execute`);
+  }
+  await Promise.all([staff.page.waitForURL(/\/invokeItem/), staff.page.click(`a[href*="invokeItem?id=${submit.id}"]`)]);
+  await staff.page.fill('[name=days]', '1');
+  await Promise.all([staff.page.waitForNavigation(), staff.page.click('form[name=InvokeForm] [type=submit]')]);
+  assert.equal((await instance(id)).status, 'end', 'completed without being assigned');
 
-  await admin.page.goto(`${web.base}/assign?id=${submit.id}&processName=${MODEL}&elementId=Submit`);
-  await admin.page.fill('[name=assignee]', 'staff');
-  await Promise.all([admin.page.waitForNavigation(), admin.page.click('form[name=InvokeForm] [type=submit]')]);
-  await staff.page.goto(`${web.base}/`);
-  assert.equal(await staff.page.locator(`a[href*="invokeItem?id=${submit.id}"]`).count(), 1, 'workbench: Execute once assigned');
-  assert.deepEqual([...admin.problems, ...staff.problems], []);
+  const manager = await signedIn('manager');
+  await manager.page.goto(`${web.base}/`);
+  assert.equal(await manager.page.locator(`a[href*="invokeItem?id=${submit.id}"]`).count(), 0, 'a completed task is no longer listed');
+  assert.deepEqual([...admin.problems, ...staff.problems, ...manager.problems], []);
+  for (const s of [admin, staff, manager]) await s.close();
+});
+
+test('tasks of other groups are not listed', async () => {
+  const admin = await signedIn('admin');
+  await admin.page.goto(`${web.base}/execute/${MODEL}`);
+  const id = instanceIdOf(admin.page);
+  await web.api('PUT', '/api2/engine/invoke', { query: { id, 'items.elementId': 'Submit' }, data: { days: 9 } });
+  const approve = await waitingItem(id, 'Approve');
+  assert.ok(approve, 'waits for the manager');
+  const staff = await signedIn('staff');
+  for (const url of ['/tasks', '/', '/user']) {
+    await staff.page.goto(web.base + url);
+    assert.equal(await staff.page.locator(`a[href*="id=${approve.id}"]`).count(), 0, `${url}: no manager task for staff`);
+  }
   await admin.close();
   await staff.close();
 });
