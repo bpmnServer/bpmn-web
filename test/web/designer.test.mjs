@@ -46,8 +46,8 @@ test('importing a model without a diagram lays it out, previews it and selects i
   const res = await upload(admin, 'plain.bpmn', NO_DIAGRAM);
   assert.equal(res.status, 302, why(res));
   assert.equal(res.location, '/');
-  const name = (await modelNames()).find(n => /^plain/.test(n));
-  assert.ok(name, 'imported model listed');
+  const name = 'plain';
+  assert.ok((await modelNames()).includes(name), 'listed under the file name without its extension');
 
   const source = await web.bpmnServer.definitions.getSource(name);
   assert.match(source, /BPMNDiagram/, 'diagram information added');
@@ -56,15 +56,15 @@ test('importing a model without a diagram lays it out, previews it and selects i
   assert.match(svg.text, /data-element-id="t"/, 'preview generated');
 
   const home = await admin.get('/');
-  assert.match(home.text, new RegExp(`data-current-process="${name.replace('.', '\\.')}"`), 'imported model is selected');
+  assert.match(home.text, /data-current-process="plain"/, 'imported model is selected');
 });
 
 test('importing a model with a diagram keeps it as it is', async () => {
   const original = fs.readFileSync(path.join(FIXTURES, 'leave-request.bpmn'), 'utf8');
   const res = await upload(admin, 'leave-copy.bpmn', original);
   assert.equal(res.status, 302, why(res));
-  const name = (await modelNames()).find(n => /^leave-copy/.test(n));
-  assert.equal(await web.bpmnServer.definitions.getSource(name), original);
+  assert.ok((await modelNames()).includes('leave-copy'));
+  assert.equal(await web.bpmnServer.definitions.getSource('leave-copy'), original);
 });
 
 test('import refuses unsafe file names', async () => {
