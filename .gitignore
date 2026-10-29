@@ -21,3 +21,6 @@ docker/bpmn_server_volume
 
 # Playwright screenshots
 /test/ui/screenshots
+
+# uploads written by older imports
+src/tmp/
