@@ -17,6 +17,7 @@ block content
 	h4 Assignment
 
 	form(name='InvokeForm',action="/assign",method="post")
+		input(type='hidden', name='_csrf', value=_csrf)
 		input(type='hidden',name='itemId',id='itemId',value=`${id}`)
 		table
 			tr
