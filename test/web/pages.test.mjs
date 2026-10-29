@@ -11,8 +11,9 @@ test.before(async () => {
   admin = await web.login('admin');
   staff = await web.login('staff');
   const started = await admin.get('/execute/' + MODEL);
+  assert.equal(started.status, 302, `starting ${MODEL}: ${why(started)}`);
   instanceId = new URL(started.location, web.base).searchParams.get('id');
-  assert.ok(instanceId, 'an instance to show');
+  assert.ok(instanceId, `an instance to show: ${started.location}`);
 });
 test.after(async () => { await web?.stop(); setImmediate(() => process.exit(0)); });
 

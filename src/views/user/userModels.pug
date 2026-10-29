@@ -58,6 +58,7 @@ div(id="processes")
 		tr 
 			a(vertical-align="top")
 			form(name='ExecuteForm',action="/execute",method="post")
+				input(type='hidden', name='_csrf', value=_csrf)
 				input(type='hidden',name='processName',id='processName')
 				td
 					table

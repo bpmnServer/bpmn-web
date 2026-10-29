@@ -16,6 +16,7 @@ block content
 	
 	
 		form(name='InvokeForm',action="/invokeItem",method="post")
+			input(type='hidden', name='_csrf', value=_csrf)
 			input(type='hidden',name='itemId',id='itemId',value=`${id}`)
 			input(type='hidden',name='returnTo',id='returnTo',value=`${returnTo}`)
 

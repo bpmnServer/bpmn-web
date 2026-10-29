@@ -26,9 +26,9 @@ div.tasks-content
 				td #{caseId}
 				td #{item.fromNow}
 				td
-					if (user.userName==item.assignee)  || user.isAdmin()
-						a(href=`${ref1}`) Execute
-						<br />
+					//- assignment is optional: whoever may see a task (assignee, candidate, unassigned) may execute it
+					a(href=`${ref1}`) Execute
+					<br />
 					a(href=`${ref2}`) Assign
 				td #{item.assignee}
 				if user && user.isAdmin()
