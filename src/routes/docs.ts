@@ -49,7 +49,11 @@ const awaitAppDelegateFactory = (middleware) => {
         }
     }
 }
-var docsFolder=import.meta.dirname + '\\..\\..\\..\\bpmn-server/docs/';
+// bpmn-server's documentation: DOCS_PATH, else a bpmn-server checkout next to this one
+// (the npm package does not ship docs/). The README comes with the package.
+var docsFolder = process.env.DOCS_PATH ? path.resolve(process.env.DOCS_PATH) + path.sep
+    : path.resolve(import.meta.dirname, '../../../bpmn-server/docs') + path.sep;
+const packageReadme = path.resolve(import.meta.dirname, '../../node_modules/bpmn-server/README.md');
 export class Docs extends Common {
 
     constructor(app) {
@@ -68,9 +72,8 @@ export class Docs extends Common {
         router.use(this.isAuthenticated);
 
         router.get('/', function (request, response) {
-            let fileName =  '../README.md';
-            return processFile(fileName, response);
-
+            const readme = path.resolve(docsFolder, '../README.md');
+            return renderFile(FS.existsSync(readme) ? readme : packageReadme, response);
         });
         router.get('/api/*splat/:fileName', awaitAppDelegateFactory(async (request, response) => {
 
@@ -113,7 +116,7 @@ export class Docs extends Common {
         router.get('/readme_md', awaitAppDelegateFactory(async (request, response) => {
 
             let processName = request.params.process;
-            let fileName = import.meta.dirname + '/../node_modules/bpmn-server/README.md';
+            let fileName = packageReadme;
 
             let file = FS.readFileSync(fileName,
                 { encoding: 'utf8', flag: 'r' });
@@ -137,8 +140,13 @@ function processFile(fileName,response) {
         response.status(400).send('invalid path');
         return;
     }
-    fileName = resolved;
-
+    return renderFile(resolved, response);
+}
+function renderFile(fileName, response) {
+    if (!FS.existsSync(fileName)) {
+        response.status(404).send('Documentation not found; set DOCS_PATH to a bpmn-server docs folder.');
+        return;
+    }
     let file = FS.readFileSync(fileName);
 
 

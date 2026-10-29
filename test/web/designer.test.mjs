@@ -1,0 +1,119 @@
+// The model designer: list, import (with layout and preview), modeler save, rename, delete, export,
+// and that only administrators reach it.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { startWebApp, why, FIXTURES } from '../support/webApp.mjs';
+
+let web, admin, staff;
+test.before(async () => {
+  web = await startWebApp();
+  [admin, staff] = await Promise.all([web.login('admin'), web.login('staff')]);
+});
+test.after(async () => { await web?.stop(); setImmediate(() => process.exit(0)); });
+
+const modelNames = async () => (await web.bpmnServer.definitions.getList()).map(m => m.name ?? m);
+
+/** A process without diagram information, as exported by tools that only write the process. */
+const NO_DIAGRAM = `<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" id="d" targetNamespace="urn:test">
+  <bpmn:process id="Plain" isExecutable="true">
+    <bpmn:startEvent id="s" name="Start" />
+    <bpmn:userTask id="t" name="Do it" />
+    <bpmn:endEvent id="e" name="Done" />
+    <bpmn:sequenceFlow id="f1" sourceRef="s" targetRef="t" />
+    <bpmn:sequenceFlow id="f2" sourceRef="t" targetRef="e" />
+  </bpmn:process>
+</bpmn:definitions>`;
+
+const upload = (client, filename, content) =>
+  client.request('POST', '/model/import', { multipart: { file: { filename, content, type: 'application/xml' } } });
+
+test('the designer is for administrators only', async () => {
+  for (const url of ['/model/list', '/model/import', '/model/new', '/model/edit/leave-request'])
+    assert.equal((await staff.get(url)).status, 403, url);
+  assert.equal((await upload(staff, 'x.bpmn', NO_DIAGRAM)).status, 403);
+});
+
+test('the model list shows the definitions', async () => {
+  const res = await admin.get('/model/list');
+  assert.equal(res.status, 200, why(res));
+  assert.match(res.text, /leave-request/);
+});
+
+test('importing a model without a diagram lays it out, previews it and selects it', async () => {
+  const res = await upload(admin, 'plain.bpmn', NO_DIAGRAM);
+  assert.equal(res.status, 302, why(res));
+  assert.equal(res.location, '/');
+  const name = 'plain';
+  assert.ok((await modelNames()).includes(name), 'listed under the file name without its extension');
+
+  const source = await web.bpmnServer.definitions.getSource(name);
+  assert.match(source, /BPMNDiagram/, 'diagram information added');
+
+  const svg = await admin.get('/model/getSvg/' + encodeURIComponent(name));
+  assert.match(svg.text, /data-element-id="t"/, 'preview generated');
+
+  const home = await admin.get('/');
+  assert.match(home.text, /data-current-process="plain"/, 'imported model is selected');
+});
+
+test('importing a model with a diagram keeps it as it is', async () => {
+  const original = fs.readFileSync(path.join(FIXTURES, 'leave-request.bpmn'), 'utf8');
+  const res = await upload(admin, 'leave-copy.bpmn', original);
+  assert.equal(res.status, 302, why(res));
+  assert.ok((await modelNames()).includes('leave-copy'));
+  assert.equal(await web.bpmnServer.definitions.getSource('leave-copy'), original);
+});
+
+test('import refuses unsafe file names', async () => {
+  const res = await upload(admin, '..\\..\\evil.bpmn', NO_DIAGRAM);
+  assert.ok(!(await modelNames()).some(n => n.includes('evil') && n.includes('..')));
+  assert.ok([302, 400].includes(res.status), why(res));
+});
+
+test('the modeler saves a model with its diagram', async () => {
+  const bpmn = fs.readFileSync(path.join(FIXTURES, 'leave-request.bpmn'), 'utf8').replace('name="Leave request"', 'name="Leave request v2"');
+  const res = await admin.request('POST', '/model/edit/leave-request', { json: { processId: 'leave-request', bpmn, svg: '<svg xmlns="http://www.w3.org/2000/svg"><g data-element-id="Submit"/></svg>' } });
+  assert.equal(res.status, 200, why(res));
+  assert.match(await web.bpmnServer.definitions.getSource('leave-request'), /Leave request v2/);
+  assert.match((await admin.get('/model/getSvg/leave-request')).text, /data-element-id="Submit"/);
+});
+
+test('a new model opens the modeler with an empty diagram', async () => {
+  const res = await admin.post('/model/new', { processName: 'brand-new' });
+  assert.equal(res.status, 302);
+  assert.equal(res.location, '/model/add/brand-new');
+  const modeler = await admin.get(res.location);
+  assert.equal(modeler.status, 200, why(modeler));
+  assert.match(modeler.text, /bpmn/i);
+});
+
+test('models are renamed and deleted', async () => {
+  await upload(admin, 'to-rename.bpmn', NO_DIAGRAM);
+  const name = (await modelNames()).find(n => /^to-rename/.test(n));
+  let res = await admin.post('/model/rename', { processName: name, newName: 'renamed' });
+  assert.equal(res.status, 302, why(res));
+  let names = await modelNames();
+  assert.ok(names.includes('renamed') && !names.includes(name), names.join(','));
+
+  res = await admin.post('/model/delete', { processName: 'renamed' });
+  assert.equal(res.status, 302, why(res));
+  assert.ok(!(await modelNames()).includes('renamed'));
+});
+
+test('model names with path separators are refused', async () => {
+  const res = await admin.post('/model/rename', { processName: 'leave-request', newName: '../escape' });
+  assert.equal(res.status, 400);
+  assert.ok((await modelNames()).includes('leave-request'));
+});
+
+test('models are exported for download', async () => {
+  const page = await admin.get('/model/export');
+  assert.equal(page.status, 200);
+  assert.match(page.text, /leave-request/);
+  const file = await admin.get('/model/download/leave-request.bpmn');
+  assert.equal(file.status, 200, why(file));
+  assert.match(file.text, /<bpmn:definitions/);
+});

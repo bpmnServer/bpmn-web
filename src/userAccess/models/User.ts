@@ -35,23 +35,14 @@ const userSchema = new mongoose.Schema({
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', function save(this: any, next: any) {
+// Mongoose 9 no longer passes `next` to pre hooks: the hook is async, and a throw rejects the save.
+userSchema.pre('save', async function save(this: any) {
     const user = this;
     if (!user.isModified('password')) {
-        return next();
+        return;
     }
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-            return next(err);
-        }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-            if (err) {
-                return next(err);
-            }
-            user.password = hash;
-            next();
-        });
-    });
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
 });
 /**
  * Helper method for validating user's password.

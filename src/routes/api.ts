@@ -54,7 +54,7 @@ export class API extends Common {
 
             //console.log(request.body);
             let query;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
@@ -92,7 +92,7 @@ export class API extends Common {
 
             //console.log(request.body);
             let query,projection='full';
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
@@ -230,7 +230,7 @@ export class API extends Common {
 
             //console.log(request.body);
             let query, data,userName,assignment;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             if (request.body.data) {
@@ -268,7 +268,7 @@ export class API extends Common {
 
             //console.log('---------invoke',request.body);
             let query, data,userName,options;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             if (request.body.data) {
@@ -345,7 +345,7 @@ export class API extends Common {
         router.put('/engine/restart', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let query, data,startNodeId,userName,options;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             if (request.body.data) {
@@ -380,7 +380,7 @@ export class API extends Common {
         router.get('/engine/get', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let query;
-            if (request.body.query) {
+            if (request.body?.query) {
                 query = request.body.query;
             }
             else
@@ -634,7 +634,7 @@ export class API extends Common {
             router.delete('/datastore/deleteInstances', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
                 let query;
-                if (request.body.query) {
+                if (request.body?.query) {
                     query = request.body.query;
                 }
                 else
