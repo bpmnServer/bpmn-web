@@ -136,7 +136,7 @@ export class Model extends Common {
                 file.pipe(fstream);
                 fstream.on('close', async function () {
                     console.log("Upload Finished of " + safeName);
-                    const name = safeName;
+                    const name = safeName.replace(/\.(bpmn|xml)$/i, '');   // the model's name, not the file's: saved as <name>.bpmn
                     let source = fsx.readFileSync(filepath,
                         { encoding: 'utf8', flag: 'r' });
 
