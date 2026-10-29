@@ -64,7 +64,7 @@ html(lang="en")
 				tr
 					td #{item.name} - #{item.elementId} - #{item.itemKey}
 					td #{item.processName} 
-					td #{item.instanceData.caseId}
+					td #{item.instanceData ? item.instanceData.caseId : ''}
 					td #{item.fromNow}
 					td
 						if (user.userName==item.assignee)  || user.isAdmin()

@@ -21,7 +21,7 @@ table
 		if user && user.isAdmin()
 		tr
 			td #{instance.name}
-			td #{instance.data.caseId}
+			td #{instance.data ? instance.data.caseId : ''}
 			td #{instance.fromNow}
 			td #{instance.endFromNow} 
 			td

@@ -1,8 +1,9 @@
 import express from 'express';
 import FS from 'node:fs';
+import path from 'node:path';
 
 import { BPMNServer, dateDiff, Behaviour_names, SystemUser   } from '../index.js';
-import { BPMNAPI , SecureUser } from '../index.js';
+import { BPMNAPI , BPMNAdminAPI, SecureUser } from '../index.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
 
@@ -10,7 +11,6 @@ import { ViewHelper } from './ViewHelper.js';
 var caseId = Math.floor(Math.random() * 10000);
 
 
-const docsFolder = import.meta.dirname + '/../bpmnServer/docs/';
 
 // main functions
 
@@ -34,6 +34,7 @@ function awaitAppDelegateFactory (middleware) {
 var bpmnServer;
 var definitions;
 var bpmnAPI;
+var bpmnAdminAPI;
 
 export class EndUser extends Common {
     config() {
@@ -41,6 +42,7 @@ export class EndUser extends Common {
 
         bpmnServer = this.webApp.bpmnServer;
         bpmnAPI = new BPMNAPI(bpmnServer);
+        bpmnAdminAPI = new BPMNAdminAPI(bpmnServer);   // model reads; BPMNAPI has no model
         definitions = bpmnServer.definitions;
 
         // Deny-by-default: end-user task routes require a session.
@@ -51,14 +53,14 @@ export class EndUser extends Common {
         router.get('/', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
 		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             
-            display(request,response, 'Show');
+            return display(request,response, 'Show');
         }));
 
         router.get('/setUser', this.isAdmin, awaitAppDelegateFactory(async (request, response) => {
             setForUser(request);
             //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
 
-            display(request, response, 'Show');
+            return display(request, response, 'Show');
         }));
         router.get('/tasks', this.isAuthenticated, awaitAppDelegateFactory(async (request, response) => {
             console.log('/tasks');
@@ -69,7 +71,7 @@ export class EndUser extends Common {
         router.get('/readme_md', awaitAppDelegateFactory(async (request, response) => {
 
             let processName = request.params.process;
-            let fileName = docsFolder + '../README.md';
+            let fileName = path.resolve(import.meta.dirname, '../../node_modules/bpmn-server/README.md');
 
             let file = FS.readFileSync(fileName,
                 { encoding: 'utf8', flag: 'r' });
@@ -117,7 +119,7 @@ export class EndUser extends Common {
             request.session.processName = processName;
 		    //console.log("isAuthenticated", request.isAuthenticated(), 'user', request.user);
             
-            display(request,response, 'Show',processName);
+            return display(request,response, 'Show',processName);
         }));
 
         router.post('/execute', awaitAppDelegateFactory(async (request, response) => {
@@ -149,14 +151,16 @@ export class EndUser extends Common {
             let processName = request.query.processName;
             let elementId = request.query.elementId;
 
-            const instances = await bpmnAPI.data.findInstances({ "items.id": id }, getSecureUser(request), 'full');
-            const instance = instances[0];
+            // findItem authorizes the task; findInstances no longer returns data or items to non-admins
+            const item = await bpmnAPI.data.findItem({ "items.id": id }, getSecureUser(request));
+            if (!item) return response.status(403).send('Item not found or not authorized');
+            const instance = await bpmnServer.dataStore.findInstance({ id: item.instanceId }, 'full');
 
             let definition=await bpmnServer.definitions.loadFromInstance(instance);
 
             let { node, fields } =definition.getNodeInfo(elementId);
             
-            let vars = ViewHelper.formatData(instance.data);
+            let vars = ViewHelper.formatData(instance.data || {});
 console.log('fields',fields);
             if (fields && fields.length > 0) {
                 response.render('invokeItem', { node,
@@ -211,15 +215,14 @@ console.log('fields',fields);
                 return;
             }
 
-            const instances = await bpmnAPI.data.findInstances({ "id": item.instanceId }, getSecureUser(request),'full');
-            const instance = instances[0];
+            const instance = await bpmnServer.dataStore.findInstance({ id: item.instanceId }, 'full');   // item authorized above
             const lastItem = instance.items[instance.items.length - 1];
 
             let definition=await bpmnServer.definitions.loadFromInstance(instance);
             let { node, fields } =definition.getNodeInfo(elementId);
             console.log('fieldsDef:',fields);
 
-            let vars = ViewHelper.formatData(instance.data);
+            let vars = ViewHelper.formatData(instance.data || {});
             response.render('assign', {
                     item, instance, vars, lastItem,
                     dueDate: ViewHelper.dateDisplay(item.dueDate),
@@ -275,7 +278,7 @@ console.log('fields',fields);
                 displayError(response, exec.errors);
             }
 
-            display(request,response, 'Run Prcesses', exec.instance.logs, exec.instance.items);
+            return display(request,response, 'Run Prcesses', exec.instance.logs, exec.instance.items);
         }));
         router.get('/instanceDetails', awaitAppDelegateFactory(async (request, response) => {
 
@@ -305,7 +308,7 @@ console.log('fields',fields);
             item['dueFrom'] = dateDiff(item.dueDate);
             item['followFrom'] = dateDiff(item.followUpDate);
         });
-        let starts = await bpmnAPI.model.findStartEvents({}, getSecureUser(request));
+        let starts = await bpmnAdminAPI.model.findStartEvents({}, getSecureUser(request));
 
 
         await response.render('tasks',
@@ -332,7 +335,7 @@ async function home(request, response)  {
 
 
 
-        display(request,response, 'Show');
+        return display(request,response, 'Show');
 }
 
 
@@ -437,7 +440,7 @@ async function display(req,res, title, logs = [], items = []) {
         else
             item['endFromNow'] = '';
     });
-    let procs=await ViewHelper.getProcs(bpmnAPI,process);
+    let procs=await ViewHelper.getProcs(bpmnAdminAPI,process);
     let procsDocs=ViewHelper.getProcsDocs(procs);
 
     res.render('user/home',
@@ -480,13 +483,13 @@ async function instanceDetails(request,response,instanceId) {
     await def.load();
     const defJson = def.getJson();
     
-    let vars = ViewHelper.formatData(instance.data);
+    let vars = ViewHelper.formatData(instance.data || {});
 
     let decorations = JSON.stringify(ViewHelper.calculateDecorations(instance.items,instance.tokens));
 
-    response.render('user/InstanceDetails',
+    response.render('InstanceDetails',
         {
-            instance, vars,
+            instance, vars, request, user: getSecureUser(request),
             accessRules: def.accessRules,
             title: 'Instance Details',
             logs,items: instance.items, svg,

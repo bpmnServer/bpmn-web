@@ -214,14 +214,16 @@ export class WebApp {
 
 
 
-		this.app.use('/', (new Workflow(this)).config());
-		this.app.use('/user', (new EndUser(this)).config());
-		this.app.use('/docs', (new Docs(this)).config());
-		this.app.use('/model', (new Model(this)).config());
+		// API routers first: the UI router at '/' requires a session for every path it sees,
+		// which would send API-key callers to /login.
 		this.app.use('/api', (new API(this)).config());
 		this.app.use('/api2', (new API2(this)).config());
 		this.app.use('/admin/api', (new API(this)).adminConfig());
 		this.app.use('/admin/api2', (new API2(this)).adminConfig());
+		this.app.use('/', (new Workflow(this)).config());
+		this.app.use('/user', (new EndUser(this)).config());
+		this.app.use('/docs', (new Docs(this)).config());
+		this.app.use('/model', (new Model(this)).config());
 
 
 	}
