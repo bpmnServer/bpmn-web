@@ -133,7 +133,7 @@ export class Model extends Common {
                 file.on('data', chunk => chunks.push(chunk));
                 file.on('end', async function () {
                     console.log("Upload Finished of " + safeName);
-                    const name = safeName;
+                    const name = safeName.replace(/\.(bpmn|xml)$/i, '');   // the model's name, not the file's: saved as <name>.bpmn
                     let source = Buffer.concat(chunks).toString('utf8');
 
                     // files without diagram information (BPMN DI) can't be drawn by the modeler
