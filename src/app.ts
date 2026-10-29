@@ -25,6 +25,7 @@ import { Docs } from './routes/docs.js';
 import { Model } from './routes/model.js';
 import { API } from './routes/api.js';
 import { API2 } from './routes/api2.js';
+import { errorDetailsHandler } from './routes/middleware/errorDetails.js';
 
 const __dirname = import.meta.dirname;
 console.log('app.ts from ', import.meta.filename);
@@ -130,10 +131,7 @@ export class WebApp {
 			// only use in development
 			app.use(errorHandler());
 		} else {
-			app.use((err, req, res, next) => {
-				console.error(err);
-				res.status(500).send('Server Error');
-			});
+			app.use(errorDetailsHandler);
 		}
 
 	}
@@ -229,45 +227,3 @@ export class WebApp {
 	}
 
 }
-
-/** Main logic
-*/
-/**
- * Load environment variables from .env file, where API keys and passwords are configured.
- */
-function setupEnvVars() {
-	dotenv.config();
-	var argv = process.argv;
-	var args = {};
-	for (let i = 2; i < argv.length; i++) {
-		const key = argv[i];
-		const val = argv[++i];
-		process.env[key] = val;
-	}
-}
-
-
-setupEnvVars();
-
-/**
- * Warn (don't hard-fail — this is a demo) about unsafe/incomplete config:
- *  - an empty API_KEY previously authenticated EVERY /api request
- *    (`undefined == undefined`); the middleware now fails closed, but a
- *    misconfigured server should still be flagged;
- *  - REQUIRE_AUTHENTICATION=false disables all UI auth.
- */
-function warnBootConfig() {
-    const warnings: string[] = [];
-    if (!process.env.API_KEY) warnings.push('API_KEY is not set — /api and /api2 will reject all requests (fail closed).');
-    if (!process.env.API_SERVICE_USER_NAME || !process.env.API_SERVICE_USER_GROUPS)
-        warnings.push('API_SERVICE_USER_NAME and API_SERVICE_USER_GROUPS are required for /api2.');
-    if (!process.env.SESSION_SECRET) warnings.push('SESSION_SECRET is not set — sessions/CSRF cannot be secured.');
-    if (process.env.REQUIRE_AUTHENTICATION === 'false') warnings.push('REQUIRE_AUTHENTICATION=false — UI authentication is DISABLED (dev only).');
-    if (warnings.length) console.warn('[config] ' + warnings.join('\n[config] '));
-}
-
-warnBootConfig();
-
-const webApp = new WebApp();
-
-export default webApp.app;

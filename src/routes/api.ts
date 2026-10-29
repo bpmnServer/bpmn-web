@@ -2,7 +2,7 @@ import express from 'express';
 import FS from 'node:fs';
 //import { ExecuteDecisionTable, ExecuteCondition, ExecuteExpression } from 'dmn-engine';
 
-import { BPMNServer, dateDiff, Behaviour_names, CacheManager   } from '../index.js';
+import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
 
 //const bpmnServer = new BPMNServer(config);
 
@@ -182,7 +182,7 @@ export class API extends Common {
             try {
 
                 var list = [];
-                CacheManager.liveInstances.forEach(exec => {
+                (this.bpmnServer.cache.list() || []).forEach(exec => {   // this server's live executions
                     list.push({ instance: exec.instance, currentItem: exec.item.id,currentElement: exec.item.elementId, status: exec.instance.status });
                 });
                 response.json({cache:list,engine: this.bpmnServer.engine.status()});

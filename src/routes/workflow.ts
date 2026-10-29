@@ -5,6 +5,7 @@ import { BPMNServer, dateDiff, Behaviour_names   } from '../index.js';
 import { BPMNAPI , SecureUser } from '../index.js';
 import { Common } from './common.js';
 import { ViewHelper } from './ViewHelper.js';
+import { bpmnToSvg } from './bpmnToSvg.js';
 
 
 var caseId = Math.floor(Math.random() * 10000);
@@ -528,7 +529,10 @@ async function instanceDetails(request,response,instanceId,version) {
         svg= instance.svg;
         if (!svg)
             svg = await definitions.getSVG(instance.name);
-
+        // decorations and the replay animation find elements by data-element-id; older generated
+        // previews lack it, so draw the diagram again from the instance's model
+        if (!svg || !svg.includes('data-element-id'))
+            svg = (await bpmnToSvg(instance.source || await definitions.getSource(instance.name))) || svg;
     }
     catch (ex) {
 

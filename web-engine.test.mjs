@@ -6,7 +6,7 @@ import { MyAppDelegate } from './dist/sample-app/appDelegate.js';
 import { MemoryMongoDB } from './MemoryMongoDB.mjs';
 import { fileURLToPath } from 'node:url';
 
-const PROC = fileURLToPath(new URL('./src/test/processes/', import.meta.url));
+const PROC = fileURLToPath(new URL('./test/processes/', import.meta.url));
 const logger = new Logger({ toConsole: false });
 
 const configuration = new Configuration({

@@ -8,6 +8,8 @@ import { ViewHelper } from './ViewHelper.js';
 
 import FS from 'node:fs';
 import path from 'node:path';
+import { layoutProcess } from 'bpmn-auto-layout';
+import { bpmnToSvg } from './bpmnToSvg.js';
 
 import { BPMNServer,BPMNAPI} from '../index.js';
 import { Common } from './common.js';
@@ -134,12 +136,31 @@ export class Model extends Common {
                 file.pipe(fstream);
                 fstream.on('close', async function () {
                     console.log("Upload Finished of " + safeName);
-                    const name = safeName;
-                    const source = fsx.readFileSync(filepath,
+                    const name = safeName.replace(/\.(bpmn|xml)$/i, '');   // the model's name, not the file's: saved as <name>.bpmn
+                    let source = fsx.readFileSync(filepath,
                         { encoding: 'utf8', flag: 'r' });
 
+                    // files without diagram information (BPMN DI) can't be drawn by the modeler
+                    if (!/<(\w+:)?BPMNDiagram[\s>]/.test(source)) {
+                        try {
+                            source = await layoutProcess(source);
+                        }
+                        catch (exc) {
+                            console.log('auto-layout error:', exc);
+                        }
+                    }
+
+                    let svg = null;
                     try {
-                    await definitions.save(name, source, null);
+                        svg = await bpmnToSvg(source);
+                    }
+                    catch (exc) {
+                        console.log('svg render error:', exc);
+                    }
+
+                    try {
+                    await definitions.save(name, source, svg);
+                    req.session.processName = name;     // focus the imported model on the home page
                     }
                     catch(exc)
                     {
@@ -300,6 +321,14 @@ export class Model extends Common {
             let fileName = import.meta.dirname + '/../processes/' + processName + '.svg';
 
             let svg = await definitions.getSVG(processName);
+            if (!svg) {     // models saved without a preview, e.g. imported before previews were generated
+                try {
+                    svg = await bpmnToSvg(await definitions.getSource(processName));
+                }
+                catch (exc) {
+                    console.log('svg render error:', exc);
+                }
+            }
 
             response.header("Content-Type", "image/svg+xml");
             response.send(svg);

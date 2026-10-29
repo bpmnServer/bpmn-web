@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="6.5.1">
+  <bpmn:collaboration id="Collaboration_PropertyInsuranceClaim">
+    <bpmn:participant id="Participant_PropertyInsuranceClaim" name="Property Insurance Claim" processRef="Process_PropertyInsuranceClaim" />
+  </bpmn:collaboration>
+  <bpmn:message id="Message_PaymentConfirmation" name="Payment Confirmation" />
+  <bpmn:process id="Process_PropertyInsuranceClaim" name="Property Insurance Claim" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_ClaimReceived" name="Claim received">
+      <bpmn:messageEventDefinition id="MessageEventDefinition_ClaimReceived" />
+      <bpmn:outgoing>Flow_Start_Verify</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_VerifyCoverage" name="Verify policy coverage">
+      <bpmn:documentation>The system evaluates the claim against the policy coverage rules and stores the result in claimCovered.</bpmn:documentation>
+      <bpmn:incoming>Flow_Start_Verify</bpmn:incoming>
+      <bpmn:outgoing>Flow_Verify_CoverageGateway</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_Coverage" name="Is the claim covered?" default="Flow_NotCovered_Reject" gatewayDirection="Diverging">
+      <bpmn:incoming>Flow_Verify_CoverageGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Covered_Assign</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NotCovered_Reject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_AssessClaim" name="Assess claim" camunda:candidateGroups="ClaimsAssessors">
+      <bpmn:incoming>Flow_Covered_Assign</bpmn:incoming>
+      <bpmn:outgoing>Flow_Assess_PaymentWait</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="Event_PaymentConfirmed" name="Wait for payment confirmation">
+      <bpmn:incoming>Flow_Assess_PaymentWait</bpmn:incoming>
+      <bpmn:outgoing>Flow_Payment_Settle</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_PaymentConfirmation" messageRef="Message_PaymentConfirmation" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Task_MarkSettled" name="Mark claim as settled">
+      <bpmn:incoming>Flow_Payment_Settle</bpmn:incoming>
+      <bpmn:outgoing>Flow_Settle_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_RejectClaim" name="Reject claim">
+      <bpmn:documentation>The system rejects the claim because claimCovered is false.</bpmn:documentation>
+      <bpmn:incoming>Flow_NotCovered_Reject</bpmn:incoming>
+      <bpmn:outgoing>Flow_Reject_End</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_Settled" name="Claim settled">
+      <bpmn:incoming>Flow_Settle_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="EndEvent_Rejected" name="Claim rejected">
+      <bpmn:incoming>Flow_Reject_End</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_Start_Verify" sourceRef="StartEvent_ClaimReceived" targetRef="Task_VerifyCoverage" />
+    <bpmn:sequenceFlow id="Flow_Verify_CoverageGateway" sourceRef="Task_VerifyCoverage" targetRef="Gateway_Coverage" />
+    <bpmn:sequenceFlow id="Flow_Covered_Assign" name="Covered" sourceRef="Gateway_Coverage" targetRef="Task_AssessClaim">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${claimCovered == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_NotCovered_Reject" name="Not covered" sourceRef="Gateway_Coverage" targetRef="Task_RejectClaim" />
+    <bpmn:sequenceFlow id="Flow_Assess_PaymentWait" sourceRef="Task_AssessClaim" targetRef="Event_PaymentConfirmed" />
+    <bpmn:sequenceFlow id="Flow_Payment_Settle" sourceRef="Event_PaymentConfirmed" targetRef="Task_MarkSettled" />
+    <bpmn:sequenceFlow id="Flow_Settle_End" sourceRef="Task_MarkSettled" targetRef="EndEvent_Settled" />
+    <bpmn:sequenceFlow id="Flow_Reject_End" sourceRef="Task_RejectClaim" targetRef="EndEvent_Rejected" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PropertyInsuranceClaim">
+    <bpmndi:BPMNPlane id="BPMNPlane_PropertyInsuranceClaim" bpmnElement="Collaboration_PropertyInsuranceClaim">
+      <bpmndi:BPMNShape id="Participant_PropertyInsuranceClaim_di" bpmnElement="Participant_PropertyInsuranceClaim" isHorizontal="true"><dc:Bounds x="120" y="40" width="1300" height="360" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_ClaimReceived_di" bpmnElement="StartEvent_ClaimReceived"><dc:Bounds x="170" y="190" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VerifyCoverage_di" bpmnElement="Task_VerifyCoverage"><dc:Bounds x="250" y="168" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Coverage_di" bpmnElement="Gateway_Coverage" isMarkerVisible="true"><dc:Bounds x="420" y="183" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AssessClaim_di" bpmnElement="Task_AssessClaim"><dc:Bounds x="530" y="168" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_PaymentConfirmed_di" bpmnElement="Event_PaymentConfirmed"><dc:Bounds x="710" y="190" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MarkSettled_di" bpmnElement="Task_MarkSettled"><dc:Bounds x="810" y="168" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Settled_di" bpmnElement="EndEvent_Settled"><dc:Bounds x="1000" y="190" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RejectClaim_di" bpmnElement="Task_RejectClaim"><dc:Bounds x="530" y="300" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Rejected_di" bpmnElement="EndEvent_Rejected"><dc:Bounds x="710" y="322" width="36" height="36" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_Start_Verify_di" bpmnElement="Flow_Start_Verify"><di:waypoint x="206" y="208" /><di:waypoint x="250" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Verify_CoverageGateway_di" bpmnElement="Flow_Verify_CoverageGateway"><di:waypoint x="370" y="208" /><di:waypoint x="420" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Covered_Assign_di" bpmnElement="Flow_Covered_Assign"><di:waypoint x="470" y="208" /><di:waypoint x="530" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NotCovered_Reject_di" bpmnElement="Flow_NotCovered_Reject"><di:waypoint x="445" y="233" /><di:waypoint x="445" y="340" /><di:waypoint x="530" y="340" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Assess_PaymentWait_di" bpmnElement="Flow_Assess_PaymentWait"><di:waypoint x="650" y="208" /><di:waypoint x="710" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Payment_Settle_di" bpmnElement="Flow_Payment_Settle"><di:waypoint x="746" y="208" /><di:waypoint x="810" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Settle_End_di" bpmnElement="Flow_Settle_End"><di:waypoint x="930" y="208" /><di:waypoint x="1000" y="208" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Reject_End_di" bpmnElement="Flow_Reject_End"><di:waypoint x="650" y="340" /><di:waypoint x="710" y="340" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
