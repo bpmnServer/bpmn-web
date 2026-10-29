@@ -44,8 +44,9 @@ export interface ErrorDetails {
     time: string;
 }
 
-export function describeError(err, req): ErrorDetails {
-    const raw = err?.status ?? err?.statusCode;
+export function describeError(err, req, res?): ErrorDetails {
+    // middleware such as lusca (CSRF) sets the response status, then passes a plain Error
+    const raw = err?.status ?? err?.statusCode ?? (res?.statusCode >= 400 ? res.statusCode : undefined);
     const status = Number.isInteger(raw) && raw >= 400 && raw <= 599 ? raw : 500;
     const message = err instanceof Error ? err.message : (typeof err === 'string' ? err : 'Unexpected error');
     const details: ErrorDetails = {
@@ -66,7 +67,7 @@ function escapeHtml(value: string): string {
 }
 
 export function errorDetailsHandler(err, req, res, next): void {
-    const details = describeError(err, req);
+    const details = describeError(err, req, res);
     console.error(`[error ${details.reference}] ${details.method} ${details.path}`, err);
     if (res.headersSent) {
         next(err);

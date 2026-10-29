@@ -300,6 +300,8 @@ let svg;
     }
     decorMap = new Map();
     function scanSVG() {
+            // every page loads this script; only instance pages define decorations
+            if (typeof decorations === 'undefined') return;
 
             /**
              *  Modification to SVG 

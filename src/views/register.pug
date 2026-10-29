@@ -7,6 +7,7 @@ block content
 				h1.text-center.login-title Registration Details
 					div.signup-wall
 						form(class='form-signin', action='/signup', method='POST')
+							input(type='hidden', name='_csrf', value=_csrf)
 							input(type='text', name='username', class='form-control', placeholder='Username',required, autofocus)
 							input(type='password', name='password', class='form-control nomargin', placeholder='Password', required)
 							input(type='email', name='email', class='form-control', placeholder='Email',required)

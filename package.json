@@ -19,8 +19,10 @@
     "start": "node --import tsx src/main.ts",
     "start:prod": "node dist/main.js",
     "clean": "tsc --build --clean",
-    "test": "npm run test:unit && npm run test:engine && npm run test:web",
+    "test": "npm run test:unit && npm run test:client && npm run test:engine && npm run test:web",
+    "test:client": "node --test \"client-tests/*.test.mjs\"",
     "test:engine": "node --test web-engine.test.mjs",
+    "test:ui": "node --test --test-concurrency=1 \"test/ui/*.test.mjs\"",
     "test:web": "node --test --test-concurrency=1 \"test/web/*.test.mjs\"",
     "test:unit": "node --test apikey-auth.test.mjs web-security.test.mjs account-security.test.mjs dashboard-header.test.mjs error-details.test.mjs bpmn-svg.test.mjs architecture-boundary.test.mjs admin-route-boundary.test.mjs"
   },

@@ -140,7 +140,7 @@ export class API2 extends Common {
                 lastItem={},
                 latestItem={},
                 getTotalCount= false
-              } = request.body;
+              } = request.body ?? {};   // a GET may come without a body
 
               limit=Number.parseInt(limit); // ensure limit is a number
             
@@ -153,9 +153,9 @@ export class API2 extends Common {
             catch (exc) {
                 error = exc.toString();
                 console.log(error);
-                response.error=error;
             }
-            response.json(results);
+            if (!error && results && results.error) error = results.error;   // the store reports some failures as { error }
+            response.json(error ? { errors: error } : results);
         }));
         router.get('/data/fieldInfo', loggedIn, this.requireSystem, awaitAppDelegateFactory(async (request, response) => {
     
@@ -187,7 +187,7 @@ export class API2 extends Common {
 
                 let data = ViewHelper.formatData(instance.data);
     
-                response.json({ errors: [], node: JSON.parse(node2),fields ,data });
+                response.json({ node: JSON.parse(node2),fields ,data });
             }));
         router.delete('/data/deleteInstances', loggedIn, this.requireAdmin, awaitAppDelegateFactory(async (request, response) => {
 
@@ -234,7 +234,7 @@ export class API2 extends Common {
                 response.json(context.instance);
             }
             catch (exc) {
-                response.json({ error: exc.toString() });
+                response.json({ errors: exc.toString() });
             }
         }));
 ///
@@ -333,7 +333,7 @@ export class API2 extends Common {
             }
             catch (exc) {
                 console.log(exc);
-                response.json({ error: exc.toString() });
+                response.json({ errors: exc.toString() });
             }
         }));
 
@@ -403,11 +403,13 @@ export class API2 extends Common {
             }
             catch (exc) {
                 console.log(exc);
-                response.json({ error: exc.toString() });
+                response.json({ errors: exc.toString() });
             }
         }));
 
 
+        // an unknown API path is the caller's mistake: answer it here, not with the UI's login redirect
+        router.use((request, response) => response.status(404).json({ errors: `No API route ${request.method} ${request.originalUrl.split('?')[0]}` }));
         return router;
     }
 
@@ -507,7 +509,7 @@ export class API2 extends Common {
             }
             catch (exc) {
                 console.log('error:',exc);
-                response.json({ errors: exc });
+                response.json({ errors: exc.toString() });
             }
         });
 
@@ -567,9 +569,11 @@ export class API2 extends Common {
             }
             catch (exc) {
                 console.log(exc);
-                response.json({ errors: JSON.stringify(exc, null, 2) });
+                response.json({ errors: exc.toString() });
             }
         }));
+        // an unknown API path is the caller's mistake: answer it here, not with the UI's login redirect
+        router.use((request, response) => response.status(404).json({ errors: `No API route ${request.method} ${request.originalUrl.split('?')[0]}` }));
         return router;
     }
 }

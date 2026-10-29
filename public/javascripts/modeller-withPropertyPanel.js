@@ -158,7 +158,7 @@ var bpmnModeler = new _Modeler.default({
 });
 */
 
-BPMNModeler =bpmnModeler;
+window.BPMNModeler = bpmnModeler;   // an undeclared global throws in strict mode
 
 container.removeClass('with-diagram');
 

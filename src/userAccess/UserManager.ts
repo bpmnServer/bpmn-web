@@ -75,18 +75,15 @@ export class UserManager {
 		this.app.use(passport.session());
 		this.app.use(flash());
 		
-		this.app.use((req, res, next) => {
-			if (req.path === '/api/upload') {
-				// Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
-				next();
-			} else {
-				lusca.csrf({
-					cookie: { name: '_csrf' },
-					allowlist: '/',
-					secret: process.env.SESSION_SECRET
-				})(req, res, next);
-			}
-		}); 
+		// CSRF protection for the session-authenticated UI. The API routers authenticate with an
+		// API key, not a cookie, so they are exempt. (The previous allowlist '/' exempted every path.)
+		// Forms send the token as _csrf; scripts as the X-CSRF-Token header (public/javascripts/csrf.js).
+		const csrf = lusca.csrf({
+			cookie: { name: '_csrf' },
+			secret: process.env.SESSION_SECRET,
+		});
+		const apiPath = /^\/(admin\/)?api2?(\/|$)/;
+		this.app.use((req, res, next) => apiPath.test(req.path) ? next() : csrf(req, res, next));
 
 	} 
 	setup() {

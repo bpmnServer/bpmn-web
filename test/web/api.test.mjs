@@ -50,9 +50,22 @@ test('a task is assigned through /api2', async () => {
   assert.equal(waitingAt(saved, 'Submit').assignee, 'manager');
 });
 
-test('starting an unknown model reports an error', async () => {
-  const res = await web.api('POST', '/api2/engine/start', { name: 'no-such-model', data: {} });
-  assert.ok(res.body.error || res.status >= 400, JSON.stringify(res.body));
+test('failures are reported as { errors } on both APIs', async () => {
+  for (const url of ['/api2/engine/start', '/api/engine/start']) {
+    const res = await web.api('POST', url, { name: 'no-such-model', data: {} });
+    assert.equal(typeof res.body.errors, 'string', `${url}: ${JSON.stringify(res.body)}`);
+    assert.match(res.body.errors, /no-such-model/);
+    assert.equal(res.body.error, undefined, `${url}: no { error }`);
+  }
+  const invoked = await web.api('PUT', '/api2/engine/invoke', { query: { id: 'no-such-instance' }, data: {} });
+  assert.equal(typeof invoked.body.errors, 'string', JSON.stringify(invoked.body));
+});
+
+test('successful answers carry no errors', async () => {
+  const started = await web.api('POST', '/api2/engine/start', { name: MODEL, data: {} });
+  assert.equal(started.body.errors, undefined);
+  const found = await web.api('POST', '/api2/data/findItems', { query: { id: started.body.id } });
+  assert.equal(found.body.errors, undefined);
 });
 
 test('instances are found through /api2', async () => {
