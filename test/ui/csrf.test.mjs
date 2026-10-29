@@ -80,7 +80,7 @@ test('the import page uploads (multipart, token as a header)', async () => {
   await Promise.all([page.waitForURL(web.base + '/'), page.click('input[type=submit][value=Import]')]);
   assert.deepEqual(refused, []);
   assert.deepEqual(errors, []);
-  assert.equal(await page.inputValue('#process'), 'browser-import.bpmn');
+  assert.equal(await page.inputValue('#process'), 'browser-import', 'selected under the file name without its extension');
   await close();
 });
 
