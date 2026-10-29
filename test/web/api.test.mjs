@@ -100,3 +100,23 @@ test('the admin key alone does not let a non-administrator service account chang
   assert.equal(res.status, 403);
   assert.ok(!JSON.stringify((await web.api('GET', '/admin/api2/model/list', undefined, ADMIN_API_KEY)).body).includes('api-model'));
 });
+
+test('the runtime API reads models: list, start events, events', async () => {
+  const list = await web.api('GET', '/api2/model/list');
+  assert.equal(list.status, 200);
+  assert.ok(list.body.some(m => (m.name ?? m) === MODEL), JSON.stringify(list.body).slice(0, 200));
+  const starts = await web.api('GET', '/api2/model/findStartEvents');
+  assert.equal(starts.status, 200);
+  assert.ok(starts.body.some(e => (e.modelName ?? e.name) === MODEL), JSON.stringify(starts.body).slice(0, 300));
+  assert.equal((await web.api('GET', '/api2/model/findEvents')).status, 200);
+});
+
+test('the runtime API can not change models', async () => {
+  for (const [method, url] of [['POST', '/api2/model/rename'], ['POST', '/api2/model/delete'], ['POST', '/api2/model/import/x']]) {
+    const res = await web.api(method, url, { name: MODEL, newName: 'x' });
+    assert.notEqual(res.status, 200, url);
+  }
+  const names = (await web.bpmnServer.definitions.getList()).map(m => m.name ?? m);
+  assert.ok(names.includes(MODEL));
+});
+

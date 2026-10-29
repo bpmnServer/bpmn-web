@@ -72,9 +72,8 @@ test('model administration over the API needs the admin key', async () => {
 });
 
 test('the runtime API does not expose model administration', async () => {
-  const res = await web.api('GET', '/api2/model/list');
+  const res = await web.api('POST', '/api2/model/delete', { name: 'leave-request' });
   assert.notEqual(res.status, 200);
-  assert.ok(!Array.isArray(res.body), 'no model list');
 });
 
 test('unknown API paths answer 404 JSON', async () => {

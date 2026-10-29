@@ -57,6 +57,19 @@ export class API2 extends Common {
         let self = this;
 
 
+        // Reading models (bpmn-server >= 3.2: BPMNAPI.model is read-only). What a client needs to
+        // offer processes: the list, start events the service account may use, events. Changing
+        // models stays under /admin/api2.
+        router.get('/model/list', awaitAppDelegateFactory(async (request, response) => {
+            response.json(await api.model.list(request.body?.query ?? {}, self.getUser(request)));
+        }));
+        router.get('/model/findEvents', awaitAppDelegateFactory(async (request, response) => {
+            response.json(await api.model.findEvents(request.body?.query ?? {}, self.getUser(request)));
+        }));
+        router.get('/model/findStartEvents', awaitAppDelegateFactory(async (request, response) => {
+            response.json(await api.model.findStartEvents(request.body?.query ?? {}, self.getUser(request)));
+        }));
+
         router.get('/status', loggedIn, awaitAppDelegateFactory(async (request, response) => {
 
             let status;
