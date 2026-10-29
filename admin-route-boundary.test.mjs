@@ -13,10 +13,13 @@ test('legacy operational router excludes definition administration', () => {
   assert.equal(paths(api.adminConfig()).some((path) => path.startsWith('/definitions')), true);
 });
 
-test('authorized operational router excludes model administration', () => {
+test('authorized operational router reads models but excludes model administration', () => {
   const api = new API2(webApp);
-  assert.equal(paths(api.config()).some((path) => path.startsWith('/model')), false);
-  assert.equal(paths(api.adminConfig()).some((path) => path.startsWith('/model')), true);
+  const runtimeModel = paths(api.config()).filter((path) => path.startsWith('/model')).sort();
+  assert.deepEqual(runtimeModel, ['/model/findEvents', '/model/findStartEvents', '/model/list']);
+  const admin = paths(api.adminConfig());
+  for (const write of ['/model/import{/:name}', '/model/rename', '/model/delete'])
+    assert.ok(admin.includes(write), write);
 });
 
 test.after(() => { setImmediate(() => process.exit(0)); });
